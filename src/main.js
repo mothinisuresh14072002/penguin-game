@@ -3,18 +3,30 @@ import './style.css';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
- {id:'penguin',name:'Pip the Penguin',cost:0,icon:'🐧',color:0x181f2b},
- {id:'fox',name:'Frost the Fox',cost:120,icon:'🦊',color:0xe57936},
- {id:'seal',name:'Splash the Seal',cost:260,icon:'🦭',color:0x869da9},
- {id:'bear',name:'Boris the Bear',cost:450,icon:'🐻‍❄️',color:0xf5f4ed},
- {id:'royal',name:'Royal Penguin',cost:700,icon:'👑',color:0x4c8fe8},
+ {id:'bunny',name:'Bella Bunny',cost:0,icon:'🐰',color:0xf9e5ef,biome:'meadow'},
+ {id:'unicorn',name:'Ula Unicorn',cost:150,icon:'🦄',color:0xf5e5ff,biome:'rainbow'},
+ {id:'horse',name:'Hugo Horse',cost:250,icon:'🐴',color:0xbf8557,biome:'grassland'},
+ {id:'cat',name:'Coco Cat',cost:350,icon:'🐱',color:0xe9a965,biome:'city'},
+ {id:'dog',name:'Dodo Dog',cost:450,icon:'🐶',color:0xc58b55,biome:'park'},
+ {id:'penguin',name:'Pip Penguin',cost:0,icon:'🐧',color:0x181f2b,biome:'arctic'},
+ {id:'cow',name:'Mimi Cow',cost:700,icon:'🐮',color:0xf9f9ed,biome:'farm'},
 ];
-const KEY='penguin-ice-runner-v2';
+const BIOMES={
+ meadow:{name:'Bunny Meadow',sky:0xace5f8,fog:0xe5f6ef,ground:0x84c975,edge:0x5caa86,accent:0xf8b7d5,track:0xb9de94,decor:'flower',hazards:['rock','log']},
+ rainbow:{name:'Unicorn Skyland',sky:0xdbc5fb,fog:0xf7e8fc,ground:0xe5dafa,edge:0x967ec4,accent:0xffa2d8,track:0xf6e4ff,decor:'star',hazards:['spike','rock']},
+ grassland:{name:'Horse Prairie',sky:0x99d4f9,fog:0xd5edfa,ground:0x9ecb70,edge:0x658f5a,accent:0xf5d48b,track:0xd8c58a,decor:'hay',hazards:['log','rock']},
+ city:{name:'Cat Town',sky:0xa4c6e9,fog:0xd3dcf1,ground:0xcbb9ae,edge:0x8d97b0,accent:0xf2b47d,track:0xf0e4d9,decor:'house',hazards:['log','rock']},
+ park:{name:'Puppy Park',sky:0x93d5fc,fog:0xd6f1fd,ground:0x82cd7a,edge:0x519885,accent:0xffd07b,track:0xc2dda5,decor:'tree',hazards:['log','rock']},
+ arctic:{name:'Penguin Glacier',sky:0x80caef,fog:0xb9e8ff,ground:0xf3fbff,edge:0x309ac8,accent:0x75e1ff,track:0x8fddf1,decor:'ice',hazards:['spike','rock','lion']},
+ farm:{name:'Mimi Farm',sky:0xb7dbef,fog:0xe6ecdb,ground:0x91c579,edge:0x967451,accent:0xffd49a,track:0xdbc69e,decor:'barn',hazards:['log','rock']}
+};
+const KEY='penguin-ice-runner-v3';
+const LEGACY_KEY='penguin-ice-runner-v2';
 let saved;
-try { saved=JSON.parse(localStorage.getItem(KEY)||'{}'); } catch { saved={}; }
+try { saved=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(LEGACY_KEY)||'{}'); } catch { saved={}; }
 const validIds=new Set(CHARS.map(c=>c.id));
-const profile={coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['penguin'],selected:saved.selected||'penguin'};
-if(!profile.unlocked.includes('penguin'))profile.unlocked.push('penguin');
+const profile={coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['bunny','penguin'],selected:saved.selected||'bunny'};
+for(const id of ['bunny','penguin'])if(!profile.unlocked.includes(id))profile.unlocked.push(id);
 if(!profile.unlocked.includes(profile.selected))profile.selected='penguin';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(profile))}catch{}};
 let audioEnabled=false,audioContext=null;
@@ -50,42 +62,55 @@ const sphere=new THREE.SphereGeometry(1,18,12),cube=new THREE.BoxGeometry(1,1,1)
 function part(parent,geo,m,x=0,y=0,z=0,sx=1,sy=1,sz=1){const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
 const orb=(p,m,x,y,z,sx,sy,sz)=>part(p,sphere,m,x,y,z,sx,sy,sz);
 function model(id){
- const group=new THREE.Group(),skin=mat(CHARS.find(c=>c.id===id).color),ear=mat(0x98533a),tan=mat(0xf7e9d8),black=mat(0x090d12,.2);
+ const group=new THREE.Group(),ch=CHARS.find(c=>c.id===id)||CHARS[0],skin=mat(ch.color),black=mat(0x1c2631),cream=mat(0xffefe3),rose=mat(0xf4a8b3),brown=mat(0x8c563a),pinkNose=mat(0xe9909e),mane=mat(0xe9a7cf),hoof=mat(0x654f4f);
  const pivotL=new THREE.Group(),pivotR=new THREE.Group();group.add(pivotL,pivotR);
- if(id==='penguin'||id==='royal'){
-  orb(group,skin,0,1.05,0,.52,.83,.43);orb(group,white,0,1.06,.3,.43,.69,.19);
-  orb(group,skin,0,1.94,.03,.44,.42,.39);
-  for(let s of [-1,1]){orb(group,white,s*.22,2.01,.33,.085,.09,.04);orb(group,black,s*.22,2.01,.372,.038,.047,.02)}
-  const beak=part(group,new THREE.ConeGeometry(.13,.34,10),mat(0xe98940),0,1.81,.46);beak.rotation.x=Math.PI/2;
-  pivotL.position.set(-.45,1.55,0);pivotR.position.set(.45,1.55,0);
-  orb(pivotL,skin,-.13,-.22,0,.17,.43,.14).rotation.z=-.24;
-  orb(pivotR,skin,.13,-.22,0,.17,.43,.14).rotation.z=.24;
-  for(let s of [-1,1]){orb(group,pink,s*.24,.16,.2,.19,.1,.29)}
-  if(id==='royal'){part(group,new THREE.CylinderGeometry(.24,.31,.25,7),gold,0,2.44,0);for(let x of [-.18,0,.18])part(group,new THREE.ConeGeometry(.09,.2,4),gold,x,2.65,0)}
- } else if(id==='fox'){
-  orb(group,skin,0,1.06,0,.56,.69,.42);orb(group,white,0,1.0,.36,.4,.49,.14);
-  orb(group,skin,0,1.83,.03,.47,.42,.4);
-  for(let s of [-1,1]){part(group,new THREE.ConeGeometry(.18,.44,6),skin,s*.3,2.32,0);orb(group,black,s*.2,1.87,.36,.052,.06,.028)}
-  orb(group,white,0,1.65,.37,.22,.14,.22);orb(group,black,0,1.69,.55,.09,.065,.07);
-  pivotL.position.set(-.52,1.44,0);pivotR.position.set(.52,1.44,0);
-  orb(pivotL,skin,0,-.3,.02,.18,.4,.18);orb(pivotR,skin,0,-.3,.02,.18,.4,.18);
-  for(let s of [-1,1])orb(group,skin,s*.25,.17,.15,.2,.2,.23);
-  const tail=orb(group,skin,.42,.94,-.53,.29,.31,.62);tail.rotation.z=.7;
- } else if(id==='seal'){
-  orb(group,skin,0,.88,.0,.67,.83,.67);orb(group,skin,0,1.73,.07,.54,.48,.49);
-  orb(group,tan,0,1.43,.49,.39,.27,.2);
-  for(let s of [-1,1]){orb(group,black,s*.25,1.82,.48,.052,.057,.025);orb(group,skin,s*.53,.46,0,.31,.12,.37)}
-  orb(group,black,0,1.57,.65,.085,.065,.055);
-  pivotL.position.set(-.52,1.14,0);pivotR.position.set(.52,1.14,0);
-  orb(pivotL,skin,-.15,-.31,.1,.24,.42,.14).rotation.z=.36;
-  orb(pivotR,skin,.15,-.31,.1,.24,.42,.14).rotation.z=-.36;
+ const penguin=id==='penguin';
+ orb(group,skin,0,.93,0,penguin?.57:.53,penguin?.8:.61,.43);
+ orb(group,penguin?white:cream,0,.99,.36,.39,.54,.115);
+ orb(group,skin,0,1.78,.05,.55,.52,.48);
+ const eyeY=1.82;
+ for(const side of [-1,1]){
+  orb(group,white,side*.25,eyeY,.449,.118,.145,.065);
+  orb(group,black,side*.25,eyeY,.506,.067,.092,.037);
+  orb(group,white,side*.227,eyeY+.043,.537,.025,.03,.016);
+  orb(group,rose,side*.36,1.55,.39,.105,.062,.035);
+  const leg=orb(group,skin,side*.27,.28,.15,.19,.29,.21);
+  orb(group,penguin?pink:hoof,side*.28,.12,.3,.24,.11,.27);
+ }
+ pivotL.position.set(-.52,1.22,0);pivotR.position.set(.52,1.22,0);
+ orb(pivotL,skin,-.12,-.17,0,.21,.4,.2).rotation.z=-.2;
+ orb(pivotR,skin,.12,-.17,0,.21,.4,.2).rotation.z=.2;
+ if(penguin){
+  orb(group,white,0,1.36,.48,.35,.33,.09);
+  const beak=part(group,new THREE.ConeGeometry(.12,.27,10),mat(0xe88b47),0,1.62,.56);beak.rotation.x=Math.PI/2;
  } else {
-  orb(group,skin,0,1.04,0,.66,.81,.49);orb(group,skin,0,1.87,.06,.57,.48,.48);
-  for(let s of [-1,1]){orb(group,skin,s*.44,2.19,-.03,.16,.18,.15);orb(group,dark,s*.24,1.96,.48,.048,.052,.025)}
-  orb(group,white,0,1.68,.46,.32,.2,.19);orb(group,dark,0,1.77,.62,.09,.07,.06);
-  pivotL.position.set(-.6,1.38,0);pivotR.position.set(.6,1.38,0);
-  orb(pivotL,skin,0,-.27,0,.23,.42,.2);orb(pivotR,skin,0,-.27,0,.23,.42,.2);
-  for(let s of [-1,1])orb(group,skin,s*.3,.17,.24,.26,.14,.32);
+  const snout=id==='horse'||id==='unicorn'||id==='cow';
+  orb(group,id==='cow'?rose:cream,0,1.59,.49,snout?.31:.2,snout?.2:.15,snout?.26:.19);
+  orb(group,pinkNose,0,1.62,.71,.075,.06,.05);
+  if(['bunny','cat','dog','horse','unicorn','cow'].includes(id)){
+   for(const side of [-1,1]){
+    const ear=orb(group,skin,side*.37,2.37,-.01,id==='bunny'?.17:.23,id==='bunny'?.63:.3,.15);
+    ear.rotation.z=-side*(id==='dog'?.65:.2);
+    if(id==='bunny')orb(group,rose,side*.37,2.38,.12,.09,.46,.045);
+   }
+  }
+  if(id==='unicorn'){
+   part(group,new THREE.ConeGeometry(.13,.62,8),gold,0,2.47,.34);
+   for(let k=0;k<4;k++)orb(group,mane,-.34+k*.2,2.16,.18,.16,.21,.2);
+  }
+  if(id==='horse')for(let k=0;k<4;k++)orb(group,brown,-.24+k*.15,2.19,-.1,.12,.2,.16);
+  if(id==='cow'){
+   for(let k=0;k<4;k++)orb(group,black,(k%2?1:-1)*.31,.78+(k>>1)*.37,.34,.17,.15,.08);
+   for(const side of [-1,1])part(group,new THREE.ConeGeometry(.1,.24,9),cream,side*.27,2.46,-.07);
+  }
+  if(id==='cat'){
+   for(const side of [-1,1])for(let k=-1;k<=1;k++){
+    const whisker=part(group,new THREE.CylinderGeometry(.009,.009,.35,5),cream,side*.46,1.55+k*.07,.46);
+    whisker.rotation.z=Math.PI/2+k*.13;
+   }
+  }
+  if(id==='dog')orb(group,brown,.1,1.87,.47,.22,.17,.09);
+  const tail=orb(group,skin,.48,.92,-.41,.17,.22,.41);tail.rotation.z=.48;
  }
  return {group,pivotL,pivotR};
 }

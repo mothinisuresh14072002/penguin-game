@@ -1,21 +1,105 @@
-# Polar Dash ❄️ — 3D Arctic Endless Runner
+<div align="center">
 
-**Polar Dash** is an original, mobile-oriented Three.js endless runner. Run along three lanes across a snowy arctic world, dodge rocks, ice spikes, wooden barriers and lions, collect gold, refill energy, activate power-ups and unlock playable animal characters. Inspired by the endless-runner genre; it is not affiliated with Subway Surfers.
+<img src="assets/readme-banner.svg" alt="Polar Dash — animated Arctic game artwork" width="100%" />
 
-## Current features
+# ❄️ POLAR DASH
+### Run. Jump. Slide. Survive the Frozen Frontier.
 
-- Original endless runner with progressively increasing speed and procedural obstacle rows
-- Five playable unlockable characters: Pip the Penguin, Frost the Fox, Splash the Seal, Boris the Bear, Royal Penguin
-- Three-lane switching, jump and slide; touch swipes and keyboard controls
-- Energy meter that drains with play and recharges from green pickups
-- Collectible coins and a persistent offline character shop
-- Shield pickup (absorbs one crash) and temporary coin magnet
-- Best distance and wallet saved via browser localStorage
-- Procedural 3D geometry, icy track, snow, mountains and lighting
-- Responsive interface and mobile-friendly presentation
-- Capacitor configuration for packaging the web game as an Android app
+**A stylized, procedural 3D Arctic endless-runner game built with Three.js, JavaScript and Vite.**
 
-## Windows CMD: run locally
+[![Three.js](https://img.shields.io/badge/Three.js-3D%20WebGL-0b192c?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-f7df1e?style=for-the-badge&logo=javascript&logoColor=111)](https://developer.mozilla.org/docs/Web/JavaScript)
+[![Vite](https://img.shields.io/badge/Vite-Build%20Tool-646cff?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
+[![Android](https://img.shields.io/badge/Android-Capacitor-3ddc84?style=for-the-badge&logo=android&logoColor=111)](https://capacitorjs.com/)
+
+[![Build](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml/badge.svg)](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml)
+[![GitHub stars](https://img.shields.io/github/stars/mothinisuresh14072002/penguin-game?style=social)](https://github.com/mothinisuresh14072002/penguin-game/stargazers)
+
+**[🎮 Run Locally](#-quick-start) · [🐧 Characters](#-meet-the-runners) · [🧊 Gameplay](#-gameplay) · [📱 Android](#-android-build-prototype) · [🛠️ Roadmap](#-roadmap)**
+
+</div>
+
+---
+
+## 🌌 Welcome to the Frozen Frontier
+
+*The ice never ends. The speed never stops.*
+
+**Polar Dash** sends a cast of animal adventurers sprinting through an endless frozen landscape. Weave between lanes, jump over ice spikes, slide through tricky sections, collect coins, replenish your energy and chase your best distance.
+
+The world and characters are generated with **procedural Three.js geometry**, not prebuilt downloadable character models. This is an **open-source, playable prototype** with a mobile-oriented interface—not yet a fully tested or published Play Store release.
+
+<div align="center">
+
+| 🧊 Endless ice | ⚡ Energy survival | 🪙 Collect & unlock | 🛡️ Power-ups |
+|:---:|:---:|:---:|:---:|
+| Three-lane running | Grab energy pickups | Unlock new characters | Shield & coin magnet |
+
+</div>
+
+## 🎮 Gameplay
+
+| Feature | Current implementation |
+|---|---|
+| **Infinite run** | Procedural obstacles and increasing movement speed |
+| **Movement** | Switch between three lanes, jump and slide |
+| **Hazards** | Ice rocks, spikes, barriers and lion enemies |
+| **Energy** | Energy decreases during a run; green pickups refill it |
+| **Rewards** | Collect coins and spend them in the character shop |
+| **Power-ups** | Shield and temporary coin magnet |
+| **Progress** | Best distance, coins and unlocked characters stored locally |
+| **Controls** | Keyboard and mobile swipe gestures |
+| **Audio** | Optional, lightweight synthesized gameplay effects |
+
+## 🐾 Meet the Runners
+
+<div align="center">
+
+| 🐧 Pip | 🦊 Frost | 🦭 Splash | 🐻‍❄️ Boris | 👑 Royal Penguin |
+|:---:|:---:|:---:|:---:|:---:|
+| Penguin | Fox | Seal | Polar Bear | Penguin |
+| **Free** | **120 coins** | **260 coins** | **450 coins** | **700 coins** |
+
+*Character prices refer to in-game coins earned while playing, not real-money purchases.*
+
+</div>
+
+## ✨ Three.js Visual Experience
+
+<table>
+<tr>
+<td width="50%">
+
+### 🌨️ Procedural Frozen World
+
+- Arctic mountains and glacier cliffs
+- Snow-covered track sections
+- Generated ice formations and hazards
+- Animated falling snow
+- Fog, lighting, shadows and tone mapping
+
+</td>
+<td width="50%">
+
+### 🐧 Animated 3D Characters
+
+- Multiple original animal designs
+- Character movement and flipper animation
+- Jump and slide motion
+- Smooth-follow camera
+- Runtime mesh generation
+
+</td>
+</tr>
+</table>
+
+**About the animation:** the illustrated banner at the top is an SVG animation. The **real-time 3D gameplay** runs through Three.js when the project is launched. GitHub does not execute interactive WebGL/Three.js inside a README. The models are currently stylized procedural prototypes, not photorealistic production assets.
+
+> 📸 **Gameplay preview:** An actual recorded gameplay GIF or screenshot will be added after a successful browser/device capture. This README intentionally does not present concept art as a real in-game screenshot.
+
+## 🚀 Quick Start
+
+**Requirements:** Node.js and npm. Use CMD or the integrated terminal in VS Code / Antigravity.
 
 ```cmd
 git clone https://github.com/mothinisuresh14072002/penguin-game.git
@@ -24,27 +108,67 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5173/**.
+Then open **http://localhost:5173/** (or the address displayed by Vite).
 
-## Controls
+### 🎮 Controls
 
-| Action | Windows | Mobile |
-| --- | --- | --- |
-| Switch lane | A / D or Left / Right | Swipe left / right |
-| Jump | W / Space / Up | Swipe up or tap |
-| Slide | S / Down | Swipe down |
-| Pause | P | Pause button |
+| Action | Windows / Keyboard | Phone / Tablet |
+|---|---|---|
+| Switch left or right | `A` / `D` or `←` / `→` | Swipe left / right |
+| Jump | `W`, `Space`, `↑` | Swipe up / tap |
+| Slide | `S`, `↓` | Swipe down |
+| Pause | `P` | Pause button |
+| Sound effects | Sound toggle | Sound toggle |
 
-## Build the website
+### Build for Web
 
 ```cmd
 npm run build
 npm run preview
 ```
 
-## Android prototype with Capacitor
+The optimized web output is generated in `dist/`.
 
-Install Android Studio, Android SDK and a compatible JDK first.
+## 🏗️ Project Architecture
+
+```text
+penguin-game/
+├── .github/
+│   └── workflows/build.yml     # GitHub Actions build checks
+├── assets/
+│   └── readme-banner.svg       # Animated README banner
+├── docs/
+│   └── PLAY_STORE_RELEASE.md   # Android release checklist
+├── src/
+│   ├── main.js                 # Three.js scene + gameplay systems
+│   └── style.css               # Game UI and responsive styles
+├── index.html                  # Game interface
+├── package.json                # Dependencies and scripts
+├── capacitor.config.json      # Android app wrapper configuration
+├── PRIVACY.md                  # Prototype privacy notes
+└── README.md
+```
+
+### How It Works
+
+```mermaid
+flowchart TD
+    A[Start Game] --> B[Choose Character]
+    B --> C[Three.js Game Loop]
+    C --> D[Switch Lanes / Jump / Slide]
+    D --> E{Obstacle or Pickup?}
+    E -->|Obstacle| F[Collision / Shield Check]
+    E -->|Coin / Energy| G[Update Rewards]
+    F --> H{Run Over?}
+    H -->|No| C
+    H -->|Yes| I[Save Best Score & Coins]
+    G --> C
+    I --> B
+```
+
+## 📱 Android Build (Prototype)
+
+This repository includes **Capacitor** configuration for building an Android wrapper around the web game. Install **Android Studio**, an Android SDK and a compatible JDK.
 
 ```cmd
 npm install
@@ -54,31 +178,42 @@ npm run android:sync
 npm run android:open
 ```
 
-The last command opens the native Android project in Android Studio. Run on an Android device, then use **Build > Generate Signed Bundle / APK** to produce a signed Android App Bundle (.aab) for Play Console.
+**Note:** Run `npm run android:add` only for the first Android project creation. For later updates, use `npm run android:sync`.
 
-On later web-game updates, run `npm run android:sync` to update the Android project.
+The game **has not yet been signed, published or confirmed through a complete Android device-test cycle**. For release requirements, see **[Google Play release guide](docs/PLAY_STORE_RELEASE.md)** and **[Privacy notes](PRIVACY.md)**.
 
-**Do not commit your private signing keys.**
+## 🗺️ Roadmap
 
-## What remains before Google Play publication
+- [x] Procedural 3D Arctic environment
+- [x] Three-lane running, jumping and sliding
+- [x] Five selectable / unlockable animal characters
+- [x] Coins, energy, shields and magnets
+- [x] Local progress saving and basic audio cues
+- [x] Capacitor Android configuration
+- [x] GitHub Actions build workflow added
+- [ ] Verify the production build and automate gameplay tests
+- [ ] Higher-fidelity character meshes, textures and skeletal animation
+- [ ] Device-tested 60 FPS performance targets and graphical quality presets
+- [ ] Additional levels, biomes, missions and onboarding
+- [ ] Capture authentic gameplay footage, screenshots and trailer
+- [ ] Sign, test and submit the Android App Bundle to Google Play
 
-This is a **prototype, not yet a Play Store-approved product**. Before release:
+## 🤝 Contributing
 
-1. Test on several real Android devices and profile performance, memory, frame pacing and touch input.
-2. Generate a unique production application ID, 512×512 icon, feature graphics, screenshots and accessible store description.
-3. Add suitable audio, settings, privacy policy, content rating and Play Console Data safety disclosures based on actual data processing.
-4. Add Android app lifecycle handling (pause/resume, audio focus), robust save migrations, accessibility, and appropriate analytics only if desired.
-5. Review age/child-directed content rules and advertising/monetization policies before integrating ads or purchases.
-6. Use the currently required Android target SDK, sign an .aab and complete Play Console internal/closed testing and any account-specific testing requirements.
-7. Run a full QA pass and publish only after there are no blocking gameplay or compliance issues.
+Contributions, bug reports and improvements are welcome. Feel free to [open an issue](https://github.com/mothinisuresh14072002/penguin-game/issues) or submit a pull request.
 
-## Honest quality note
+## 👩‍💻 Project Author
 
-This is a stylized procedural MVP with primitive-based 3D animal models, **not** the same fidelity as a commercial AAA endless runner. For store-level production polish, create original high-quality models, optimized textures, skeletal character animation, sound, VFX, biome art and onboarding.
+Developed and maintained by **[Mothini S.](https://github.com/mothinisuresh14072002)**.
 
-## Architecture
+<div align="center">
 
-- `src/main.js`: procedural world, characters, game physics, spawning, shop, energy and power-ups
-- `src/style.css`: HUD, overlays, responsive shop and styling
-- `index.html`: game UI
-- `capacitor.config.json`: Android wrapper metadata
+---
+
+### ❄️ Every Run Is a New Adventure
+
+**Made with Three.js · Built for the Frozen Frontier**
+
+[⬆ Back to Top](#️-polar-dash)
+
+</div>

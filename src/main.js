@@ -118,7 +118,7 @@ let character=model(profile.selected);scene.add(character.group);
 const SHARED_GEOMETRIES=new Set([sphere,cube,coneGeo]);
 const SHARED_MATERIALS=new Set([snowMat,iceMat,deepIce,rockMat,dark,white,pink,gold,energyMat,powerMat,wood]);
 function disposeGroup(root){root.traverse(obj=>{if(obj.isMesh){if(obj.geometry&&!SHARED_GEOMETRIES.has(obj.geometry))obj.geometry.dispose();const mats=Array.isArray(obj.material)?obj.material:[obj.material];for(const m of mats)if(m&&!SHARED_MATERIALS.has(m))m.dispose()}})}
-function swapCharacter(){scene.remove(character.group);disposeGroup(character.group);character=model(profile.selected);scene.add(character.group)}
+function swapCharacter(){scene.remove(character.group);disposeGroup(character.group);character=model(profile.selected);scene.add(character.group);applyBiome()}
 // Endless segments are recycled instead of spawning unlimited geometry.
 for(let i=0;i<14;i++){
  const g=new THREE.Group();scene.add(g);scrollItems.push(g);g.position.z=10-i*18;
@@ -146,6 +146,63 @@ for(let i=0;i<22;i++){
  part(scene,new THREE.ConeGeometry(5,h,5),rockMat,x,h*.5-3,-95-(i%3)*9);
  part(scene,new THREE.ConeGeometry(2.4,h*.37,5),snowMat,x,h*.79-3,-95-(i%3)*9);
 }
+// All biome decorations are generated in Three.js and reused across runs.
+let currentTheme=BIOMES.arctic;
+const biomeDecor=[];
+const sceneryMaterials=new Set();
+function addScenery(parent,shape,color,x,y,z,sx,sy,sz){
+ const material=mat(color,.83);
+ sceneryMaterials.add(material);
+ return part(parent,shape,material,x,y,z,sx,sy,sz);
+}
+function clearScenery(){
+ for(const o of biomeDecor){scene.remove(o);o.traverse(obj=>{
+  if(obj.isMesh){
+   if(obj.geometry&&!SHARED_GEOMETRIES.has(obj.geometry))obj.geometry.dispose();
+   if(obj.material&&sceneryMaterials.has(obj.material))obj.material.dispose();
+  }
+ })}
+ biomeDecor.length=0;sceneryMaterials.clear();
+}
+function sceneryProp(type,x,z,i){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);biomeDecor.push(g);
+ if(type==='ice'){
+  addScenery(g,coneGeo,0x9aefff,0,1.0,0,.6,1.8,.6);
+  addScenery(g,coneGeo,0xc0f8ff,.5,.54,.25,.3,.92,.3);
+ }else if(type==='flower'){
+  addScenery(g,sphere,0x4eac5b,0,.35,0,.07,.46,.07);
+  for(let j=0;j<5;j++){const a=j*Math.PI*2/5;addScenery(g,sphere,i%2?0xffa8d3:0xfff0a7,Math.cos(a)*.2,.8+Math.sin(a)*.2,0,.16,.16,.09)}
+  addScenery(g,sphere,0xffdd79,0,.8,.08,.13,.13,.1);
+ }else if(type==='star'){
+  addScenery(g,new THREE.OctahedronGeometry(.6),i%2?0xffb8e3:0x99f4ff,0,1.7,0,1,1,1);
+  addScenery(g,sphere,0xfff9ff,0,.6,0,.65,.18,.6);
+ }else if(type==='hay'){
+  addScenery(g,cube,0xecc676,0,.55,0,1.3,1,1);
+  addScenery(g,cube,0xb78340,0,.56,.51,1.35,.09,.08);
+ }else if(type==='house'||type==='barn'){
+  addScenery(g,cube,type==='barn'?0xc66b57:0xe9bcaf,0,1,0,2,2,1.7);
+  const roof=addScenery(g,coneGeo,type==='barn'?0x634d57:0x9684a9,0,2.55,0,1.5,1.25,1.5);roof.rotation.y=Math.PI/4;
+  addScenery(g,cube,0xffffff,0,.65,.88,.55,.9,.05);
+ }else if(type==='tree'){
+  addScenery(g,cube,0x8a654a,0,.8,0,.33,1.6,.33);
+  addScenery(g,sphere,i%2?0x5da66a:0x81b96b,0,2.04,0,1.03,1.02,.87);
+ }
+}
+function applyBiome(){
+ const picked=CHARS.find(c=>c.id===profile.selected)||CHARS[0];
+ const biome=BIOMES[picked.biome];currentTheme=biome;
+ scene.background.setHex(biome.sky);scene.fog.color.setHex(biome.fog);
+ snowMat.color.setHex(biome.ground);iceMat.color.setHex(biome.track);
+ deepIce.color.setHex(biome.edge);rockMat.color.setHex(biome.hazards.includes('spike')?0x6a8ea4:0x917e75);
+ clearScenery();
+ for(let i=0;i<44;i++){
+  const side=i%2===0?-1:1, x=side*(10.5+(i%3)*2.0), z=12-Math.floor(i/2)*11.5;
+  sceneryProp(biome.decor,x,z,i);
+ }
+ if($('worldName'))$('worldName').textContent=biome.name;
+ if($('shopMessage'))$('shopMessage').textContent='World: '+biome.name;
+}
+applyBiome();
 function makeObject(kind,lane,at){
  const root=new THREE.Group();scene.add(root);let radius=.7;
  const x=laneX[lane];
@@ -170,8 +227,8 @@ function row(at){
  const count=Math.random()<.25+difficulty*.43?2:1;
  while(blocked.size<count)blocked.add(Math.floor(Math.random()*3));
  for(const lane of blocked){
-   const types=['rock','spike','log','lion'];
-   makeObject(types[Math.floor(Math.random()*(distance>450?4:3))],lane,at);
+   const types=currentTheme.hazards;
+   makeObject(types[Math.floor(Math.random()*types.length)],lane,at);
  }
  for(let lane=0;lane<3;lane++)if(!blocked.has(lane)){
    if(Math.random()<.85){for(let i=0;i<3;i++)makeObject('coin',lane,at+2.0+i*1.2);}
@@ -204,7 +261,7 @@ function shop(){
 }
 function menu(){
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.add('hidden');updateHUD();
- showScreen('POLAR DASH','An endless ice adventure. Switch lanes, jump obstacles, collect energy and unlock new animal friends.',[
+ showScreen('POLAR DASH','A cute animal adventure across magical worlds. Switch lanes, jump obstacles, collect energy and unlock new animal friends.',[
   {text:'START RUN',action:start},{text:'CHARACTERS & SHOP',secondary:true,action:shop}
  ]);
 }

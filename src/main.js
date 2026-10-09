@@ -91,6 +91,14 @@ for(let i=0;i<14;i++){
  for(const x of [-5.3,5.3]){
   const ridge=orb(g,snowMat,x,-.16,-1.5,1.2,.48,2);ridge.rotation.z=.05;
   for(let j=0;j<3;j++)part(g,coneGeo,iceMat,x+(j-1)*.6,.7,-5, .36,.88+(j%2)*.45,.36);
+  // Snow-covered glacier walls create depth cues along the playable runway.
+  for(let j=0;j<3;j++){
+    const z=-6.5+j*5.6,high=1.6+(i+j)%3*.45;
+    const cliff=part(g,cube,deepIce,x*1.55,high*.43,z,2.15,high,4.6);
+    cliff.rotation.y=(j%2?-.12:.10);
+    part(g,cube,snowMat,x*1.55,high+.04,z,2.3,.22,4.7);
+    part(g,coneGeo,iceMat,x*1.55+(j%2?.5:-.5),high+1.0,z,.48,.96,.48);
+  }
  }
 }
 // distant stationary mountain silhouettes and arctic backdrop.
@@ -211,6 +219,13 @@ renderer.domElement.addEventListener('pointerup',e=>{
  if(Math.abs(dx)>Math.abs(dy))moveLane(dx>0?1:-1);
  else if(dy<0)jump();else slide();
 });
+// Soft projected grounding beneath the active character reduces visual floating.
+const shadowCanvas=document.createElement('canvas');shadowCanvas.width=64;shadowCanvas.height=64;
+const ctx=shadowCanvas.getContext('2d');const grd=ctx.createRadialGradient(32,32,2,32,32,31);grd.addColorStop(0,'rgba(5,43,70,0.40)');grd.addColorStop(1,'rgba(5,43,70,0)');
+ctx.fillStyle=grd;ctx.fillRect(0,0,64,64);
+const shadowTexture=new THREE.CanvasTexture(shadowCanvas);
+const projectedShadow=new THREE.Mesh(new THREE.PlaneGeometry(2,1.65),new THREE.MeshBasicMaterial({map:shadowTexture,transparent:true,depthWrite:false,opacity:.82}));
+projectedShadow.rotation.x=-Math.PI/2;projectedShadow.position.y=.245;scene.add(projectedShadow);
 const snowPos=new Float32Array(350*3);
 for(let i=0;i<350;i++){snowPos[i*3]=(Math.random()-.5)*36;snowPos[i*3+1]=Math.random()*19;snowPos[i*3+2]=-Math.random()*85;}
 const flakesGeo=new THREE.BufferGeometry();flakesGeo.setAttribute('position',new THREE.BufferAttribute(snowPos,3));
@@ -259,6 +274,7 @@ function tick(now){
   updateHUD();
  }
  character.group.position.set(laneX[0]+(laneX[2]-laneX[0])*playerLane/2,playerY,2);
+ projectedShadow.position.x=character.group.position.x;projectedShadow.position.z=2;projectedShadow.material.opacity=.82-Math.min(.65,playerY*.2);
  character.group.rotation.z=Math.sin(clockTime*14)*.04*(running&&!paused?1:0);
  character.group.scale.y=sliding>0?.55:1;
  const run=running&&!paused?1:0;

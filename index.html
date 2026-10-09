@@ -1,7 +1,9 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#081c30"/><title>Penguin Ice Adventure</title></head><body>
-<div id="app"><div id="hud"><div class="brand"><span>❄</span> PENGUIN <b>ICE ADVENTURE</b></div><div class="stats"><span>🪙 <b id="coins">0</b></span><span>❤️ <b id="lives">3</b></span><span>🏁 <b id="distance">0</b>%</span></div></div>
-<div id="help">A / D or ← / → to walk <i>•</i> SPACE to jump <i>•</i> R to restart</div>
-<div id="notice" class="notice hidden"><h1 id="notice-title"></h1><p id="notice-body"></p><button id="restart">PLAY AGAIN</button></div>
-<div id="start" class="notice"><div class="tag">A LITTLE ARCTIC ADVENTURE</div><h1>RUN. JUMP.<br><em>SURVIVE.</em></h1><p>Guide your penguin across the ice. Leap over sharp crystals and icy rocks, avoid the lion, collect golden coins, and reach the blue flag.</p><button id="play">START ADVENTURE ↗</button><small>3 lives · Reach the flag to win</small></div>
-<div class="mobile"><button id="left" aria-label="Move left">◀</button><button id="right" aria-label="Move right">▶</button><button id="jump" aria-label="Jump">JUMP ↑</button></div>
-<div id="credits">3D PROCEDURAL WORLD · THREE.JS</div></div><script type="module" src="/src/main.js"></script></body></html>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0b294b"><meta name="description" content="Polar Dash: a 3D Arctic endless runner with unlockable animal characters."><title>Polar Dash ❄ Arctic Runner</title></head><body>
+<div id="app">
+<header class="hud"><div class="logo"><span>❄</span> POLAR <b>DASH</b></div><div class="hud-stats"><span>🏁 <b id="distance">0</b>m</span><span>🪙 <b id="coins">0</b></span><span>💰 <b id="walletHud">0</b></span><button id="pauseBtn" title="Pause game">Ⅱ</button></div></header>
+<div class="energy-ui"><span>⚡ ENERGY <strong id="energy">100</strong>%</span><div class="energy-track"><div id="energyFill"></div></div><span id="power"></span></div>
+<div id="overlay" class="overlay"><div class="glass"><span class="eyebrow">THE FROZEN FRONTIER</span><h1 id="screenTitle">POLAR DASH</h1><p id="screenText"></p><div id="screenActions" class="buttons"></div><p class="hint">← → SWITCH LANES · ↑ JUMP · ↓ SLIDE<br>On mobile: swipe in any direction</p></div></div>
+<div id="shop" class="overlay hidden"><div class="glass shop-panel"><span class="eyebrow">COLLECT · UNLOCK · PLAY</span><h1>CHARACTERS</h1><p>Earn coins on the ice and unlock your favourite arctic animal. Wallet: 🪙 <strong id="wallet">0</strong></p><div id="charGrid" class="char-grid"></div><p id="shopMessage"></p><div class="buttons"><button id="startFromShop">PLAY NOW →</button><button class="secondary" id="shopBack">BACK</button></div></div></div>
+<div id="pauseBanner" class="pause-banner hidden">PAUSED · TAP ▶ TO RESUME</div>
+<footer><span>A THREE.JS ARCTIC ADVENTURE</span><button id="soundBtn">SOUND: OFF</button></footer>
+</div><script type="module" src="/src/main.js"></script></body></html>

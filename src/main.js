@@ -137,7 +137,7 @@ function showScreen(title,message,buttons){
  for(const b of buttons){const btn=document.createElement('button');btn.textContent=b.text;btn.className=b.secondary?'secondary':'';btn.onclick=b.action;actions.appendChild(btn)}
 }
 function shop(){
- running=false;paused=false;$('shop').classList.remove('hidden');$('overlay').classList.add('hidden');
+ running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.remove('hidden');$('overlay').classList.add('hidden');
  const grid=$('charGrid');grid.replaceChildren();
  for(const c of CHARS){
   const unlocked=profile.unlocked.includes(c.id),selected=profile.selected===c.id;
@@ -153,18 +153,18 @@ function shop(){
  $('wallet').textContent=profile.coins;
 }
 function menu(){
- running=false;paused=false;$('shop').classList.add('hidden');updateHUD();
+ running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.add('hidden');updateHUD();
  showScreen('POLAR DASH','An endless ice adventure. Switch lanes, jump obstacles, collect energy and unlock new animal friends.',[
   {text:'START RUN',action:start},{text:'CHARACTERS & SHOP',secondary:true,action:shop}
  ]);
 }
 function start(){
- running=true;paused=false;ended=false;playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=10;spawnNext=26;invincible=1;
+ running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=10;spawnNext=26;invincible=1;
  clearObjects();$('overlay').classList.add('hidden');$('shop').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';
  for(let i=0;i<8;i++){row(spawnNext);spawnNext+=17;}
 }
 function finish(reason){
- if(ended)return;ended=true;running=false;
+ if(ended)return;ended=true;running=false;paused=false;$('pauseBanner').classList.add('hidden');
  const points=Math.floor(distance);
  profile.coins+=runCoins;profile.best=Math.max(profile.best,points);save();updateHUD();
  showScreen('RUN COMPLETE',reason+' Distance: '+points+'m · Coins: +'+runCoins+' · Best: '+profile.best+'m',[
@@ -196,7 +196,7 @@ addEventListener('keydown',e=>{
  if(e.code==='ArrowRight'||e.code==='KeyD')moveLane(1);
  if(e.code==='ArrowUp'||e.code==='KeyW'||e.code==='Space')jump();
  if(e.code==='ArrowDown'||e.code==='KeyS')slide();
- if(e.code==='KeyP')$('pauseBtn').click();
+ if(e.code==='KeyP'||e.code==='Escape')$('pauseBtn').click();
 });
 addEventListener('keyup',e=>keys.delete(e.code));
 let touch=null;
@@ -223,14 +223,14 @@ function tick(now){
   sliding=Math.max(0,sliding-dt);shield=Math.max(0,shield-dt);magnet=Math.max(0,magnet-dt);invincible=Math.max(0,invincible-dt);
   while(spawnNext<distance+150){row(spawnNext);spawnNext+=Math.max(12,19-distance/290);}
   for(const e of [...entities]){
-   e.root.position.z=-(e.at-distance);
+   e.root.position.z=2-(e.at-distance);
    if(e.kind==='coin'||e.kind==='energy'||e.kind==='shield'||e.kind==='magnet'){
      e.root.rotation.y+=dt*2.8;e.root.position.y=Math.sin(clockTime*4+e.at)*.09;
      if(magnet>0&&e.kind==='coin'&&Math.abs(e.at-distance)<9)e.root.position.x=THREE.MathUtils.damp(e.root.position.x,laneX[Math.round(playerLane)],7,dt);
    } else if(e.kind==='lion') e.root.rotation.y=Math.sin(clockTime*3)*.25;
    const isPick=['coin','energy','shield','magnet'].includes(e.kind);
-   const sameLane=Math.abs(e.root.position.x-laneX[playerLane>2?2:Math.round(playerLane)])<(.7+(isPick?.55:0));
-   if(Math.abs(e.at-distance)<.73&&!e.taken&&sameLane){
+   const sameLane=Math.abs(e.root.position.x-character.group.position.x)<(isPick?.76:1.03);
+   if(running&&Math.abs(e.at-distance-2)<.76&&!e.taken&&sameLane){
     if(isPick){
       if(e.kind==='coin')runCoins++;
       if(e.kind==='energy')energy=Math.min(100,energy+29);
@@ -239,7 +239,7 @@ function tick(now){
       e.taken=true;e.root.visible=false;
     }else if(invincible<=0){
       const above=playerY>1.15, duck=sliding>0&&e.kind==='log';
-      if(!above&&!duck)crash();
+      if(!above&&!duck){crash();break;}
     }
    }
    if(e.at<distance-13){scene.remove(e.root);entities.splice(entities.indexOf(e),1)}
@@ -266,4 +266,6 @@ function tick(now){
  renderer.render(scene,camera);
 }
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6))});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&!paused)$('pauseBtn').click()});
+window.addEventListener('blur',()=>{if(running&&!paused)$('pauseBtn').click();keys.clear()});
 menu();requestAnimationFrame(tick);

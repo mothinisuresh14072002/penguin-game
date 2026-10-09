@@ -125,7 +125,7 @@ function row(at){
  }
  for(let lane=0;lane<3;lane++)if(!blocked.has(lane)){
    if(Math.random()<.85){for(let i=0;i<3;i++)makeObject('coin',lane,at+2.0+i*1.2);}
-   if(Math.random()<.24)makeObject('energy',lane,at+5.9);
+   if(Math.random()<.34)makeObject('energy',lane,at+5.9);
    if(Math.random()<.055)makeObject(Math.random()<.5?'shield':'magnet',lane,at+7);
  }
 }
@@ -229,8 +229,8 @@ function tick(now){
      if(magnet>0&&e.kind==='coin'&&Math.abs(e.at-distance)<9)e.root.position.x=THREE.MathUtils.damp(e.root.position.x,laneX[Math.round(playerLane)],7,dt);
    } else if(e.kind==='lion') e.root.rotation.y=Math.sin(clockTime*3)*.25;
    const isPick=['coin','energy','shield','magnet'].includes(e.kind);
-   const sameLane=Math.abs(e.root.position.x-character.group.position.x)<(isPick?.76:1.03);
-   if(running&&Math.abs(e.at-distance-2)<.76&&!e.taken&&sameLane){
+   const sameLane=Math.abs(e.root.position.x-(laneX[0]+(laneX[2]-laneX[0])*playerLane/2))<(isPick?.76:1.03);
+   if(running&&Math.abs(e.at-distance)<.76&&!e.taken&&sameLane){
     if(isPick){
       if(e.kind==='coin')runCoins++;
       if(e.kind==='energy')energy=Math.min(100,energy+29);

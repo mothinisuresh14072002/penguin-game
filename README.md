@@ -3,7 +3,7 @@
 <img src="assets/readme-banner.svg" alt="Polar Dash — animated Arctic game artwork" width="100%" />
 
 # ❄️ POLAR DASH
-### Run. Jump. Slide. Survive the Frozen Frontier.
+### Seven Cute Heroes. Seven Colorful Worlds. Endless Adventures.
 
 **A cute, multi-world 3D animal endless runner built with Three.js, JavaScript and Vite.**
 
@@ -15,25 +15,25 @@
 [![Build](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml/badge.svg)](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml)
 [![GitHub stars](https://img.shields.io/github/stars/mothinisuresh14072002/penguin-game?style=social)](https://github.com/mothinisuresh14072002/penguin-game/stargazers)
 
-**[🎮 Run Locally](#-quick-start) · [🐧 Characters](#-meet-the-runners) · [🧊 Gameplay](#-gameplay) · [📱 Android](#-android-build-prototype) · [🛠️ Roadmap](#-roadmap)**
+**[🎮 Play Locally](#-quick-start) · [🐾 Characters & Worlds](#-meet-the-runners-and-their-worlds) · [✨ Three.js](#-threejs-visual-experience) · [📱 Android](#-android-build-prototype) · [🗺️ Roadmap](#️-roadmap)**
 
 </div>
 
 ---
 
-## 🌌 Welcome to the Frozen Frontier
+## 🌈 Welcome to the Animal Worlds
 
-*The ice never ends. The speed never stops.*
+*Pick your animal. Explore its world. Keep running!* 
 
-**Polar Dash** sends a cast of animal adventurers sprinting through an endless frozen landscape. Weave between lanes, jump over ice spikes, slide through tricky sections, collect coins, replenish your energy and chase your best distance.
+**Polar Dash** is a playful 3D endless runner featuring seven cute animals and seven character-linked environments. Choose Bella Bunny for a flower meadow, Ula Unicorn for pastel magic, Pip Penguin for a frozen glacier, or one of the other animal friends. Switch lanes, jump, slide, gather coins and energy, and chase your personal best.
 
 The world and characters are generated with **procedural Three.js geometry**, not prebuilt downloadable character models. This is an **open-source, playable prototype** with a mobile-oriented interface—not yet a fully tested or published Play Store release.
 
 <div align="center">
 
-| 🧊 Endless ice | ⚡ Energy survival | 🪙 Collect & unlock | 🛡️ Power-ups |
+| 🌈 Seven themed worlds | ⚡ Energy survival | 🪙 Collect & unlock | 🛡️ Power-ups |
 |:---:|:---:|:---:|:---:|
-| Three-lane running | Grab energy pickups | Unlock new characters | Shield & coin magnet |
+| Character-linked scenery | Grab energy pickups | Unlock new characters | Shield & coin magnet |
 
 </div>
 
@@ -43,7 +43,7 @@ The world and characters are generated with **procedural Three.js geometry**, no
 |---|---|
 | **Infinite run** | Procedural obstacles and increasing movement speed |
 | **Movement** | Switch between three lanes, jump and slide |
-| **Hazards** | Ice rocks, spikes, barriers and lion enemies |
+| **Hazards** | World-dependent rocks, spikes, wooden obstacles and an Arctic lion |
 | **Energy** | Energy decreases during a run; green pickups refill it |
 | **Rewards** | Collect coins and spend them in the character shop |
 | **Power-ups** | Shield and temporary coin magnet |
@@ -58,14 +58,31 @@ Pick your favourite chibi-style animal. Each character changes the **sky, track 
 | Character | Home world | Unlock |
 |:---|:---|---:|
 | 🐰 Bella Bunny | 🌷 Bunny Meadow — flowers and soft grass | Free |
-| 🦄 Ula Unicorn | 🌈 Unicorn Skyland — pastel clouds and magic crystals | 150 coins |
-| 🐴 Hugo Horse | 🌾 Horse Prairie — grass and hay bales | 250 coins |
-| 🐱 Coco Cat | 🏘️ Cat Town — colourful houses | 350 coins |
+| 🦄 Ula Unicorn | 🌈 Unicorn Skyland — pastel palette and star-shaped crystal scenery | 150 coins |
+| 🐴 Hugo Horse | 🌾 Horse Prairie — grass-themed track and hay bales | 250 coins |
+| 🐱 Coco Cat | 🏘️ Cat Town — little houses and warm-toned paths | 350 coins |
 | 🐶 Dodo Dog | 🌳 Puppy Park — trees and green paths | 450 coins |
 | 🐧 Pip Penguin | ❄️ Penguin Glacier — ice formations and snow | Free |
-| 🐮 Mimi Cow | 🚜 Mimi Farm — barns and countryside | 700 coins |
+| 🐮 Mimi Cow | 🚜 Mimi Farm — mini barns and farm-coloured track | 700 coins |
 
 Progress from earlier versions is retained where possible. The penguin remains freely available.
+
+
+### 🎨 World-switching implementation
+
+Selecting a character applies its environment configuration using the `CHARS` and `BIOMES` definitions in `src/main.js`. The game updates the sky and fog, road materials, scenery props, world label and generated obstacle types. Worlds are **linked to the selected character**, not separate level downloads.
+
+| Environment | Decorative objects | Obstacle pool |
+| --- | --- | --- |
+| 🌷 Bunny Meadow | Flowers | Rocks, wooden barriers |
+| 🌈 Unicorn Skyland | Sparkling crystal shapes | Spikes, rocks |
+| 🌾 Horse Prairie | Hay bales | Wooden barriers, rocks |
+| 🏘️ Cat Town | Little houses | Wooden barriers, rocks |
+| 🌳 Puppy Park | Trees | Wooden barriers, rocks |
+| ❄️ Penguin Glacier | Ice crystals | Spikes, rocks, lion |
+| 🚜 Mimi Farm | Barns | Wooden barriers, rocks |
+
+The earlier v2 saved profile is read if a v3 profile does not yet exist. Bella Bunny and Pip Penguin are both free; legacy unlocks for removed characters are not carried over as equivalents.
 
 ## ✨ Three.js Visual Experience
 
@@ -73,21 +90,22 @@ Progress from earlier versions is retained where possible. The penguin remains f
 <tr>
 <td width="50%">
 
-### 🌨️ Procedural Frozen World
+### 🌍 Procedural Animal Worlds
 
-- Arctic mountains and glacier cliffs
-- Snow-covered track sections
-- Generated ice formations and hazards
-- Animated falling snow
-- Fog, lighting, shadows and tone mapping
+- Seven configurable sky, track and fog palettes
+- World-specific decorations: flowers, crystals, hay, houses, trees, ice and barns
+- Biome-dependent obstacle pools
+- Procedural mountains and track scenery
+- Animated snowfall, lighting, shadows and tone mapping
 
 </td>
 <td width="50%">
 
-### 🐧 Animated 3D Characters
+### 🐾 Cute Animated 3D Characters
 
-- Multiple original animal designs
-- Character movement and flipper animation
+- Bunny, unicorn, small horse, cat, dog, penguin and cow
+- Chibi-style shapes with ears, faces and character details
+- Basic procedural movement and arm/flipper animation
 - Jump and slide motion
 - Smooth-follow camera
 - Runtime mesh generation
@@ -96,7 +114,7 @@ Progress from earlier versions is retained where possible. The penguin remains f
 </tr>
 </table>
 
-**About the animation:** the illustrated banner at the top is an SVG animation. The **real-time 3D gameplay** runs through Three.js when the project is launched. GitHub does not execute interactive WebGL/Three.js inside a README. The models are currently stylized procedural prototypes, not photorealistic production assets.
+**About the visuals:** the animated Arctic banner above is illustrative of the penguin's glacier world, not every biome or an in-game screenshot. The illustrated banner at the top is an SVG animation. The **real-time 3D gameplay** runs through Three.js when the project is launched. GitHub does not execute interactive WebGL/Three.js inside a README. The models are currently stylized procedural prototypes, not photorealistic production assets.
 
 > 📸 **Gameplay preview:** An actual recorded gameplay GIF or screenshot will be added after a successful browser/device capture. This README intentionally does not present concept art as a real in-game screenshot.
 
@@ -194,7 +212,8 @@ The game **has not yet been signed, published or confirmed through a complete An
 - [x] Local progress saving and basic audio cues
 - [x] Capacitor Android configuration
 - [x] GitHub Actions build workflow added
-- [ ] Verify the production build and automate gameplay tests
+- [x] GitHub Actions production build verified
+- [ ] Add automated gameplay/browser tests
 - [ ] Higher-fidelity character meshes, textures and skeletal animation
 - [ ] Device-tested 60 FPS performance targets and graphical quality presets
 - [ ] Additional levels, biomes, missions and onboarding
@@ -213,9 +232,9 @@ Developed and maintained by **[Mothini S.](https://github.com/mothinisuresh14072
 
 ---
 
-### ❄️ Every Run Is a New Adventure
+### 🐾 Every Animal Has a World
 
-**Made with Three.js · Built for the Frozen Frontier**
+**Made with Three.js · Explore seven magical animal worlds**
 
 [⬆ Back to Top](#️-polar-dash)
 

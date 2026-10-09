@@ -79,7 +79,7 @@ let character=model(profile.selected);scene.add(character.group);
 function swapCharacter(){scene.remove(character.group);character=model(profile.selected);scene.add(character.group)}
 // Endless segments are recycled instead of spawning unlimited geometry.
 for(let i=0;i<14;i++){
- const g=new THREE.Group();scene.add(g);scrollItems.push(g);
+ const g=new THREE.Group();scene.add(g);scrollItems.push(g);g.position.z=10-i*18;
  part(g,cube,deepIce,0,-.65,0,9,1.5,18);
  part(g,cube,iceMat,0,.06,0,9,.19,18);
  part(g,cube,snowMat,0,.16,0,9,.12,18.1);
@@ -244,7 +244,7 @@ function tick(now){
    }
    if(e.at<distance-13){scene.remove(e.root);entities.splice(entities.indexOf(e),1)}
   }
-  for(let i=0;i<scrollItems.length;i++){const segment=scrollItems[i];const position=(i*18-(distance%252));segment.position.z=-position+(-117);}
+  for(let i=0;i<scrollItems.length;i++){const segment=scrollItems[i];const position=((i*18-(distance%252)+252)%252);segment.position.z=10-position;}
   for(let i=0;i<350;i++){
    snowPos[i*3+1]-=dt*(.9+(i%5)*.2);
    snowPos[i*3+2]+=dt*speed*.4;

@@ -5,7 +5,7 @@
 # ❄️ POLAR DASH
 ### Run. Jump. Slide. Survive the Frozen Frontier.
 
-**A stylized, procedural 3D Arctic endless-runner game built with Three.js, JavaScript and Vite.**
+**A cute, multi-world 3D animal endless runner built with Three.js, JavaScript and Vite.**
 
 [![Three.js](https://img.shields.io/badge/Three.js-3D%20WebGL-0b192c?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-f7df1e?style=for-the-badge&logo=javascript&logoColor=111)](https://developer.mozilla.org/docs/Web/JavaScript)
@@ -51,18 +51,21 @@ The world and characters are generated with **procedural Three.js geometry**, no
 | **Controls** | Keyboard and mobile swipe gestures |
 | **Audio** | Optional, lightweight synthesized gameplay effects |
 
-## 🐾 Meet the Runners
+## 🐾 Meet the Runners and Their Worlds
 
-<div align="center">
+Pick your favourite chibi-style animal. Each character changes the **sky, track colours, scenery and available obstacles**.
 
-| 🐧 Pip | 🦊 Frost | 🦭 Splash | 🐻‍❄️ Boris | 👑 Royal Penguin |
-|:---:|:---:|:---:|:---:|:---:|
-| Penguin | Fox | Seal | Polar Bear | Penguin |
-| **Free** | **120 coins** | **260 coins** | **450 coins** | **700 coins** |
+| Character | Home world | Unlock |
+|:---|:---|---:|
+| 🐰 Bella Bunny | 🌷 Bunny Meadow — flowers and soft grass | Free |
+| 🦄 Ula Unicorn | 🌈 Unicorn Skyland — pastel clouds and magic crystals | 150 coins |
+| 🐴 Hugo Horse | 🌾 Horse Prairie — grass and hay bales | 250 coins |
+| 🐱 Coco Cat | 🏘️ Cat Town — colourful houses | 350 coins |
+| 🐶 Dodo Dog | 🌳 Puppy Park — trees and green paths | 450 coins |
+| 🐧 Pip Penguin | ❄️ Penguin Glacier — ice formations and snow | Free |
+| 🐮 Mimi Cow | 🚜 Mimi Farm — barns and countryside | 700 coins |
 
-*Character prices refer to in-game coins earned while playing, not real-money purchases.*
-
-</div>
+Progress from earlier versions is retained where possible. The penguin remains freely available.
 
 ## ✨ Three.js Visual Experience
 
@@ -184,9 +187,9 @@ The game **has not yet been signed, published or confirmed through a complete An
 
 ## 🗺️ Roadmap
 
-- [x] Procedural 3D Arctic environment
+- [x] Procedural 3D environments for seven animal worlds
 - [x] Three-lane running, jumping and sliding
-- [x] Five selectable / unlockable animal characters
+- [x] Seven chibi-style animal characters with different home worlds
 - [x] Coins, energy, shields and magnets
 - [x] Local progress saving and basic audio cues
 - [x] Capacitor Android configuration

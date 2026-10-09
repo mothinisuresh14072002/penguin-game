@@ -12,7 +12,8 @@ const CHARS=[
 const KEY='penguin-ice-runner-v2';
 let saved;
 try { saved=JSON.parse(localStorage.getItem(KEY)||'{}'); } catch { saved={}; }
-const profile={coins:Math.max(0,Number(saved.coins)||0),best:Math.max(0,Number(saved.best)||0),unlocked:Array.isArray(saved.unlocked)?saved.unlocked:['penguin'],selected:saved.selected||'penguin'};
+const validIds=new Set(CHARS.map(c=>c.id));
+const profile={coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['penguin'],selected:saved.selected||'penguin'};
 if(!profile.unlocked.includes('penguin'))profile.unlocked.push('penguin');
 if(!profile.unlocked.includes(profile.selected))profile.selected='penguin';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(profile))}catch{}};
@@ -76,7 +77,10 @@ function model(id){
  return {group,pivotL,pivotR};
 }
 let character=model(profile.selected);scene.add(character.group);
-function swapCharacter(){scene.remove(character.group);character=model(profile.selected);scene.add(character.group)}
+const SHARED_GEOMETRIES=new Set([sphere,cube,coneGeo]);
+const SHARED_MATERIALS=new Set([snowMat,iceMat,deepIce,rockMat,dark,white,pink,gold,energyMat,powerMat,wood]);
+function disposeGroup(root){root.traverse(obj=>{if(obj.isMesh){if(obj.geometry&&!SHARED_GEOMETRIES.has(obj.geometry))obj.geometry.dispose();const mats=Array.isArray(obj.material)?obj.material:[obj.material];for(const m of mats)if(m&&!SHARED_MATERIALS.has(m))m.dispose()}})}
+function swapCharacter(){scene.remove(character.group);disposeGroup(character.group);character=model(profile.selected);scene.add(character.group)}
 // Endless segments are recycled instead of spawning unlimited geometry.
 for(let i=0;i<14;i++){
  const g=new THREE.Group();scene.add(g);scrollItems.push(g);g.position.z=10-i*18;
@@ -129,7 +133,7 @@ function row(at){
    if(Math.random()<.055)makeObject(Math.random()<.5?'shield':'magnet',lane,at+7);
  }
 }
-function clearObjects(){for(const e of entities)scene.remove(e.root);entities.length=0}
+function clearObjects(){for(const e of entities){scene.remove(e.root);disposeGroup(e.root)}entities.length=0}
 function showScreen(title,message,buttons){
  const screen=$('overlay');screen.classList.remove('hidden');
  $('screenTitle').textContent=title;$('screenText').textContent=message;
@@ -230,7 +234,7 @@ function tick(now){
    } else if(e.kind==='lion') e.root.rotation.y=Math.sin(clockTime*3)*.25;
    const isPick=['coin','energy','shield','magnet'].includes(e.kind);
    const sameLane=Math.abs(e.root.position.x-(laneX[0]+(laneX[2]-laneX[0])*playerLane/2))<(isPick?.76:1.03);
-   if(running&&Math.abs(e.at-distance)<.76&&!e.taken&&sameLane){
+   if(running&&!ended&&Math.abs(e.at-distance)<.76&&!e.taken&&sameLane){
     if(isPick){
       if(e.kind==='coin')runCoins++;
       if(e.kind==='energy')energy=Math.min(100,energy+29);
@@ -242,7 +246,7 @@ function tick(now){
       if(!above&&!duck){crash();break;}
     }
    }
-   if(e.at<distance-13){scene.remove(e.root);entities.splice(entities.indexOf(e),1)}
+   if(e.at<distance-13){scene.remove(e.root);disposeGroup(e.root);entities.splice(entities.indexOf(e),1)}
   }
   for(let i=0;i<scrollItems.length;i++){const segment=scrollItems[i];const position=((i*18-(distance%252)+252)%252);segment.position.z=10-position;}
   for(let i=0;i<350;i++){

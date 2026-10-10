@@ -266,7 +266,7 @@ function menu(){
  ]);
 }
 function start(){
- ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=10;spawnNext=26;invincible=1;lastMilestone=0;noticeUntil=0;$('speedNotice')?.classList.add('hidden');
+ ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=10;spawnNext=26;invincible=1;combo=0;lastCoinDistance=-100;lastMilestone=0;noticeUntil=0;$('speedNotice')?.classList.add('hidden');
  clearObjects();$('overlay').classList.add('hidden');$('shop').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';
  for(let i=0;i<8;i++){row(spawnNext);spawnNext+=17;}
 }
@@ -325,7 +325,7 @@ const snowPos=new Float32Array(350*3);
 for(let i=0;i<350;i++){snowPos[i*3]=(Math.random()-.5)*36;snowPos[i*3+1]=Math.random()*19;snowPos[i*3+2]=-Math.random()*85;}
 const flakesGeo=new THREE.BufferGeometry();flakesGeo.setAttribute('position',new THREE.BufferAttribute(snowPos,3));
 const flakes=new THREE.Points(flakesGeo,new THREE.PointsMaterial({color:0xffffff,size:.075,transparent:true,opacity:.77,depthWrite:false}));scene.add(flakes);
-let last=performance.now(),lastMilestone=0,noticeUntil=0;
+let last=performance.now(),lastMilestone=0,noticeUntil=0,combo=0,lastCoinDistance=-100;
 function showSpeedNotice(message){const banner=$('speedNotice');if(banner){banner.textContent=message;banner.classList.remove('hidden');noticeUntil=clockTime+1.4;}}
 function tick(now){
  requestAnimationFrame(tick);
@@ -355,7 +355,7 @@ function tick(now){
    const sameLane=isPick?dx<.43&&dy<.75:dx<1.03;
    if(running&&!ended&&Math.abs(e.at-distance)<.76&&!e.taken&&sameLane){
     if(isPick){
-      if(e.kind==='coin'){runCoins++;sound(880,.075,'sine',.045)}
+      if(e.kind==='coin'){combo=distance-lastCoinDistance<9?combo+1:1;lastCoinDistance=distance;runCoins++;sound(760+Math.min(combo,8)*35,.07,'sine',.04);if(combo===5||combo===10||combo===20)showSpeedNotice('✨ '+combo+' COIN STREAK!')}
       if(e.kind==='energy'){energy=Math.min(100,energy+29);sound(660,.18,'triangle')}
       if(e.kind==='shield'){shield=13;sound(540,.22,'triangle')}
       if(e.kind==='magnet'){magnet=11;sound(510,.22,'triangle')}
@@ -365,7 +365,7 @@ function tick(now){
       if(!above&&!duck){crash();break;}
     }
    }
-   if(e.at<distance-13){scene.remove(e.root);disposeGroup(e.root);entities.splice(entities.indexOf(e),1)}
+   if(e.at<distance-13){if(e.kind==='coin'&&!e.taken&&magnet<=0)combo=0;scene.remove(e.root);disposeGroup(e.root);entities.splice(entities.indexOf(e),1)}
   }
   for(let i=0;i<scrollItems.length;i++){const segment=scrollItems[i];segment.position.z=10-i*18;}
   for(let i=0;i<350;i++){
@@ -388,6 +388,10 @@ function tick(now){
  if(run&&playerY<=.02&&sliding<=0&&clockTime-lastStepSound>.25){lastStepSound=clockTime;sound(165+(Math.floor(clockTime*10)%3)*21,.047,'triangle',.014)}
  character.pivotL.rotation.x=Math.sin(clockTime*13)*.32*run;
  character.pivotR.rotation.x=-Math.sin(clockTime*13)*.32*run;
+ // Wider field of view at higher speeds makes acceleration more noticeable.
+ const desiredFov=57+(Math.min(32,speed)-10)*.38;
+ const newFov=THREE.MathUtils.damp(camera.fov,desiredFov,2.8,dt);
+ if(Math.abs(newFov-camera.fov)>.02){camera.fov=newFov;camera.updateProjectionMatrix()}
  const desiredX=character.group.position.x*.28;
  camera.position.x=THREE.MathUtils.damp(camera.position.x,desiredX,2,dt);
  camera.lookAt(camera.position.x*.3,1.4,-17);

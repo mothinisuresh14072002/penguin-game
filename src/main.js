@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import './style.css';
 import {createAnimal, animateAnimal} from './animalArt.js';
 import {populateHabitat} from './worldArt.js';
+import {renderCharacterPreviews} from './characterPreviews.js';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
@@ -207,13 +208,17 @@ function showScreen(title,message,buttons){
  const actions=$('screenActions');actions.replaceChildren();
  for(const b of buttons){const btn=document.createElement('button');btn.textContent=b.text;btn.className=b.secondary?'secondary':'';btn.onclick=b.action;actions.appendChild(btn)}
 }
+let characterPreviews;
 function shop(){
+ if(!characterPreviews)characterPreviews=renderCharacterPreviews(CHARS,BIOMES);
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.remove('hidden');$('overlay').classList.add('hidden');
  const grid=$('charGrid');grid.replaceChildren();
  for(const c of CHARS){
   const unlocked=profile.unlocked.includes(c.id),selected=profile.selected===c.id;
   const button=document.createElement('button');button.className='char-card'+(selected?' selected':'');
-  button.innerHTML='<span class="char-emoji">'+c.icon+'</span><strong>'+c.name+'</strong><small>'+(selected?'SELECTED':unlocked?'USE CHARACTER':'🪙 '+c.cost)+'</small>';
+  const thumb=characterPreviews?.get(c.id);
+  button.innerHTML=(thumb?'<img class="char-thumb" alt="3D character preview" src="'+thumb+'">':'<span class="char-emoji">'+c.icon+'</span>')+
+   '<strong>'+c.icon+' '+c.name+'</strong><small>'+BIOMES[c.biome].name+'</small><small>'+(selected?'SELECTED':unlocked?'USE CHARACTER':'🪙 '+c.cost)+'</small>';
   button.onclick=()=>{
    if(unlocked){profile.selected=c.id;swapCharacter();save();shop();}
    else if(profile.coins>=c.cost){profile.coins-=c.cost;profile.unlocked.push(c.id);profile.selected=c.id;swapCharacter();save();shop();}

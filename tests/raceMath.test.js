@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { FINISH_DISTANCE, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, pickupTouch } from '../src/raceMath.js';
+import { FINISH_DISTANCE, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, pickupTouch, crossedDistance } from '../src/raceMath.js';
 
 test('race accelerates and stops at a safe maximum', () => {
   assert.equal(raceSpeed(0), 22);
@@ -37,4 +37,10 @@ test('track elements loop without gaps in the cycle', () => {
       assert.ok(z <= 14 && z > 14 - 24 * 8);
     }
   }
+});
+
+test('fast movement cannot pass through objects between frames', () => {
+ assert.ok(crossedDistance(10, 13.3, 11.8));
+ assert.ok(crossedDistance(20, 23.9, 23.7));
+ assert.equal(crossedDistance(10, 12, 18), false);
 });

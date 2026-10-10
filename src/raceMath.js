@@ -23,3 +23,9 @@ export const pickupTouch = (pickupX, pickupZ, pickupY, playerX, playerZ, playerY
   Math.abs(pickupX - playerX) < 0.48 &&
   Math.abs(pickupZ - playerZ) < 0.85 &&
   Math.abs(pickupY - (playerY + 1.12)) < 0.83;
+
+// Continuous collision detection prevents tunnelling when a fast character
+// crosses an object between rendered frames.
+export const crossedDistance = (previous, current, objectDistance, halfWidth = 0.82) =>
+  objectDistance >= Math.min(previous, current) - halfWidth &&
+  objectDistance <= Math.max(previous, current) + halfWidth;

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import './race.css';
-import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch } from './raceMath.js';
+import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
 const $ = id => document.getElementById(id);
 const CHARACTERS = [
@@ -220,6 +220,7 @@ function findWinner(){
 function updatePlayer(p,dt){
  p.time+=dt;const currentSpeed=raceSpeed(p.distance),moving=p.stun>0?.37:1;
  p.stun=Math.max(0,p.stun-dt);p.invuln=Math.max(0,p.invuln-dt);
+ const previousDistance=p.distance;
  p.distance+=currentSpeed*moving*dt;
  p.energy=Math.max(0,p.energy-dt*(.96+currentSpeed*.014));
  p.lane=THREE.MathUtils.damp(p.lane,p.target,16,dt);
@@ -232,7 +233,7 @@ function updatePlayer(p,dt){
  for(const e of p.objects){
   e.root.position.z=2-(e.at-p.distance);
   if(e.pickup){e.root.rotation.y+=dt*3;e.root.position.y=Math.sin(p.time*4+e.at)*.07}
-  if(!e.taken&&Math.abs(e.at-p.distance)<.82){
+  if(!e.taken&&crossedDistance(previousDistance,p.distance,e.at)){
    if(e.pickup){
     const y=e.kind==='energy'?1.19:1.14;
     if(pickupTouch(e.root.position.x,e.root.position.z,y+e.root.position.y,px,2,p.y)){

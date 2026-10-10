@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {createAnimal} from './animalArt.js';
+import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 
 // Renders the SAME 3D models used in the game into compact shop thumbnails.
 // Falls back to the emoji selector if WebGL preview rendering is unavailable.
@@ -49,4 +50,37 @@ export function renderCharacterPreviews(characters, biomes){
   if(renderer){renderer.dispose();renderer.forceContextLoss();}
  }
  return previews;
+}
+
+/**
+ * If a GLB is installed, show its genuine 3D mesh in the character selector.
+ * This runs once on demand and releases the temporary WebGL context.
+ */
+export async function renderImportedPreview(id,skyColor=0xace5f8){
+ const actor=await loadImportedAnimal(id);
+ if(!actor)return null;
+ let renderer;
+ try{
+  renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true,powerPreference:'low-power'});
+  renderer.setSize(180,200,false);renderer.setPixelRatio(1);
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.3;
+  const scene=new THREE.Scene();scene.background=new THREE.Color(skyColor);
+  const camera=new THREE.PerspectiveCamera(46,180/200,.1,70);
+  camera.position.set(0,1.65,6.0);camera.lookAt(0,1.40,0);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x8aa9c5,3.4));
+  const key=new THREE.DirectionalLight(0xfff8ea,3.2);
+  key.position.set(-4,8,5);scene.add(key);
+  actor.group.rotation.y=-.20;
+  scene.add(actor.group);
+  renderer.render(scene,camera);
+  return renderer.domElement.toDataURL('image/png');
+ }catch(error){
+  console.warn('Unable to generate GLB shop portrait',error);
+  return null;
+ }finally{
+  releaseImportedAnimal(actor);
+  if(renderer){renderer.dispose();renderer.forceContextLoss();}
+ }
 }

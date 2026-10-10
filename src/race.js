@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import './race.css';
 import {createAnimal, animateAnimal} from './animalArt.js';
+import {populateHabitat} from './worldArt.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
 const $ = id => document.getElementById(id);
@@ -49,27 +50,8 @@ function createHero(id,scene){
 }
 function prop(scene,type,ch,x,z,index){
  const group=new THREE.Group();group.position.set(x,0,z);scene.add(group);
- const green=material(0x78b978),bark=material(0x846b50),white=material(0xfffaf4),feature=material(ch.accent);
- if(type==='flowers'){
-  piece(group,geom.cylinder,green,0,.4,0,.05,.7,.05);
-  for(let a=0;a<5;a++){const theta=a*Math.PI*2/5;ball(group,feature,Math.sin(theta)*.25,.85+Math.cos(theta)*.21,0,.15,.15,.13)}
-  ball(group,material(0xffe885),0,.85,.09,.12,.12,.12);
- }else if(type==='crystals'||type==='ice'){
-  piece(group,geom.cone,feature,0,.95,0,.46,1.8,.46);
-  piece(group,geom.cone,white,.55,.53,.14,.28,1.1,.28);
- }else if(type==='hay'){
-  piece(group,geom.box,material(0xedc476),0,.49,0,1.35,.95,1.05);
-  piece(group,geom.box,bark,0,.54,.53,1.4,.08,.09);
- }else if(type==='town'||type==='farm'){
-  const building=material(type==='town'?0xeeb59f:0xd15d5d);
-  piece(group,geom.box,building,0,1.1,0,2.1,2.1,1.8);
-  const roof=piece(group,geom.cone,material(type==='town'?0x7a85ad:0x895b5b),0,2.57,0,1.47,1.2,1.47);
-  roof.rotation.y=Math.PI/4;
-  piece(group,geom.box,white,0,.68,.94,.47,.85,.09);
- }else if(type==='trees'){
-  piece(group,geom.cylinder,bark,0,1,0,.20,2,.20);
-  ball(group,index%2?green:material(0x58a384),0,2.2,0,.9,1.02,.82);
- }
+ populateHabitat(group,type,index,(parent,geo,color,xx,yy,zz,sx,sy,sz)=>
+  piece(parent,geo,material(color),xx,yy,zz,sx,sy,sz));
  return group;
 }
 function newRacePlayer(ch,index){

@@ -3,9 +3,9 @@
 <img src="assets/readme-banner.svg" alt="Polar Dash — animated Arctic game artwork" width="100%" />
 
 # ❄️ POLAR DASH
-### Seven Cute Heroes. Seven Colorful Worlds. Endless Adventures.
+### Seven Cute Heroes · Seven Living Worlds · Two-Friend Races
 
-**A cute, multi-world 3D animal endless runner built with Three.js, JavaScript and Vite.**
+**Fast 3D animal endless runner with a solo adventure and same-screen, two-player split-screen races. Built using Three.js and Vite.**
 
 [![Three.js](https://img.shields.io/badge/Three.js-3D%20WebGL-0b192c?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-f7df1e?style=for-the-badge&logo=javascript&logoColor=111)](https://developer.mozilla.org/docs/Web/JavaScript)
@@ -15,7 +15,7 @@
 [![Build](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml/badge.svg)](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml)
 [![GitHub stars](https://img.shields.io/github/stars/mothinisuresh14072002/penguin-game?style=social)](https://github.com/mothinisuresh14072002/penguin-game/stargazers)
 
-**[🎮 Play Locally](#-quick-start) · [🐾 Characters & Worlds](#-meet-the-runners-and-their-worlds) · [✨ Three.js](#-threejs-visual-experience) · [📱 Android](#-android-build-prototype) · [🗺️ Roadmap](#️-roadmap)**
+**[🎮 Play](#-quick-start) · [🏁 Two Friends](#-two-friend-split-screen-race) · [🐾 Characters](#-meet-the-runners-and-their-worlds) · [✨ Three.js](#-threejs-visual-experience) · [📱 Android](#-android-build-prototype)**
 
 </div>
 
@@ -31,9 +31,9 @@ The world and characters are generated with **procedural Three.js geometry**, no
 
 <div align="center">
 
-| 🌈 Seven themed worlds | ⚡ Energy survival | 🪙 Collect & unlock | 🛡️ Power-ups |
+| 🌈 Seven themed worlds | 🏁 Two-player races | ⚡ Speed & energy | 🪙 Collect & unlock |
 |:---:|:---:|:---:|:---:|
-| Character-linked scenery | Grab energy pickups | Unlock new characters | Shield & coin magnet |
+| Character-linked nature | Same-screen split view | Faster progression | Earn coins in solo |
 
 </div>
 
@@ -41,15 +41,39 @@ The world and characters are generated with **procedural Three.js geometry**, no
 
 | Feature | Current implementation |
 |---|---|
-| **Infinite run** | Procedural obstacles and increasing movement speed |
+| **Solo endless run** | Progressive acceleration (18 → 58 world units/s), safe obstacle paths and faster pacing |
 | **Movement** | Switch between three lanes, jump and slide |
 | **Hazards** | World-dependent rocks, spikes, wooden obstacles and an Arctic lion |
 | **Energy** | Energy decreases during a run; green pickups refill it |
 | **Rewards** | Collect coins and spend them in the character shop |
 | **Power-ups** | Shield and temporary coin magnet |
 | **Progress** | Best distance, coins and unlocked characters stored locally |
-| **Controls** | Keyboard and mobile swipe gestures |
+| **Controls** | Keyboard and mobile swipe gestures; two-player controls are independent |
 | **Audio** | Optional, lightweight synthesized gameplay effects |
+
+## 🏁 Two-Friend Split-Screen Race
+
+**NEW: Two people can play on the same desktop or mobile screen.** Choose any two of the seven animal heroes, each with their own nature world. Both runners face the **same generated obstacle-lane pattern**, so the race is fair even when the worlds look different.
+
+- **Desktop:** two side-by-side Three.js views, with one shared renderer and two cameras.
+- **Portrait phone:** two views stacked vertically. Each player swipes within their own half of the screen.
+- **Goal:** first runner to **1,000m** wins. Obstacles temporarily slow a runner and reduce energy; pickups recharge it.
+- **Scoring:** separate distance, coins, energy, hits and a winner/results screen. The race is local multiplayer, not online networking.
+- **Fair play:** all seven heroes are available to select in the race lobby, regardless of solo shop unlocks. Race coins are session scores and do not change the solo wallet.
+
+| Action | Player 1 (🔷) | Player 2 (🔶) |
+|:---|:---|:---|
+| Change lane | `A` / `D` | `J` / `L` |
+| Jump | `W` or Space | `I` |
+| Slide | `S` | `K` |
+| Mobile control | Swipe inside first viewport | Swipe inside second viewport |
+| Pause | `P` or Escape, or on-screen button | Shared pause |
+
+**[Open race mode in your local browser](race.html)** after running the dev server, or visit **http://localhost:5173/race.html**.
+
+### Speed, game feel & animated nature
+
+Both modes accelerate over time. Solo runs progress toward 58 world units/second; the **two-player race reaches 70 world units/second**. Camera field of view widens with speed, and lane markings, roadside nature and clouds stream past the camera. Race obstacle spacing scales with speed so an increasing pace does not automatically create impossible lane changes. The road surface itself remains continuous.
 
 ## 🐾 Meet the Runners and Their Worlds
 
@@ -93,6 +117,8 @@ The earlier v2 saved profile is read if a v3 profile does not yet exist. Bella B
 ### 🌍 Procedural Animal Worlds
 
 - Seven configurable sky, track and fog palettes
+- Animated parallax clouds and scene-specific nature details
+- Butterflies in meadow, farm, prairie and park
 - World-specific decorations: flowers, crystals, hay, houses, trees, ice and barns
 - Biome-dependent obstacle pools
 - Procedural mountains and track scenery
@@ -148,7 +174,13 @@ npm run build
 npm run preview
 ```
 
-The optimized web output is generated in `dist/`.
+The optimized web output is generated in `dist/` and includes both `index.html` and `race.html`.
+
+### Run Race Tests
+
+```cmd
+node --test tests/raceMath.test.js
+```
 
 ## 🏗️ Project Architecture
 
@@ -161,8 +193,15 @@ penguin-game/
 ├── docs/
 │   └── PLAY_STORE_RELEASE.md   # Android release checklist
 ├── src/
-│   ├── main.js                 # Three.js scene + gameplay systems
-│   └── style.css               # Game UI and responsive styles
+│   ├── main.js                 # Solo 3D runner + immersive animal biomes
+│   ├── style.css               # Solo UI
+│   ├── race.js                 # Local two-player split-screen game
+│   ├── race.css                # Desktop and mobile race interface
+│   └── raceMath.js             # Testable deterministic race mechanics
+├── tests/
+│   └── raceMath.test.js        # Fairness, coin, speed, road tests
+├── race.html                   # Two-friend race entry point
+├── vite.config.js              # Bundles both HTML entry points
 ├── index.html                  # Game interface
 ├── package.json                # Dependencies and scripts
 ├── capacitor.config.json      # Android app wrapper configuration
@@ -211,11 +250,14 @@ The game **has not yet been signed, published or confirmed through a complete An
 - [x] Coins, energy, shields and magnets
 - [x] Local progress saving and basic audio cues
 - [x] Capacitor Android configuration
-- [x] GitHub Actions build workflow added
+- [x] GitHub Actions build workflow with deterministic race-physics unit tests
+- [x] Two friends racing on the same screen (desktop split view, portrait stacked view)
+- [x] Faster acceleration, animated lane markers, moving nature and sky clouds
 - [x] GitHub Actions production build verified
 - [ ] Add automated gameplay/browser tests
 - [ ] Higher-fidelity character meshes, textures and skeletal animation
 - [ ] Device-tested 60 FPS performance targets and graphical quality presets
+- [ ] Browser and physical-device playtesting of both-player controls and framerate
 - [ ] Additional levels, biomes, missions and onboarding
 - [ ] Capture authentic gameplay footage, screenshots and trailer
 - [ ] Sign, test and submit the Android App Bundle to Google Play

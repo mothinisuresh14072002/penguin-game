@@ -274,7 +274,7 @@ function shop(){
 function menu(){
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.add('hidden');updateHUD();
  showScreen('POLAR DASH','A cute animal adventure across magical worlds. Switch lanes, jump obstacles, collect energy and unlock new animal friends.',[
-  {text:'START RUN',action:start},{text:'CHARACTERS & SHOP',secondary:true,action:shop}
+  {text:'🏃 SOLO RUN',action:start},{text:'🏁 2 FRIEND RACE',action:()=>location.assign('./race.html')},{text:'CHARACTERS & SHOP',secondary:true,action:shop}
  ]);
 }
 function start(){

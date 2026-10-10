@@ -372,6 +372,7 @@ function tick(now){
  if(running&&!paused){
   clockTime+=dt;
   speed=Math.min(58,18+distance*.042);
+  const previousDistance=distance;
   distance+=speed*dt;
   const milestone=Math.floor(distance/250);
   if(milestone>lastMilestone){lastMilestone=milestone;showSpeedNotice('⚡ SPEED UP!  '+Math.round(speed)+' RUN SPEED');sound(790,.15,'triangle',.04)}
@@ -392,7 +393,7 @@ function tick(now){
    // A pickup requires actual horizontal AND vertical contact; adjacent lanes never auto-collect.
    const dy=Math.abs((e.kind==='coin'?1.12:e.kind==='energy'?1.2:1.27)+e.root.position.y-(playerY+1.12));
    const sameLane=isPick?dx<.43&&dy<.75:dx<1.03;
-   if(running&&!ended&&Math.abs(e.at-distance)<.76&&!e.taken&&sameLane){
+   if(running&&!ended&&!e.taken&&e.at>=previousDistance-.76&&e.at<=distance+.76&&sameLane){
     if(isPick){
       if(e.kind==='coin'){combo=distance-lastCoinDistance<9?combo+1:1;lastCoinDistance=distance;runCoins++;sound(760+Math.min(combo,8)*35,.07,'sine',.04);if(combo===5||combo===10||combo===20)showSpeedNotice('✨ '+combo+' COIN STREAK!')}
       if(e.kind==='energy'){energy=Math.min(100,energy+29);sound(660,.18,'triangle')}

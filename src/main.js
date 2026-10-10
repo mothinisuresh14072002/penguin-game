@@ -224,14 +224,14 @@ function makeObject(kind,lane,at){
 function row(at){
  let blocked=new Set();
  const difficulty=Math.min(1,distance/1400);
- const count=Math.random()<.25+difficulty*.43?2:1;
+ const count=Math.random()<.18+difficulty*.50?2:1;
  while(blocked.size<count)blocked.add(Math.floor(Math.random()*3));
  for(const lane of blocked){
    const types=currentTheme.hazards;
    makeObject(types[Math.floor(Math.random()*types.length)],lane,at);
  }
  for(let lane=0;lane<3;lane++)if(!blocked.has(lane)){
-   if(Math.random()<.85){for(let i=0;i<3;i++)makeObject('coin',lane,at+2.0+i*1.2);}
+   if(Math.random()<.92){for(let i=0;i<4;i++)makeObject('coin',lane,at+2.0+i*1.15);}
    if(Math.random()<.34)makeObject('energy',lane,at+5.9);
    if(Math.random()<.055)makeObject(Math.random()<.5?'shield':'magnet',lane,at+7);
  }
@@ -266,7 +266,7 @@ function menu(){
  ]);
 }
 function start(){
- ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=10;spawnNext=26;invincible=1;
+ ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=10;spawnNext=26;invincible=1;lastMilestone=0;noticeUntil=0;$('speedNotice')?.classList.add('hidden');
  clearObjects();$('overlay').classList.add('hidden');$('shop').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';
  for(let i=0;i<8;i++){row(spawnNext);spawnNext+=17;}
 }
@@ -325,25 +325,34 @@ const snowPos=new Float32Array(350*3);
 for(let i=0;i<350;i++){snowPos[i*3]=(Math.random()-.5)*36;snowPos[i*3+1]=Math.random()*19;snowPos[i*3+2]=-Math.random()*85;}
 const flakesGeo=new THREE.BufferGeometry();flakesGeo.setAttribute('position',new THREE.BufferAttribute(snowPos,3));
 const flakes=new THREE.Points(flakesGeo,new THREE.PointsMaterial({color:0xffffff,size:.075,transparent:true,opacity:.77,depthWrite:false}));scene.add(flakes);
-let last=performance.now();
+let last=performance.now(),lastMilestone=0,noticeUntil=0;
+function showSpeedNotice(message){const banner=$('speedNotice');if(banner){banner.textContent=message;banner.classList.remove('hidden');noticeUntil=clockTime+1.4;}}
 function tick(now){
  requestAnimationFrame(tick);
  const dt=Math.min(.043,(now-last)/1000);last=now;
  if(running&&!paused){
-  clockTime+=dt;distance+=speed*dt;speed=Math.min(24,10+distance*.007);
+  clockTime+=dt;
+  speed=Math.min(32,10+distance*.018);
+  distance+=speed*dt;
+  const milestone=Math.floor(distance/250);
+  if(milestone>lastMilestone){lastMilestone=milestone;showSpeedNotice('SPEED UP!  '+Math.round(speed)+' km/h');sound(790,.15,'triangle',.04)}
   energy=Math.max(0,energy-dt*(1.1+speed*.025));if(energy<=0)finish('You ran out of energy.');
   playerLane=THREE.MathUtils.damp(playerLane,targetLane,13,dt);
   if(playerY>.001||velocityY>0){velocityY-=25*dt;playerY=Math.max(0,playerY+velocityY*dt);if(playerY===0)velocityY=0;}
   sliding=Math.max(0,sliding-dt);shield=Math.max(0,shield-dt);magnet=Math.max(0,magnet-dt);invincible=Math.max(0,invincible-dt);
-  while(spawnNext<distance+150){row(spawnNext);spawnNext+=Math.max(12,19-distance/290);}
+  while(spawnNext<distance+150){row(spawnNext);spawnNext+=Math.max(18,23-distance/350);}
   for(const e of [...entities]){
    e.root.position.z=2-(e.at-distance);
    if(e.kind==='coin'||e.kind==='energy'||e.kind==='shield'||e.kind==='magnet'){
      e.root.rotation.y+=dt*2.8;e.root.position.y=Math.sin(clockTime*4+e.at)*.09;
-     if(magnet>0&&e.kind==='coin'&&Math.abs(e.at-distance)<9)e.root.position.x=THREE.MathUtils.damp(e.root.position.x,laneX[Math.round(playerLane)],7,dt);
+     if(magnet>0&&e.kind==='coin'&&Math.abs(e.at-distance)<3&&Math.abs(e.root.position.x-(laneX[0]+(laneX[2]-laneX[0])*playerLane/2))<1.7)e.root.position.x=THREE.MathUtils.damp(e.root.position.x,laneX[0]+(laneX[2]-laneX[0])*playerLane/2,5,dt);
    } else if(e.kind==='lion') e.root.rotation.y=Math.sin(clockTime*3)*.25;
    const isPick=['coin','energy','shield','magnet'].includes(e.kind);
-   const sameLane=Math.abs(e.root.position.x-(laneX[0]+(laneX[2]-laneX[0])*playerLane/2))<(isPick?.76:1.03);
+   const playerX=laneX[0]+(laneX[2]-laneX[0])*playerLane/2;
+   const dx=Math.abs(e.root.position.x-playerX);
+   // A pickup requires actual horizontal AND vertical contact; adjacent lanes never auto-collect.
+   const dy=Math.abs((e.kind==='coin'?1.12:e.kind==='energy'?1.2:1.27)+e.root.position.y-(playerY+1.12));
+   const sameLane=isPick?dx<.43&&dy<.75:dx<1.03;
    if(running&&!ended&&Math.abs(e.at-distance)<.76&&!e.taken&&sameLane){
     if(isPick){
       if(e.kind==='coin'){runCoins++;sound(880,.075,'sine',.045)}
@@ -358,7 +367,7 @@ function tick(now){
    }
    if(e.at<distance-13){scene.remove(e.root);disposeGroup(e.root);entities.splice(entities.indexOf(e),1)}
   }
-  for(let i=0;i<scrollItems.length;i++){const segment=scrollItems[i];const position=((i*18-(distance%252)+252)%252);segment.position.z=10-position;}
+  for(let i=0;i<scrollItems.length;i++){const segment=scrollItems[i];segment.position.z=10-i*18;}
   for(let i=0;i<350;i++){
    snowPos[i*3+1]-=dt*(.9+(i%5)*.2);
    snowPos[i*3+2]+=dt*speed*.4;
@@ -366,6 +375,7 @@ function tick(now){
    if(snowPos[i*3+2]>14)snowPos[i*3+2]=-88;
   }
   flakesGeo.attributes.position.needsUpdate=true;
+  if(clockTime>noticeUntil)$('speedNotice')?.classList.add('hidden');
   updateHUD();
  }
  character.group.position.set(laneX[0]+(laneX[2]-laneX[0])*playerLane/2,playerY,2);

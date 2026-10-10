@@ -29,12 +29,12 @@ const profile={coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.ma
 for(const id of ['bunny','penguin'])if(!profile.unlocked.includes(id))profile.unlocked.push(id);
 if(!profile.unlocked.includes(profile.selected))profile.selected='penguin';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(profile))}catch{}};
-let audioEnabled=false,audioContext=null;
+let audioEnabled=false,audioContext=null,lastStepSound=0;
+function ensureAudio(){try{audioContext??=new (window.AudioContext||window.webkitAudioContext)();if(audioContext.state==='suspended')audioContext.resume()}catch{}}
 function sound(frequency=440,duration=.08,type='sine',volume=.065){
  if(!audioEnabled)return;
  try {
-  audioContext??=new (window.AudioContext||window.webkitAudioContext)();
-  if(audioContext.state==='suspended')audioContext.resume();
+  ensureAudio();if(!audioContext)return;
   const oscillator=audioContext.createOscillator(),gain=audioContext.createGain(),t=audioContext.currentTime;
   oscillator.type=type;oscillator.frequency.setValueAtTime(frequency,t);
   gain.gain.setValueAtTime(volume,t);gain.gain.exponentialRampToValueAtTime(.001,t+duration);
@@ -118,7 +118,7 @@ let character=model(profile.selected);scene.add(character.group);
 const SHARED_GEOMETRIES=new Set([sphere,cube,coneGeo]);
 const SHARED_MATERIALS=new Set([snowMat,iceMat,deepIce,rockMat,dark,white,pink,gold,energyMat,powerMat,wood]);
 function disposeGroup(root){root.traverse(obj=>{if(obj.isMesh){if(obj.geometry&&!SHARED_GEOMETRIES.has(obj.geometry))obj.geometry.dispose();const mats=Array.isArray(obj.material)?obj.material:[obj.material];for(const m of mats)if(m&&!SHARED_MATERIALS.has(m))m.dispose()}})}
-function swapCharacter(){scene.remove(character.group);disposeGroup(character.group);character=model(profile.selected);scene.add(character.group);applyBiome()}
+function swapCharacter(){scene.remove(character.group);disposeGroup(character.group);character=model(profile.selected);scene.add(character.group);applyBiome();sound(690,.12,'triangle')}
 // Endless segments are recycled instead of spawning unlimited geometry.
 for(let i=0;i<14;i++){
  const g=new THREE.Group();scene.add(g);scrollItems.push(g);g.position.z=10-i*18;
@@ -266,7 +266,7 @@ function menu(){
  ]);
 }
 function start(){
- running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=10;spawnNext=26;invincible=1;
+ ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=10;spawnNext=26;invincible=1;
  clearObjects();$('overlay').classList.add('hidden');$('shop').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';
  for(let i=0;i<8;i++){row(spawnNext);spawnNext+=17;}
 }
@@ -284,7 +284,7 @@ function crash(){
 }
 function moveLane(n){if(!running||paused)return;targetLane=THREE.MathUtils.clamp(targetLane+n,0,2);}
 function jump(){if(running&&!paused&&playerY<=.02&&sliding<=0){velocityY=10.0;sound(420,.12,'triangle')}}
-function slide(){if(running&&!paused&&playerY<=.02)sliding=.8}
+function slide(){if(running&&!paused&&playerY<=.02){sliding=.8;sound(260,.1,'triangle',.035)}}
 function updateHUD(){
  $('distance').textContent=Math.floor(distance);$('coins').textContent=runCoins;$('energy').textContent=Math.ceil(energy);
  $('energyFill').style.width=energy+'%';
@@ -294,7 +294,7 @@ function updateHUD(){
 $('pauseBtn').onclick=()=>{if(!running)return;paused=!paused;$('pauseBtn').textContent=paused?'▶':'Ⅱ';$('pauseBanner').classList.toggle('hidden',!paused)};
 $('shopBack').onclick=menu;
 $('startFromShop').onclick=start;
-$('soundBtn').onclick=()=>{audioEnabled=!audioEnabled;$('soundBtn').textContent=audioEnabled?'SOUND: ON':'SOUND: OFF';sound(580,.12,'triangle')};
+$('soundBtn').onclick=()=>{audioEnabled=!audioEnabled;try{localStorage.setItem('polar-dash-sound',audioEnabled?'on':'off')}catch{};$('soundBtn').textContent=audioEnabled?'SOUND: ON':'SOUND: OFF';if(audioEnabled){ensureAudio();sound(580,.12,'triangle')}};
 const keys=new Set();
 addEventListener('keydown',e=>{
  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
@@ -346,7 +346,7 @@ function tick(now){
    const sameLane=Math.abs(e.root.position.x-(laneX[0]+(laneX[2]-laneX[0])*playerLane/2))<(isPick?.76:1.03);
    if(running&&!ended&&Math.abs(e.at-distance)<.76&&!e.taken&&sameLane){
     if(isPick){
-      if(e.kind==='coin'){runCoins++;sound(880,.08,'sine',.045)}
+      if(e.kind==='coin'){runCoins++;sound(880,.075,'sine',.045)}
       if(e.kind==='energy'){energy=Math.min(100,energy+29);sound(660,.18,'triangle')}
       if(e.kind==='shield'){shield=13;sound(540,.22,'triangle')}
       if(e.kind==='magnet'){magnet=11;sound(510,.22,'triangle')}
@@ -370,9 +370,12 @@ function tick(now){
  }
  character.group.position.set(laneX[0]+(laneX[2]-laneX[0])*playerLane/2,playerY,2);
  projectedShadow.position.x=character.group.position.x;projectedShadow.position.z=2;projectedShadow.material.opacity=.82-Math.min(.65,playerY*.2);
+ // Game progression moves toward -Z: orient every animal forward along -Z, not toward the camera.
+ character.group.rotation.y=THREE.MathUtils.damp(character.group.rotation.y,Math.PI,13,dt);
  character.group.rotation.z=Math.sin(clockTime*14)*.04*(running&&!paused?1:0);
  character.group.scale.y=sliding>0?.55:1;
  const run=running&&!paused?1:0;
+ if(run&&playerY<=.02&&sliding<=0&&clockTime-lastStepSound>.25){lastStepSound=clockTime;sound(165+(Math.floor(clockTime*10)%3)*21,.047,'triangle',.014)}
  character.pivotL.rotation.x=Math.sin(clockTime*13)*.32*run;
  character.pivotR.rotation.x=-Math.sin(clockTime*13)*.32*run;
  const desiredX=character.group.position.x*.28;
@@ -383,4 +386,7 @@ function tick(now){
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6))});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&!paused)$('pauseBtn').click()});
 window.addEventListener('blur',()=>{if(running&&!paused)$('pauseBtn').click();keys.clear()});
+try{audioEnabled=localStorage.getItem('polar-dash-sound')==='on'}catch{};
+$('soundBtn').textContent=audioEnabled?'SOUND: ON':'SOUND: OFF';
+character.group.rotation.y=Math.PI;
 menu();requestAnimationFrame(tick);

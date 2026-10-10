@@ -79,7 +79,8 @@ function createHero(id,scene){
  hero.add(armL,armR);
  ball(armL,coat,-.08,-.27,0,.19,.39,.18);
  ball(armR,coat,.08,-.27,0,.19,.39,.18);
- const shadow=piece(scene,geom.ball,material(0x30506a),0,.25,2,.8,.025,.48);
+ const shadowMaterial=new THREE.MeshBasicMaterial({color:0x284b66,transparent:true,opacity:.4,depthWrite:false});disposables.add(shadowMaterial);
+ const shadow=piece(scene,geom.ball,shadowMaterial,0,.25,2,.8,.025,.48);
  const feet=hero.children.filter(c=>c.type==='Group'&&c!==armL&&c!==armR);
  hero.rotation.y=Math.PI;
  return {group:hero,armL,armR,feet,shadow};
@@ -132,13 +133,19 @@ function newRacePlayer(ch,index){
   piece(scene,geom.cone,material(index===0?0xa0c2c4:0xa7bddc),x,h*.48-3,-100-i%3*11,5,h,5);
   piece(scene,geom.cone,material(0xe7f7fa),x,h*.81-3,-100-i%3*11,2.1,h*.32,2.1);
  }
+ const skyClouds=[],cloudMat=material(0xffffff);
+ for(let i=0;i<14;i++){
+  const cloud=new THREE.Group();
+  for(let k=-1;k<=1;k++)ball(cloud,cloudMat,k*.83,Math.abs(k)*-.1,0,.91,k===0?.73:.49,.57);
+  scene.add(cloud);skyClouds.push(cloud);
+ }
  const scenery=[];
  for(let i=0;i<46;i++){
   const x=(i%2===0?-1:1)*(9+(i%3)*1.7),z=14-Math.floor(i/2)*12;
   scenery.push(prop(scene,ch.scenery,ch,x,z,i));
  }
  const hero=createHero(ch.id,scene);
- return {scene,camera,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,done:false,step:0,noticeUntil:0};
+ return {scene,camera,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
 }
 function obstacle(player,kind,lane,at){
  const root=new THREE.Group();root.position.set(LANE_POSITIONS[lane],0,2-(at-player.distance));player.scene.add(root);
@@ -245,6 +252,10 @@ function updatePlayer(p,dt){
   if(p.objects[i].at<p.distance-12){p.scene.remove(p.objects[i].root);p.objects.splice(i,1)}
  }
  for(let i=0;i<p.scenery.length;i++)p.scenery[i].position.z=trackLoop(Math.floor(i/2),12,p.distance*.82,23);
+ for(let i=0;i<p.skyClouds.length;i++){
+  const cloud=p.skyClouds[i];
+  cloud.position.set((i%2===0?-1:1)*(10+i%4*2)+Math.sin(p.time*.35+i),12+(i%4)*2,trackLoop(i,20,p.distance*.2,14));
+ }
  for(let i=0;i<p.laneMarks.length;i++)p.laneMarks[i].position.z=trackLoop(Math.floor(i/2),8,p.distance,24);
  p.hero.group.position.set(px,p.y,2);
  p.hero.group.rotation.z=Math.sin(p.time*15)*.035*(p.stun>0?.1:1);

@@ -4,3 +4,11 @@
 @media(max-width:640px){.world-label{right:10px;top:62px;font-size:10px;padding:7px 9px}}
 
 .speed-notice{position:fixed;top:22%;left:50%;transform:translate(-50%,-50%);z-index:5;padding:12px 27px;background:linear-gradient(110deg,#f6fcff,#70ebfc);color:#0b3a59;border-radius:100px;font-weight:900;font-size:clamp(15px,3vw,23px);letter-spacing:.07em;box-shadow:0 10px 34px #186a9c65;pointer-events:none;animation:speed-pop .35s ease-out}.speed-notice.hidden{display:none}@keyframes speed-pop{from{opacity:0;transform:translate(-50%,-20%) scale(.7)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+
+/* Real 3D character thumbnails, captured from the same animated models used in the game. */
+.char-card{min-height:196px;gap:5px;overflow:hidden;position:relative;padding:7px 4px 11px}
+.char-thumb{display:block;width:100%;max-width:160px;aspect-ratio:9/10;object-fit:contain;border-radius:13px;box-shadow:0 2px 11px #001a3045}
+.char-card strong{font-size:12px}
+.char-card small{font-size:10px;text-align:center;line-height:1.3}
+.char-card.selected .char-thumb{box-shadow:0 0 0 2px #b2fcff,0 8px 20px #022f5050}
+@media(max-width:520px){.char-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.char-card{min-height:160px}.char-thumb{max-width:130px}.shop-panel{max-height:90vh}}

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import './race.css';
 import {createAnimal, animateAnimal} from './animalArt.js';
 import {populateHabitat} from './worldArt.js';
+import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
 const $ = id => document.getElementById(id);
@@ -126,6 +127,7 @@ function spawnRow(player){
  player.nextSpawn+=spawnSpacing(raceSpeed(at));
 }
 function clearPlayer(player){
+ if(player.hero?.imported&&player.hero.mixer)player.hero.mixer.stopAllAction();
  const geometries=new Set(),materials=new Set();
  player.scene.traverse(object=>{
   if(!object.isMesh)return;
@@ -212,6 +214,7 @@ function updatePlayer(p,dt){
  for(let i=0;i<p.laneMarks.length;i++)p.laneMarks[i].position.z=trackLoop(Math.floor(i/2),8,p.distance,24);
  p.hero.group.position.set(px,p.y,2);
  animateAnimal(p.hero,p.time,p.stun<=0,p.y>.05);
+ p.hero.update?.(dt,p.time,p.stun<=0,p.y>.05);
  p.hero.group.scale.y=p.slide>0?.57:(p.y>.05?1.04:1);
  p.hero.shadow.position.x=px;
  p.hero.shadow.material.opacity=.55-Math.min(.43,p.y*.15);
@@ -274,9 +277,34 @@ function reset(){
  for(const p of racers){
   $('p'+(p.index+1)+'Name').textContent=p.ch.emoji+' '+p.ch.name;
   for(let i=0;i<6;i++)spawnRow(p);
+  tryImportedRaceHero(p);
  }
  $('raceOverlay').classList.add('hidden');$('raceResult').hidden=true;$('pauseLabel').hidden=true;
  $('pauseRace').textContent='Ⅱ PAUSE';beep(700,.15,.03);
+}
+// Swap only the actual character mesh. Each viewport keeps its own shadow
+// and race state, and a late load from an older race cannot replace a rematch.
+function tryImportedRaceHero(player){
+ if(player.ch.id!=='bunny')return;
+ loadImportedAnimal(player.ch.id).then(imported=>{
+  if(!imported)return;
+  if(racers[player.index]!==player){
+   releaseImportedAnimal(imported);return;
+  }
+  const previous=player.hero;
+  player.scene.remove(previous.group);
+  const oldGeo=new Set(),oldMats=new Set();
+  previous.group.traverse(o=>{
+   if(!o.isMesh)return;
+   if(o.geometry)oldGeo.add(o.geometry);
+   for(const m of Array.isArray(o.material)?o.material:[o.material])if(m)oldMats.add(m);
+  });
+  for(const g of oldGeo)g.dispose();
+  for(const m of oldMats)m.dispose();
+  imported.group.rotation.y=Math.PI;
+  player.scene.add(imported.group);
+  player.hero={...imported,shadow:previous.shadow};
+ });
 }
 function move(index,delta){if(!playing||paused||!racers[index])return;racers[index].target=clampLane(racers[index].target+delta)}
 function jump(index){const p=racers[index];if(!playing||paused||!p||p.y>.03||p.slide>0)return;p.vy=12.4;beep(370,.07,.02)}

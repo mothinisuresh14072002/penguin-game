@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#162e56"/>
+<meta name="description" content="Two friends compete side by side in Polar Dash local split-screen race mode."/>
+<title>Polar Dash — Two Player Race</title>
+</head>
+<body>
+<div id="race-root">
+  <header class="race-top"><a href="./index.html" class="back-link">← SOLO / HOME</a><span class="title">🐾 POLAR DASH <b>DUO RACE</b></span><button id="pauseRace" type="button">Ⅱ PAUSE</button></header>
+  <div class="race-hud p1"><div class="name">🔷 P1 <span id="p1Name">Bella Bunny</span></div><div class="stats"><b id="p1Distance">0</b> m · 🪙 <b id="p1Coins">0</b> · ⚡ <b id="p1Energy">100</b>%</div><div class="energy"><div id="p1Bar"></div></div><span id="p1Notice" class="notice"></span></div>
+  <div class="race-hud p2"><div class="name">🔶 P2 <span id="p2Name">Pip Penguin</span></div><div class="stats"><b id="p2Distance">0</b> m · 🪙 <b id="p2Coins">0</b> · ⚡ <b id="p2Energy">100</b>%</div><div class="energy"><div id="p2Bar"></div></div><span id="p2Notice" class="notice"></span></div>
+  <div class="split-marker"></div>
+  <div class="race-goal">🏁 FIRST TO 1,000m WINS</div>
+  <div id="raceOverlay" class="overlay">
+    <div class="panel">
+      <div class="eyebrow">TWO FRIENDS • ONE SCREEN</div>
+      <h1 id="raceTitle">DUO DASH</h1>
+      <p id="raceMessage">Race through beautiful animal worlds. Dodge obstacles, grab energy and reach the finish before your friend!</p>
+      <div id="raceSetup" class="choices">
+        <label>🔷 PLAYER 1 <select id="p1Pick" aria-label="Player 1 character"></select></label>
+        <label>🔶 PLAYER 2 <select id="p2Pick" aria-label="Player 2 character"></select></label>
+      </div>
+      <div id="raceResult" class="result" hidden></div>
+      <div class="actions"><button id="raceStart">🏁 START RACE</button><a href="./index.html" class="secondary">← SOLO MODE</a></div>
+      <div class="controls"><span><b>Player 1</b> A / D move · W jump · S slide</span><span><b>Player 2</b> J / L move · I jump · K slide</span><span>📱 Swipe inside your half of the screen to play</span></div>
+    </div>
+  </div>
+  <div id="pauseLabel" class="paused" hidden>⏸ PAUSED · PRESS P TO RESUME</div>
+</div>
+<script type="module" src="/src/race.js"></script>
+</body>
+</html>

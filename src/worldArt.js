@@ -58,11 +58,9 @@ export function populateHabitat(parent, type, index, addMesh) {
     }
   }else if(type==='star'||type==='crystals'){
     if(seed===0||seed===4){
-      const arch=add(torus,0xffcae0,0,3.2,.4,2.5,2.1,1);
-      arch.rotation.z=Math.PI;
+      add(torus,0xffcae0,0,.95,.4,2.5,2.1,1);
       for(let j=0;j<4;j++){
-        const a=add(torus,[0x8adbf7,0xfaceff,0xffefb7,0xc2f5de][j],0,3.2,.4,.1+(4-j)*.56,.1+(4-j)*.56,1);
-        a.rotation.z=Math.PI;
+        add(torus,[0x8adbf7,0xfaceff,0xffefb7,0xc2f5de][j],0,.95,.4,.1+(4-j)*.56,.1+(4-j)*.56,1);
       }
       for(const side of [-1,1]){orb(0xffffff,side*1.9,1.25,.6,.8,.36,.61);orb(0xece3ff,side*2.2,1.5,.5,.64,.32,.56)}
     }else{

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import './style.css';
+import {createAnimal, animateAnimal} from './animalArt.js';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
@@ -61,59 +62,7 @@ const snowMat=mat(0xf3fbff),iceMat=mat(0x8fddf1,.27,.12),deepIce=mat(0x309ac8,.3
 const sphere=new THREE.SphereGeometry(1,18,12),cube=new THREE.BoxGeometry(1,1,1),coneGeo=new THREE.ConeGeometry(1,1,7);
 function part(parent,geo,m,x=0,y=0,z=0,sx=1,sy=1,sz=1){const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
 const orb=(p,m,x,y,z,sx,sy,sz)=>part(p,sphere,m,x,y,z,sx,sy,sz);
-function model(id){
- const group=new THREE.Group(),ch=CHARS.find(c=>c.id===id)||CHARS[0],skin=mat(ch.color),black=mat(0x1c2631),cream=mat(0xffefe3),rose=mat(0xf4a8b3),brown=mat(0x8c563a),pinkNose=mat(0xe9909e),mane=mat(0xe9a7cf),hoof=mat(0x654f4f);
- const pivotL=new THREE.Group(),pivotR=new THREE.Group();group.add(pivotL,pivotR);
- const penguin=id==='penguin';
- orb(group,skin,0,.93,0,penguin?.57:.53,penguin?.8:.61,.43);
- orb(group,penguin?white:cream,0,.99,.36,.39,.54,.115);
- orb(group,skin,0,1.78,.05,.55,.52,.48);
- const eyeY=1.82;
- for(const side of [-1,1]){
-  orb(group,white,side*.25,eyeY,.449,.118,.145,.065);
-  orb(group,black,side*.25,eyeY,.506,.067,.092,.037);
-  orb(group,white,side*.227,eyeY+.043,.537,.025,.03,.016);
-  orb(group,rose,side*.36,1.55,.39,.105,.062,.035);
-  const leg=orb(group,skin,side*.27,.28,.15,.19,.29,.21);
-  orb(group,penguin?pink:hoof,side*.28,.12,.3,.24,.11,.27);
- }
- pivotL.position.set(-.52,1.22,0);pivotR.position.set(.52,1.22,0);
- orb(pivotL,skin,-.12,-.17,0,.21,.4,.2).rotation.z=-.2;
- orb(pivotR,skin,.12,-.17,0,.21,.4,.2).rotation.z=.2;
- if(penguin){
-  orb(group,white,0,1.36,.48,.35,.33,.09);
-  const beak=part(group,new THREE.ConeGeometry(.12,.27,10),mat(0xe88b47),0,1.62,.56);beak.rotation.x=Math.PI/2;
- } else {
-  const snout=id==='horse'||id==='unicorn'||id==='cow';
-  orb(group,id==='cow'?rose:cream,0,1.59,.49,snout?.31:.2,snout?.2:.15,snout?.26:.19);
-  orb(group,pinkNose,0,1.62,.71,.075,.06,.05);
-  if(['bunny','cat','dog','horse','unicorn','cow'].includes(id)){
-   for(const side of [-1,1]){
-    const ear=orb(group,skin,side*.37,2.37,-.01,id==='bunny'?.17:.23,id==='bunny'?.63:.3,.15);
-    ear.rotation.z=-side*(id==='dog'?.65:.2);
-    if(id==='bunny')orb(group,rose,side*.37,2.38,.12,.09,.46,.045);
-   }
-  }
-  if(id==='unicorn'){
-   part(group,new THREE.ConeGeometry(.13,.62,8),gold,0,2.47,.34);
-   for(let k=0;k<4;k++)orb(group,mane,-.34+k*.2,2.16,.18,.16,.21,.2);
-  }
-  if(id==='horse')for(let k=0;k<4;k++)orb(group,brown,-.24+k*.15,2.19,-.1,.12,.2,.16);
-  if(id==='cow'){
-   for(let k=0;k<4;k++)orb(group,black,(k%2?1:-1)*.31,.78+(k>>1)*.37,.34,.17,.15,.08);
-   for(const side of [-1,1])part(group,new THREE.ConeGeometry(.1,.24,9),cream,side*.27,2.46,-.07);
-  }
-  if(id==='cat'){
-   for(const side of [-1,1])for(let k=-1;k<=1;k++){
-    const whisker=part(group,new THREE.CylinderGeometry(.009,.009,.35,5),cream,side*.46,1.55+k*.07,.46);
-    whisker.rotation.z=Math.PI/2+k*.13;
-   }
-  }
-  if(id==='dog')orb(group,brown,.1,1.87,.47,.22,.17,.09);
-  const tail=orb(group,skin,.48,.92,-.41,.17,.22,.41);tail.rotation.z=.48;
- }
- return {group,pivotL,pivotR};
-}
+function model(id){return createAnimal(id)}
 let character=model(profile.selected);scene.add(character.group);
 const SHARED_GEOMETRIES=new Set([sphere,cube,coneGeo]);
 const SHARED_MATERIALS=new Set([snowMat,iceMat,deepIce,rockMat,dark,white,pink,gold,energyMat,powerMat,wood]);
@@ -444,12 +393,10 @@ function tick(now){
  projectedShadow.position.x=character.group.position.x;projectedShadow.position.z=2;projectedShadow.material.opacity=.82-Math.min(.65,playerY*.2);
  // Game progression moves toward -Z: orient every animal forward along -Z, not toward the camera.
  character.group.rotation.y=THREE.MathUtils.damp(character.group.rotation.y,Math.PI,13,dt);
- character.group.rotation.z=Math.sin(clockTime*14)*.04*(running&&!paused?1:0);
- character.group.scale.y=sliding>0?.55:1;
- const run=running&&!paused?1:0;
+ const run=running&&!paused;
+ animateAnimal(character,clockTime,run,playerY>.05);
+ character.group.scale.y=sliding>0?.53:(playerY>.05?1.04:1);
  if(run&&playerY<=.02&&sliding<=0&&clockTime-lastStepSound>.25){lastStepSound=clockTime;sound(165+(Math.floor(clockTime*10)%3)*21,.047,'triangle',.014)}
- character.pivotL.rotation.x=Math.sin(clockTime*13)*.32*run;
- character.pivotR.rotation.x=-Math.sin(clockTime*13)*.32*run;
  // Wider field of view at higher speeds makes acceleration more noticeable.
  const desiredFov=57+(Math.min(58,speed)-18)*.28;
  const newFov=THREE.MathUtils.damp(camera.fov,desiredFov,2.8,dt);

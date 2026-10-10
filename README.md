@@ -75,6 +75,31 @@ The world and characters are generated with **procedural Three.js geometry**, no
 
 Both modes accelerate over time. Solo runs progress toward 58 world units/second; the **two-player race reaches 70 world units/second**. Camera field of view widens with speed, and lane markings, roadside nature and clouds stream past the camera. Race obstacle spacing scales with speed so an increasing pace does not automatically create impossible lane changes. The road surface itself remains continuous.
 
+## 🐰 Import your own Bella Bunny 3D model
+
+The game supports a **real GLB character replacement** for Bella Bunny,
+using the local file `public/models/bunny.glb` rather than a remote service.
+
+- **Solo game:** replaces the procedural Bella Bunny when the GLB is present.
+- **Two-friend race:** either player may select the same imported bunny.
+- **Character shop:** generates a portrait from the imported model.
+- **Safe behavior:** missing or broken files fall back to the existing playable bunny.
+- **Automatic fitting:** model scaling, centering and foot placement are adjusted to match the game.
+- **Animation:** imported clips play when provided. Unrigged meshes get a subtle running bounce as a temporary fallback.
+
+**Asset status:** The source-code integration is complete. The uploaded
+`white_mesh.glb` is a 5.7 MB untextured, unrigged mesh. To activate it in
+your GitHub checkout, download it from the conversation, rename it to
+`bunny.glb`, and add it under `public/models/`. See
+[model installation instructions](public/models/README.md).
+The binary is not included in the repository yet.
+
+```cmd
+git add public/models/bunny.glb
+git commit -m "Add Bella Bunny GLB asset"
+git push origin main
+```
+
 ## 🐾 Meet the Runners and Their Worlds
 
 Pick your favourite chibi-style animal. Each character changes the **sky, track colours, scenery and available obstacles**.

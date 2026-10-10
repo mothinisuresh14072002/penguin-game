@@ -181,29 +181,56 @@ function sceneryProp(type,x,z,i){
  if(type==='ice'){
   addScenery(g,coneGeo,0x9aefff,0,1.0,0,.6,1.8,.6);
   addScenery(g,coneGeo,0xc0f8ff,.5,.54,.25,.3,.92,.3);
+  addScenery(g,sphere,0xffffff,-.4,.2,-.35,.8,.28,.6);
  }else if(type==='flower'){
   addScenery(g,sphere,0x4eac5b,0,.35,0,.07,.46,.07);
   for(let j=0;j<5;j++){const a=j*Math.PI*2/5;addScenery(g,sphere,i%2?0xffa8d3:0xfff0a7,Math.cos(a)*.2,.8+Math.sin(a)*.2,0,.16,.16,.09)}
   addScenery(g,sphere,0xffdd79,0,.8,.08,.13,.13,.1);
+  if(i%3===0)for(const offset of [-.65,.55])addScenery(g,sphere,0x69b878,offset,.3,-.2,.5,.38,.46);
  }else if(type==='star'){
   addScenery(g,new THREE.OctahedronGeometry(.6),i%2?0xffb8e3:0x99f4ff,0,1.7,0,1,1,1);
   addScenery(g,sphere,0xfff9ff,0,.6,0,.65,.18,.6);
+  addScenery(g,sphere,0xa8f1ff,-.7,1.2,-.4,.2,.2,.2);
  }else if(type==='hay'){
   addScenery(g,cube,0xecc676,0,.55,0,1.3,1,1);
   addScenery(g,cube,0xb78340,0,.56,.51,1.35,.09,.08);
+  addScenery(g,cube,0x8b7750,1.3,.55,0,.14,1.1,.14);
  }else if(type==='house'||type==='barn'){
   addScenery(g,cube,type==='barn'?0xc66b57:0xe9bcaf,0,1,0,2,2,1.7);
   const roof=addScenery(g,coneGeo,type==='barn'?0x634d57:0x9684a9,0,2.55,0,1.5,1.25,1.5);roof.rotation.y=Math.PI/4;
   addScenery(g,cube,0xffffff,0,.65,.88,.55,.9,.05);
+  if(i%2===0)addScenery(g,sphere,0x71b578,1.45,.42,0,.55,.45,.56);
  }else if(type==='tree'){
   addScenery(g,cube,0x8a654a,0,.8,0,.33,1.6,.33);
   addScenery(g,sphere,i%2?0x5da66a:0x81b96b,0,2.04,0,1.03,1.02,.87);
+  if(i%4===0)addScenery(g,sphere,0xffcb81,.6,1.8,.25,.2,.18,.18);
  }
+}
+// Parallax clouds and soft nature details add life without requiring large 3D assets.
+const skyClouds=[];
+const cloudMaterial=mat(0xffffff,.95);
+for(let i=0;i<15;i++){
+ const g=new THREE.Group();scene.add(g);
+ for(const offset of [-1,0,1])orb(g,cloudMaterial,offset*.85,Math.abs(offset)*-.13,0,.98, .5+(offset===0?.27:0),.68);
+ skyClouds.push(g);
+}
+const butterflies=[];
+for(let i=0;i<10;i++){
+ const g=new THREE.Group(),wings=[];
+ const color=mat(i%2?0xfab6e0:0xffe69a,.8);
+ for(const side of [-1,1]){
+  const wing=orb(g,color,side*.18,0,0,.22,.12,.05);
+  wings.push(wing);
+ }
+ orb(g,dark,0,0,0,.055,.13,.06);
+ scene.add(g);butterflies.push({g,wings});
 }
 function applyBiome(){
  const picked=CHARS.find(c=>c.id===profile.selected)||CHARS[0];
  const biome=BIOMES[picked.biome];currentTheme=biome;
  scene.background.setHex(biome.sky);scene.fog.color.setHex(biome.fog);
+ cloudMaterial.color.setHex(picked.biome==='rainbow'?0xffe4ff:0xffffff);
+ for(const b of butterflies)b.g.visible=['meadow','grassland','park','farm'].includes(picked.biome);
  snowMat.color.setHex(biome.ground);iceMat.color.setHex(biome.track);
  deepIce.color.setHex(biome.edge);rockMat.color.setHex(biome.hazards.includes('spike')?0x6a8ea4:0x917e75);
  clearScenery();
@@ -384,6 +411,18 @@ function tick(now){
    const period=30*11.5;
    const offset=((Math.floor(i/2)*11.5-distance*.78)%period+period)%period;
    biomeDecor[i].position.z=14-offset;
+  }
+  for(let i=0;i<skyClouds.length;i++){
+   const period=15*19;
+   const offset=((i*19-distance*.18)%period+period)%period;
+   skyClouds[i].position.set((i%2?-1:1)*(13+(i%4)*2)+Math.sin(clockTime*.25+i)*1.5,11+(i%5)*2.2,13-offset);
+  }
+  for(let i=0;i<butterflies.length;i++){
+   const b=butterflies[i],period=10*27;
+   const offset=((i*27-distance*.42)%period+period)%period;
+   b.g.position.set((i%2?-1:1)*(5.6+(i%3)*1.2),1.9+Math.sin(clockTime*2+i)*.32,12-offset);
+   b.wings[0].rotation.y=Math.sin(clockTime*11+i)*.9;
+   b.wings[1].rotation.y=-Math.sin(clockTime*11+i)*.9;
   }
   for(let i=0;i<laneDashes.length;i++){
    const period=24*8;

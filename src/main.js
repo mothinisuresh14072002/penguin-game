@@ -139,6 +139,18 @@ for(let i=0;i<14;i++){
   }
  }
 }
+
+// Fast-moving lane markings make the ice, meadow and farm roads feel alive.
+// This is decorative only: stable base track remains solid beneath every runner.
+const laneDashes=[];
+for(let k=0;k<48;k++){
+ const mesh=new THREE.Mesh(cube,new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.34,depthWrite:false}));
+ mesh.scale.set(.08,.018,1.9);
+ mesh.position.y=.34;
+ mesh.position.x=k%2===0?-1.3:1.3;
+ scene.add(mesh);laneDashes.push(mesh);
+}
+
 // distant stationary mountain silhouettes and arctic backdrop.
 for(let i=0;i<22;i++){
  const x=(i-11)*10;
@@ -195,7 +207,7 @@ function applyBiome(){
  snowMat.color.setHex(biome.ground);iceMat.color.setHex(biome.track);
  deepIce.color.setHex(biome.edge);rockMat.color.setHex(biome.hazards.includes('spike')?0x6a8ea4:0x917e75);
  clearScenery();
- for(let i=0;i<44;i++){
+ for(let i=0;i<60;i++){
   const side=i%2===0?-1:1, x=side*(10.5+(i%3)*2.0), z=12-Math.floor(i/2)*11.5;
   sceneryProp(biome.decor,x,z,i);
  }
@@ -266,7 +278,7 @@ function menu(){
  ]);
 }
 function start(){
- ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=10;spawnNext=26;invincible=1;combo=0;lastCoinDistance=-100;lastMilestone=0;noticeUntil=0;$('speedNotice')?.classList.add('hidden');
+ ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=18;spawnNext=26;invincible=1;combo=0;lastCoinDistance=-100;lastMilestone=0;noticeUntil=0;$('speedNotice')?.classList.add('hidden');
  clearObjects();$('overlay').classList.add('hidden');$('shop').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';
  for(let i=0;i<8;i++){row(spawnNext);spawnNext+=17;}
 }
@@ -332,15 +344,15 @@ function tick(now){
  const dt=Math.min(.043,(now-last)/1000);last=now;
  if(running&&!paused){
   clockTime+=dt;
-  speed=Math.min(32,10+distance*.018);
+  speed=Math.min(58,18+distance*.042);
   distance+=speed*dt;
   const milestone=Math.floor(distance/250);
-  if(milestone>lastMilestone){lastMilestone=milestone;showSpeedNotice('SPEED UP!  '+Math.round(speed)+' km/h');sound(790,.15,'triangle',.04)}
+  if(milestone>lastMilestone){lastMilestone=milestone;showSpeedNotice('⚡ SPEED UP!  '+Math.round(speed)+' RUN SPEED');sound(790,.15,'triangle',.04)}
   energy=Math.max(0,energy-dt*(1.1+speed*.025));if(energy<=0)finish('You ran out of energy.');
   playerLane=THREE.MathUtils.damp(playerLane,targetLane,13,dt);
   if(playerY>.001||velocityY>0){velocityY-=25*dt;playerY=Math.max(0,playerY+velocityY*dt);if(playerY===0)velocityY=0;}
   sliding=Math.max(0,sliding-dt);shield=Math.max(0,shield-dt);magnet=Math.max(0,magnet-dt);invincible=Math.max(0,invincible-dt);
-  while(spawnNext<distance+150){row(spawnNext);spawnNext+=Math.max(18,23-distance/350);}
+  while(spawnNext<distance+150){row(spawnNext);spawnNext+=Math.max(28,speed*0.9);}
   for(const e of [...entities]){
    e.root.position.z=2-(e.at-distance);
    if(e.kind==='coin'||e.kind==='energy'||e.kind==='shield'||e.kind==='magnet'){
@@ -367,7 +379,17 @@ function tick(now){
    }
    if(e.at<distance-13){if(e.kind==='coin'&&!e.taken&&magnet<=0)combo=0;scene.remove(e.root);disposeGroup(e.root);entities.splice(entities.indexOf(e),1)}
   }
-  for(let i=0;i<scrollItems.length;i++){const segment=scrollItems[i];segment.position.z=10-i*18;}
+  // Background scenery and lane dashes wrap ahead of the player, never exposing track gaps.
+  for(let i=0;i<biomeDecor.length;i++){
+   const period=30*11.5;
+   const offset=((Math.floor(i/2)*11.5-distance*.78)%period+period)%period;
+   biomeDecor[i].position.z=14-offset;
+  }
+  for(let i=0;i<laneDashes.length;i++){
+   const period=24*8;
+   const offset=((Math.floor(i/2)*8-distance)%period+period)%period;
+   laneDashes[i].position.z=11-offset;
+  }
   for(let i=0;i<350;i++){
    snowPos[i*3+1]-=dt*(.9+(i%5)*.2);
    snowPos[i*3+2]+=dt*speed*.4;
@@ -389,7 +411,7 @@ function tick(now){
  character.pivotL.rotation.x=Math.sin(clockTime*13)*.32*run;
  character.pivotR.rotation.x=-Math.sin(clockTime*13)*.32*run;
  // Wider field of view at higher speeds makes acceleration more noticeable.
- const desiredFov=57+(Math.min(32,speed)-10)*.38;
+ const desiredFov=57+(Math.min(58,speed)-18)*.28;
  const newFov=THREE.MathUtils.damp(camera.fov,desiredFov,2.8,dt);
  if(Math.abs(newFov-camera.fov)>.02){camera.fov=newFov;camera.updateProjectionMatrix()}
  const desiredX=character.group.position.x*.28;

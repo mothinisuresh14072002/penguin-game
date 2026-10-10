@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import './style.css';
 import {createAnimal, animateAnimal} from './animalArt.js';
 import {populateHabitat} from './worldArt.js';
-import {renderCharacterPreviews} from './characterPreviews.js';
+import {renderCharacterPreviews, renderImportedPreview} from './characterPreviews.js';
+import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
@@ -66,10 +67,37 @@ function part(parent,geo,m,x=0,y=0,z=0,sx=1,sy=1,sz=1){const o=new THREE.Mesh(ge
 const orb=(p,m,x,y,z,sx,sy,sz)=>part(p,sphere,m,x,y,z,sx,sy,sz);
 function model(id){return createAnimal(id)}
 let character=model(profile.selected);scene.add(character.group);
+let characterLoadSequence=0;
+function attemptImportedCharacter(id, sequence){
+ if(id!=='bunny')return;
+ loadImportedAnimal(id).then(imported=>{
+  if(!imported)return;
+  if(sequence!==characterLoadSequence||profile.selected!==id){
+   releaseImportedAnimal(imported);
+   return;
+  }
+  scene.remove(character.group);
+  if(character.imported)releaseImportedAnimal(character);
+  else disposeGroup(character.group);
+  character=imported;
+  character.group.rotation.y=Math.PI;
+  scene.add(character.group);
+ });
+}
 const SHARED_GEOMETRIES=new Set([sphere,cube,coneGeo]);
 const SHARED_MATERIALS=new Set([snowMat,iceMat,deepIce,rockMat,dark,white,pink,gold,energyMat,powerMat,wood]);
 function disposeGroup(root){root.traverse(obj=>{if(obj.isMesh){if(obj.geometry&&!SHARED_GEOMETRIES.has(obj.geometry))obj.geometry.dispose();const mats=Array.isArray(obj.material)?obj.material:[obj.material];for(const m of mats)if(m&&!SHARED_MATERIALS.has(m))m.dispose()}})}
-function swapCharacter(){scene.remove(character.group);disposeGroup(character.group);character=model(profile.selected);scene.add(character.group);applyBiome();sound(690,.12,'triangle')}
+function swapCharacter(){
+ ++characterLoadSequence;
+ scene.remove(character.group);
+ if(character.imported)releaseImportedAnimal(character);
+ else disposeGroup(character.group);
+ character=model(profile.selected);
+ scene.add(character.group);
+ applyBiome();sound(690,.12,'triangle');
+ attemptImportedCharacter(profile.selected,characterLoadSequence);
+}
+attemptImportedCharacter(profile.selected,characterLoadSequence);
 // Endless segments are recycled instead of spawning unlimited geometry.
 for(let i=0;i<14;i++){
  const g=new THREE.Group();scene.add(g);scrollItems.push(g);g.position.z=10-i*18;
@@ -208,7 +236,7 @@ function showScreen(title,message,buttons){
  const actions=$('screenActions');actions.replaceChildren();
  for(const b of buttons){const btn=document.createElement('button');btn.textContent=b.text;btn.className=b.secondary?'secondary':'';btn.onclick=b.action;actions.appendChild(btn)}
 }
-let characterPreviews;
+let characterPreviews,importedBunnyPreview;
 function shop(){
  if(!characterPreviews)characterPreviews=renderCharacterPreviews(CHARS,BIOMES);
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.remove('hidden');$('overlay').classList.add('hidden');
@@ -225,6 +253,14 @@ function shop(){
    else {$('shopMessage').textContent='Collect more gold coins to unlock '+c.name;}
   };
   grid.appendChild(button);
+  if(c.id==='bunny'){
+   importedBunnyPreview??=renderImportedPreview('bunny',BIOMES.meadow.sky);
+   importedBunnyPreview.then(source=>{
+    if(!source||!grid.contains(button))return;
+    const image=button.querySelector('.char-thumb');
+    if(image)image.src=source;
+   });
+  }
  }
  $('wallet').textContent=profile.coins;
 }
@@ -376,6 +412,7 @@ function tick(now){
  character.group.rotation.y=THREE.MathUtils.damp(character.group.rotation.y,Math.PI,13,dt);
  const run=running&&!paused;
  animateAnimal(character,clockTime,run,playerY>.05);
+ character.update?.(dt,clockTime,run,playerY>.05);
  character.group.scale.y=sliding>0?.53:(playerY>.05?1.04:1);
  if(run&&playerY<=.02&&sliding<=0&&clockTime-lastStepSound>.25){lastStepSound=clockTime;sound(165+(Math.floor(clockTime*10)%3)*21,.047,'triangle',.014)}
  // Wider field of view at higher speeds makes acceleration more noticeable.

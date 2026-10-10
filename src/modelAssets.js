@@ -12,7 +12,7 @@ const preflight = new Map();
 
 export function animalAssetUrl(id) {
   const relative = CHARACTER_ASSETS[id];
-  return relative ? (import.meta.env.BASE_URL || '/') + relative : null;
+  return relative ? (import.meta.env?.BASE_URL || '/') + relative : null;
 }
 
 // A real downloaded GLB can have arbitrary units/origins. Normalize it once
@@ -91,7 +91,7 @@ export function releaseImportedAnimal(actor) {
   if (!actor?.imported) return;
   if (actor.mixer) {
     actor.mixer.stopAllAction();
-    actor.mixer.uncacheRoot(actor.visual);
+    actor.mixer.uncacheRoot(actor.visual.children[0]);
   }
   const geometries=new Set(),materials=new Set();
   actor.group.traverse(o=>{

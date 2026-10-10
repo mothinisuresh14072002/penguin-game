@@ -25,7 +25,7 @@
 
 *Pick your animal. Explore its world. Keep running!* 
 
-**Polar Dash** is a playful 3D endless runner featuring seven cute animals and seven character-linked environments. Choose Bella Bunny for a flower meadow, Ula Unicorn for pastel magic, Pip Penguin for a frozen glacier, or one of the other animal friends. Switch lanes, jump, slide, gather coins and energy, and chase your personal best.
+**Polar Dash** is a playful 3D endless runner featuring seven cute animals and seven character-linked environments. The upgraded characters are playable Three.js models with expressive eyes, ears, tails, and real animated limbs—not still images pasted into the scene. Choose Bella Bunny for a flower meadow, Ula Unicorn for pastel magic, Pip Penguin for a frozen glacier, or one of the other animal friends. Switch lanes, jump, slide, gather coins and energy, and chase your personal best.
 
 The world and characters are generated with **procedural Three.js geometry**, not prebuilt downloadable character models. This is an **open-source, playable prototype** with a mobile-oriented interface—not yet a fully tested or published Play Store release.
 
@@ -117,6 +117,7 @@ The earlier v2 saved profile is read if a v3 profile does not yet exist. Bella B
 ### 🌍 Procedural Animal Worlds
 
 - Seven configurable sky, track and fog palettes
+- New character-specific 3D biomes with richer scenery: floral meadows and shrubs, rainbow crystal arches, hay and fences, colourful town cottages, park trees and ponds, icy formations, and red farm barns
 - Animated parallax clouds and scene-specific nature details
 - Butterflies in meadow, farm, prairie and park
 - World-specific decorations: flowers, crystals, hay, houses, trees, ice and barns
@@ -130,8 +131,9 @@ The earlier v2 saved profile is read if a v3 profile does not yet exist. Bella B
 ### 🐾 Cute Animated 3D Characters
 
 - Bunny, unicorn, small horse, cat, dog, penguin and cow
-- Chibi-style shapes with ears, faces and character details
-- Basic procedural movement and arm/flipper animation
+- Shared detailed procedural 3D model system with oversized sparkling eyes, cheeks, hair, tails, ears and character-specific outfits or markings
+- 3D character thumbnails rendered directly from the playable models inside the shop
+- Articulated arms, feet, ears and tails with running/bouncing animations
 - Jump and slide motion
 - Smooth-follow camera
 - Runtime mesh generation
@@ -140,7 +142,7 @@ The earlier v2 saved profile is read if a v3 profile does not yet exist. Bella B
 </tr>
 </table>
 
-**About the visuals:** the animated Arctic banner above is illustrative of the penguin's glacier world, not every biome or an in-game screenshot. The illustrated banner at the top is an SVG animation. The **real-time 3D gameplay** runs through Three.js when the project is launched. GitHub does not execute interactive WebGL/Three.js inside a README. The models are currently stylized procedural prototypes, not photorealistic production assets.
+**About the visuals:** the animated Arctic banner above is illustrative of the penguin's glacier world, not every biome or an in-game screenshot. The illustrated banner at the top is an SVG animation. The **real-time 3D gameplay** runs through Three.js when the project is launched. GitHub does not execute interactive WebGL/Three.js inside a README. The models are currently stylized procedural 3D art with more detailed rounded features, not the exact high-end cinematic characters depicted in concept images. Exact reference fidelity would require custom sculpted and rigged 3D assets, textures and further performance work.
 
 > 📸 **Gameplay preview:** An actual recorded gameplay GIF or screenshot will be added after a successful browser/device capture. This README intentionally does not present concept art as a real in-game screenshot.
 
@@ -194,12 +196,16 @@ penguin-game/
 │   └── PLAY_STORE_RELEASE.md   # Android release checklist
 ├── src/
 │   ├── main.js                 # Solo 3D runner + immersive animal biomes
+│   ├── animalArt.js            # Seven detailed animated character meshes
+│   ├── worldArt.js             # Seven themed 3D nature / environment prop sets
+│   ├── characterPreviews.js    # Renders shop thumbnails from actual game models
 │   ├── style.css               # Solo UI
 │   ├── race.js                 # Local two-player split-screen game
 │   ├── race.css                # Desktop and mobile race interface
 │   └── raceMath.js             # Testable deterministic race mechanics
 ├── tests/
-│   └── raceMath.test.js        # Fairness, coin, speed, road tests
+│   ├── raceMath.test.js        # Fairness, coin, speed, road tests
+│   └── artAssets.test.js       # Seven characters and seven environment smoke tests
 ├── race.html                   # Two-friend race entry point
 ├── vite.config.js              # Bundles both HTML entry points
 ├── index.html                  # Game interface
@@ -246,7 +252,7 @@ The game **has not yet been signed, published or confirmed through a complete An
 
 - [x] Procedural 3D environments for seven animal worlds
 - [x] Three-lane running, jumping and sliding
-- [x] Seven chibi-style animal characters with different home worlds
+- [x] Seven articulated chibi-style animal characters with richer home worlds and in-game 3D shop portraits
 - [x] Coins, energy, shields and magnets
 - [x] Local progress saving and basic audio cues
 - [x] Capacitor Android configuration

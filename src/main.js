@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import './style.css';
 import {createAnimal, animateAnimal} from './animalArt.js';
+import {populateHabitat} from './worldArt.js';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
@@ -127,33 +128,8 @@ function clearScenery(){
 }
 function sceneryProp(type,x,z,i){
  const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);biomeDecor.push(g);
- if(type==='ice'){
-  addScenery(g,coneGeo,0x9aefff,0,1.0,0,.6,1.8,.6);
-  addScenery(g,coneGeo,0xc0f8ff,.5,.54,.25,.3,.92,.3);
-  addScenery(g,sphere,0xffffff,-.4,.2,-.35,.8,.28,.6);
- }else if(type==='flower'){
-  addScenery(g,sphere,0x4eac5b,0,.35,0,.07,.46,.07);
-  for(let j=0;j<5;j++){const a=j*Math.PI*2/5;addScenery(g,sphere,i%2?0xffa8d3:0xfff0a7,Math.cos(a)*.2,.8+Math.sin(a)*.2,0,.16,.16,.09)}
-  addScenery(g,sphere,0xffdd79,0,.8,.08,.13,.13,.1);
-  if(i%3===0)for(const offset of [-.65,.55])addScenery(g,sphere,0x69b878,offset,.3,-.2,.5,.38,.46);
- }else if(type==='star'){
-  addScenery(g,new THREE.OctahedronGeometry(.6),i%2?0xffb8e3:0x99f4ff,0,1.7,0,1,1,1);
-  addScenery(g,sphere,0xfff9ff,0,.6,0,.65,.18,.6);
-  addScenery(g,sphere,0xa8f1ff,-.7,1.2,-.4,.2,.2,.2);
- }else if(type==='hay'){
-  addScenery(g,cube,0xecc676,0,.55,0,1.3,1,1);
-  addScenery(g,cube,0xb78340,0,.56,.51,1.35,.09,.08);
-  addScenery(g,cube,0x8b7750,1.3,.55,0,.14,1.1,.14);
- }else if(type==='house'||type==='barn'){
-  addScenery(g,cube,type==='barn'?0xc66b57:0xe9bcaf,0,1,0,2,2,1.7);
-  const roof=addScenery(g,coneGeo,type==='barn'?0x634d57:0x9684a9,0,2.55,0,1.5,1.25,1.5);roof.rotation.y=Math.PI/4;
-  addScenery(g,cube,0xffffff,0,.65,.88,.55,.9,.05);
-  if(i%2===0)addScenery(g,sphere,0x71b578,1.45,.42,0,.55,.45,.56);
- }else if(type==='tree'){
-  addScenery(g,cube,0x8a654a,0,.8,0,.33,1.6,.33);
-  addScenery(g,sphere,i%2?0x5da66a:0x81b96b,0,2.04,0,1.03,1.02,.87);
-  if(i%4===0)addScenery(g,sphere,0xffcb81,.6,1.8,.25,.2,.18,.18);
- }
+ populateHabitat(g,type,i,(parent,geo,color,xx,yy,zz,sx,sy,sz)=>
+  addScenery(parent,geo,color,xx,yy,zz,sx,sy,sz));
 }
 // Parallax clouds and soft nature details add life without requiring large 3D assets.
 const skyClouds=[];

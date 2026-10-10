@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import './race.css';
+import {createAnimal, animateAnimal} from './animalArt.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
 const $ = id => document.getElementById(id);
@@ -38,52 +39,13 @@ function piece(parent,geo,mat,x,y,z,sx=1,sy=1,sz=1){
 }
 function ball(parent,mat,x,y,z,sx,sy,sz){return piece(parent,geom.ball,mat,x,y,z,sx,sy,sz)}
 function createHero(id,scene){
- const ch=CHARACTERS.find(c=>c.id===id)||CHARACTERS[0],hero=new THREE.Group();
- const coat=material(ch.color),cream=material(0xfff7eb),eyes=material(0x152534),pink=material(0xf8a4b3);
- const warm=material(0xe38d4a),dark=material(0x654e52);
- scene.add(hero);
- ball(hero,coat,0,.96,0,.56,.66,.45);
- ball(hero,cream,0,1.04,.36,.42,.48,.15);
- ball(hero,coat,0,1.81,.1,.56,.52,.51);
- for(const side of [-1,1]){
-  ball(hero,cream,side*.235,1.88,.54,.125,.14,.06);
-  ball(hero,eyes,side*.235,1.88,.6,.071,.083,.04);
-  ball(hero,cream,side*.212,1.92,.625,.025,.029,.02);
-  ball(hero,pink,side*.37,1.57,.45,.09,.06,.035);
-  const leg=new THREE.Group();leg.position.set(side*.3,.38,0);hero.add(leg);
-  ball(leg,coat,0,-.16,.08,.19,.27,.19);ball(leg,id==='penguin'?pink:dark,0,-.32,.22,.22,.11,.27);
- }
- if(id==='penguin'){
-  ball(hero,cream,0,1.34,.52,.3,.3,.07);
-  const beak=piece(hero,geom.cone,warm,0,1.62,.63,.15,.29,.15);beak.rotation.x=Math.PI/2;
- }else{
-  ball(hero,id==='cow'?pink:cream,0,1.58,.52,.27,.18,.21);
-  ball(hero,pink,0,1.65,.71,.068,.054,.04);
-  for(const side of [-1,1]){
-   const ear=ball(hero,coat,side*.38,2.41,.02,id==='bunny'?.17:.22,id==='bunny'?.60:.29,.17);
-   ear.rotation.z=side*(id==='dog'?.68:.17);
-   if(id==='bunny')ball(hero,pink,side*.38,2.43,.18,.085,.43,.044);
-  }
-  if(id==='unicorn'){
-   piece(hero,geom.cone,material(0xffd968),0,2.49,.35,.13,.62,.13);
-   for(let j=0;j<3;j++)ball(hero,material(j%2?0x91e2ff:0xfaa0d3),-.28+j*.25,2.27,.09,.15,.18,.18);
-  }
-  if(id==='cow')for(let j=0;j<3;j++)ball(hero,eyes,(j%2?-.29:.29),.84+j*.15,.34,.17,.15,.1);
-  if(id==='horse')ball(hero,dark,0,2.25,-.1,.31,.22,.21);
-  if(id==='cat')for(const side of [-1,1]){
-   const whisker=piece(hero,geom.cylinder,cream,side*.5,1.56,.47,.013,.38,.013);whisker.rotation.z=Math.PI/2;
-  }
- }
- const armL=new THREE.Group(),armR=new THREE.Group();
- armL.position.set(-.55,1.37,0);armR.position.set(.55,1.37,0);
- hero.add(armL,armR);
- ball(armL,coat,-.08,-.27,0,.19,.39,.18);
- ball(armR,coat,.08,-.27,0,.19,.39,.18);
- const shadowMaterial=new THREE.MeshBasicMaterial({color:0x284b66,transparent:true,opacity:.4,depthWrite:false});disposables.add(shadowMaterial);
+ const actor=createAnimal(id);
+ scene.add(actor.group);
+ actor.group.rotation.y=Math.PI;
+ const shadowMaterial=new THREE.MeshBasicMaterial({color:0x284b66,transparent:true,opacity:.32,depthWrite:false});
+ disposables.add(shadowMaterial);
  const shadow=piece(scene,geom.ball,shadowMaterial,0,.25,2,.8,.025,.48);
- const feet=hero.children.filter(c=>c.type==='Group'&&c!==armL&&c!==armR);
- hero.rotation.y=Math.PI;
- return {group:hero,armL,armR,feet,shadow};
+ return {...actor,shadow};
 }
 function prop(scene,type,ch,x,z,index){
  const group=new THREE.Group();group.position.set(x,0,z);scene.add(group);
@@ -182,7 +144,15 @@ function spawnRow(player){
  player.nextSpawn+=spawnSpacing(raceSpeed(at));
 }
 function clearPlayer(player){
- player.scene.traverse(object=>{if(object.isMesh&&object.geometry&&!Object.values(geom).includes(object.geometry))object.geometry.dispose()});
+ const geometries=new Set(),materials=new Set();
+ player.scene.traverse(object=>{
+  if(!object.isMesh)return;
+  if(object.geometry&&!Object.values(geom).includes(object.geometry))geometries.add(object.geometry);
+  const list=Array.isArray(object.material)?object.material:[object.material];
+  for(const m of list)if(m)materials.add(m);
+ });
+ for(const g of geometries)g.dispose();
+ for(const m of materials)m.dispose();
 }
 let racers=[],playing=false,paused=false,finished=false,last=performance.now(),elapsed=0,noticeCooldown=0;
 let audio=null;
@@ -259,11 +229,8 @@ function updatePlayer(p,dt){
  }
  for(let i=0;i<p.laneMarks.length;i++)p.laneMarks[i].position.z=trackLoop(Math.floor(i/2),8,p.distance,24);
  p.hero.group.position.set(px,p.y,2);
- p.hero.group.rotation.z=Math.sin(p.time*15)*.035*(p.stun>0?.1:1);
- p.hero.group.scale.y=p.slide>0?.57:1;
- p.hero.armL.rotation.x=Math.sin(p.time*14)*.38;
- p.hero.armR.rotation.x=-Math.sin(p.time*14)*.38;
- for(let i=0;i<p.hero.feet.length;i++)p.hero.feet[i].rotation.x=Math.sin(p.time*14+i*Math.PI)*.3;
+ animateAnimal(p.hero,p.time,p.stun<=0,p.y>.05);
+ p.hero.group.scale.y=p.slide>0?.57:(p.y>.05?1.04:1);
  p.hero.shadow.position.x=px;
  p.hero.shadow.material.opacity=.55-Math.min(.43,p.y*.15);
  const fov=62+(currentSpeed-22)*.33;

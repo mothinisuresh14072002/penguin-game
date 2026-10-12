@@ -214,7 +214,14 @@ function makeObject(kind,lane,at){
  const x=laneX[lane];
  if(kind==='rock'){orb(root,rockMat,0,.59,0,.86,.69,.68);orb(root,snowMat,-.15,1.13,-.03,.65,.23,.53);radius=.78;}
  else if(kind==='spike'){for(let i=0;i<3;i++)part(root,coneGeo,iceMat,(i-1)*.33,.65+(i%2)*.22,0,.36,.72+(i%2)*.38,.36);radius=.72;}
- else if(kind==='log'){part(root,cube,wood,0,.67,0,1.65,1.06,.4);for(let i=-1;i<=1;i++)orb(root,snowMat,i*.47,1.25,0,.38,.16,.29);radius=.8;}
+ else if(kind==='log'){
+  // Raised arch: standing animals strike the overhead log; sliding animals
+  // genuinely fit under the gap, matching the collision rules.
+  part(root,cube,wood,0,1.67,0,2.15,.54,.46);
+  for(const x of [-1.06,1.06])part(root,cube,wood,x,.78,0,.16,1.55,.46);
+  for(const x of [-.52,0,.52])orb(root,snowMat,x,1.98,0,.30,.11,.28);
+  radius=1.05;
+}
  else if(kind==='coin'){part(root,new THREE.TorusGeometry(.33,.11,9,18),gold,0,1.12,0);radius=.42;}
  else if(kind==='energy'){orb(root,energyMat,0,1.2,0,.35,.48,.35);orb(root,white,0,1.2,.3,.12,.25,.07);radius=.48;}
  else if(kind==='shield'||kind==='magnet'){part(root,new THREE.OctahedronGeometry(.44),kind==='shield'?iceMat:powerMat,0,1.27,0);radius=.5;}

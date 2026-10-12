@@ -373,4 +373,15 @@ renderer.domElement.addEventListener('pointercancel',()=>touchStart=null);
 addEventListener('resize',()=>renderer.setSize(innerWidth,innerHeight));
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing&&!paused)pauseToggle()});
 addEventListener('blur',()=>{held.clear();if(playing&&!paused)pauseToggle()});
+// Opt-in read-only diagnostics for real-browser gameplay QA.
+if(new URLSearchParams(location.search).has('qa')){
+ window.__pawverseRaceQA=()=>Object.freeze({
+  playing,paused,finished,elapsed,
+  players:racers.map(p=>({
+   id:p.ch.id,distance:p.distance,coins:p.coins,
+   energy:p.energy,hit:p.hit,lane:p.lane,target:p.target,
+   y:p.y,slide:p.slide,biome:p.backdrop?.horizon?.name
+  }))
+ });
+}
 requestAnimationFrame(frame);

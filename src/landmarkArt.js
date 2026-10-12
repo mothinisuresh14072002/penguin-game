@@ -94,12 +94,45 @@ export function createWorldLandmarks(scene,id='meadow'){
   orb(0xe7faff,x,.25,z,.64,.31,.64);
  };
  if(id==='meadow'){
-  for(const [x,z] of [[-12,-20],[11,-32],[-11,-58],[14,-82]])tree(x,z,1.3,0x54b967);
+  // Asymmetrical leafy trees with soft flowering crowns, not repeated blocks.
+  const clusters=[[-13,-18], [12,-34], [-14,-55], [14,-78], [16,-108], [-16,-94]];
+  for(let t=0;t<clusters.length;t++){
+   const [x,z]=clusters[t],scale=t%2===0?1.35:1.55;
+   tree(x,z,scale,t%2?0x68bf72:0x58b965);
+   for(let k=0;k<7;k++){
+    const a=k*Math.PI*2/7;
+    const dx=Math.sin(a)*1.3*scale,dz=Math.cos(a)*.9*scale;
+    orb(k%3===0?0xffd6e8:0x91d782,x+dx,(3.1+(k%3)*.47)*scale,z+dz,
+     .45*scale,.37*scale,.45*scale);
+   }
+  }
   fence(-5.35,-8);fence(5.35,-8);daisies(-6.6,-8,12);daisies(6.5,-11,12);
-  orb(0x9dc668,-13,2.2,-40,4.7,2.6,3.7);
-  cube(0x6f463a,-10.6,1.25,-36.3,1.7,2.2,.18);
-  orb(0x745035,-10.6,2.17,-36.1,1.3,1.48,.16);
-  orb(0xfff6db,-10.6,1.5,-35.99,.28,.32,.1);
+  // A rabbit-ear burrow house that reads immediately as Bunny Meadow.
+  const bx=-12.4,bz=-39.6;
+  orb(0x79b66c,bx,2.1,bz,4.8,2.7,3.9);
+  orb(0xa7d887,bx,3.15,bz-.2,3.9,1.3,3.3);
+  // Upright rabbit-ear roof features and pink insets.
+  for(const side of [-1,1]){
+    orb(0xffeeda,bx+side*1.55,4.55,bz-.3,.75,2.3,.62);
+    orb(0xf7b3cd,bx+side*1.55,4.65,bz+.28,.40,1.65,.12);
+  }
+  // The dark arched burrow entrance faces the approaching player (+Z).
+  orb(0xe8c89b,bx,1.58,bz+3.72,1.35,1.65,.17);
+  orb(0x694635,bx,1.47,bz+3.86,.99,1.30,.11);
+  cube(0x6a463a,bx,.86,bz+3.95,1.96,1.52,.12);
+  orb(0xffd27b,bx+.65,1.45,bz+4.04,.12,.12,.10);
+  for(const side of [-1,1]){
+    orb(0xf9fff5,bx+side*2.55,1.8,bz+2.85,.56,.63,.20);
+    orb(0xa9dff6,bx+side*2.55,1.8,bz+3.06,.40,.46,.06);
+    daisies(bx+side*3.3,bz+3.2,6);
+  }
+  for(let i=0;i<13;i++){
+   const x=(i%2?-1:1)*(6.3+(i%3)*.8);
+   const z=-6-i*8;
+   // Low round hedges soften transitions between the dirt trail and flowers.
+   orb(0x71bf70,x,.37,z,1.55,.63,.74);
+   orb(0x92d787,x+.45,.57,z-.3,.96,.55,.64);
+  }
  }else if(id==='rainbow'){
   rainbow(0,12,-66,11);
   for(const [x,z] of [[-9,-29],[10,-38],[-13,-60],[12,-73]])

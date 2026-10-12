@@ -67,6 +67,28 @@ licensed animated film-quality model. The supplied concept image is still a
 target for future textured/rigged assets and art review. Real GPU/FPS
 measurements and manual visual approval are also pending.
 
+## 🌈 Phase 2: Ula Unicorn and Rainbow Skyland
+
+The second reference-inspired visual pass gives **Ula Unicorn** a pearlescent
+coat, a layered five-colour mane, a gold horn, a fuller rainbow tail, sculpted
+feather-like wings, plus **subtle mane sway and wing flutter while running**.
+
+**Rainbow Skyland** has four looping scenery strips containing pastel faceted
+crystals, bright stardust, floating cloud-capped islands, and colour-matched
+crystal bridge surroundings. These are real Three.js geometry, not background
+screenshots. Crystal and stardust meshes are instanced to keep draw calls
+bounded on mobile devices.
+
+When the player selects Unicorn, Skyland is created. Changing to any other
+character releases the Skyland resources and loads that animal's own biome.
+The two-player race allocates Skyland separately to Unicorn's viewport so the
+other player continues seeing their chosen world. Unit and real Chromium
+tests verify the selected worlds, dynamic scenery, and character animation.
+
+**Art quality:** This remains procedural stylized 3D. Matching the reference
+image at film-quality detail needs professionally textured/rigged meshes,
+art-directed lighting, and manual visual approval on real devices.
+
 ## 🎮 Gameplay and features
 
 | Feature | How it works |
@@ -174,6 +196,7 @@ penguin-game/
 │   ├── raceMath.js               Race physics and fair obstacle generation
 │   ├── animalArt.js              Seven procedural animated chibi animals
 │   ├── meadowArt.js              Instanced flowers and gravel for Bella Bunny
+│   ├── skylandArt.js             Floating islands and instanced Unicorn crystals
 │   ├── modelAssets.js            Optional GLB character loading and fallback
 │   ├── characterPreviews.js      3D portraits in the character shop
 │   ├── roadArt.js                Seven repeated illustrated road textures
@@ -224,6 +247,7 @@ Run `npm run android:add` only if no Android project already exists. For subsequ
 ## 🛣️ Roadmap
 
 - [x] Bella Bunny Phase 1: plush rear-view details and flowing flower meadow
+- [x] Ula Unicorn Phase 2: animated mane, pearlescent coat and sparkling Rainbow Skyland
 - [x] Seven selectable characters with matching 3D environments
 - [x] Distinct road textures, landscape colours, props and landmarks
 - [x] Solo gameplay with coins, energy, shields and magnets

@@ -502,16 +502,33 @@ export function createAnimal(id, palette = {}) {
   const dogTail=id==='dog'?tail:null;
   const cowTail=id==='cow'?tail:null;
   const cowEars=id==='cow'?ears:null;
-  return {group:root,pivotL,pivotR,feet,ears,tail,face,mane,wings,catTail,dogEars,dogTail,cowTail,cowEars};
+  return {id,group:root,pivotL,pivotR,feet,ears,tail,face,torso,
+    headRestY:face.position.y,bodyRestY:torso.position.y,
+    mane,wings,catTail,dogEars,dogTail,cowTail,cowEars};
 }
 
 // Character animation uses bones/groups, not just translating a static drawing.
 export function animateAnimal(actor, t, moving=true, airborne=false) {
   const pace=moving?1:0;
-  const step=Math.sin(t*14);
-  actor.pivotL.rotation.x=step*.44*pace;
-  actor.pivotR.rotation.x=-step*.44*pace;
-  if(actor.feet)for(let i=0;i<actor.feet.length;i++)actor.feet[i].rotation.x=step*(i===0?-1:1)*.55*pace;
+  const tempo={
+    bunny:11,unicorn:13,horse:15,cat:16,dog:13,penguin:10,cow:11
+  }[actor.id]||14;
+  const step=Math.sin(t*tempo);
+  const bunnyHop=actor.id==='bunny';
+  // A rabbit hops with both rear feet, while kittens/ponies alternate.
+  // Penguin flippers get a wider but slower little waddle.
+  const armSwing=actor.id==='penguin'?.58:actor.id==='bunny'?.24:.39;
+  actor.pivotL.rotation.x=step*armSwing*pace;
+  actor.pivotR.rotation.x=-step*armSwing*pace;
+  if(actor.feet)for(let i=0;i<actor.feet.length;i++){
+    actor.feet[i].rotation.x=bunnyHop
+      ?step*.32*pace
+      :step*(i===0?-1:1)*(actor.id==='penguin'?.28:.49)*pace;
+  }
+  if(actor.torso)actor.torso.position.y=actor.bodyRestY+
+    (bunnyHop?Math.abs(Math.sin(t*tempo*.5))*.042:.015*Math.abs(step))*pace;
+  if(actor.face)actor.face.position.y=actor.headRestY+
+    (bunnyHop?Math.abs(Math.sin(t*tempo*.5))*.045:.014*Math.abs(step))*pace;
   if(actor.ears)for(let i=0;i<actor.ears.length;i++)actor.ears[i].rotation.z=Math.sin(t*7+i)*.075*pace;
   if(actor.tail)actor.tail.rotation.x=Math.sin(t*9)*.16*pace;
   if(actor.catTail)actor.catTail.rotation.z=Math.sin(t*5+.7)*.22*pace;
@@ -543,6 +560,7 @@ export function animateAnimal(actor, t, moving=true, airborne=false) {
     const wing=actor.wings[i];
     if(wing)wing.rotation.z=(i===0?-1:1)*(.06+.095*Math.sin(t*9))*pace;
   }
-  actor.group.rotation.z=Math.sin(t*12)*.033*pace;
+  actor.group.rotation.z=Math.sin(t*(actor.id==='penguin'?9:12))*
+    (actor.id==='penguin'?.057:.022)*pace;
   actor.group.scale.y=airborne?1.04:1;
 }

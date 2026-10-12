@@ -400,6 +400,7 @@ export function createAnimal(id, palette = {}) {
     dressBack.name='bunny-dress-back';
     ell(dressBack,m(0xffe7ed),0,0,0,.29,.055,.06);
     const flower=groupAt(dressBack,.29,.015,-.095);
+    flower.scale.setScalar(.6);
     flower.name='bunny-dress-flower';
     for(let j=0;j<5;j++){
       const angle=j*Math.PI*2/5;
@@ -470,6 +471,7 @@ export function createAnimal(id, palette = {}) {
     // A little lavender scarf with a clear bow on the back.
     const scarf=groupAt(rear,0,1.26,-.49);
     scarf.name='cat-lavender-scarf';
+    scarf.scale.setScalar(.55); // Small accent, not a giant accessory around the kitten
     ell(scarf,m(0xceaadf),0,0,0,.47,.14,.23);
     for(const side of [-1,1])ell(scarf,m(0xe5c2ed),side*.18,-.13,-.19,
       .20,.13,.11,side*.35);
@@ -496,6 +498,7 @@ export function createAnimal(id, palette = {}) {
     // Small harness patch and heart make Dodo distinct from other pups.
     const badge=groupAt(rear,0,.92,-.65);
     badge.name='dog-park-heart';
+    badge.scale.setScalar(.55);
     for(const side of [-1,1])ell(badge,m(0xf3a2b2),side*.09,.035,0,.10,.11,.06);
     const heart=ell(badge,m(0xeb7795),0,-.09,-.025,.15,.13,.06);
     heart.rotation.z=Math.PI/4;
@@ -513,6 +516,7 @@ export function createAnimal(id, palette = {}) {
     }
     const scarf=groupAt(rear,0,1.36,-.48);
     scarf.name='penguin-blue-scarf';
+    scarf.scale.setScalar(.52); // Keep the clean black-white penguin silhouette
     ell(scarf,m(0x83dafa),0,0,-.015,.51,.14,.18);
     ell(scarf,m(0x60bce8),-.34,-.27,-.15,.17,.34,.14,.11);
     ell(scarf,trim,-.36,-.55,-.17,.17,.08,.14);
@@ -548,6 +552,7 @@ export function createAnimal(id, palette = {}) {
     }
     const bow=groupAt(rear,0,1.29,-.54);
     bow.name='cow-pink-bow';
+    bow.scale.setScalar(.48); // Small charm, not a distracting floating bow
     ell(bow,m(0xf5b4cc),0,0,0,.13,.15,.12);
     for(const side of [-1,1]){
       ell(bow,m(0xffcbdf),side*.19,.02,.018,.22,.16,.10,side*.34);

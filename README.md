@@ -228,6 +228,68 @@ not professionally authored textured and rigged models. The game is still
 not visually identical to the cinematic concept art; real-phone FPS tests
 and manual art-direction acceptance remain outstanding.
 
+## 🥕 Animal Food, Market and Daily Adventures
+
+Pawverse Dash now has a **collect → store → sell → earn** loop for the
+solo adventure. During the run, grab your animal's favourite 3D treats,
+avoid obstacles and keep the food you find even if the run ends.
+
+| Runner | Treat | Sell value |
+|---|---|---:|
+| Bella Bunny | 🥕 Carrot | 3 coins |
+| Ula Unicorn | 🌈 Rainbow Fruit | 5 coins |
+| Hugo Horse | 🍎 Apple | 4 coins |
+| Coco Cat | 🐟 Fish | 4 coins |
+| Dodo Dog | 🦴 Bone | 3 coins |
+| Pip Penguin | 🐟 Silver Fish | 4 coins |
+| Mimi Cow | 🌽 Corn | 3 coins |
+
+In the **Characters & Shop** screen, switch between **Characters**,
+**Sell Food**, **Mystery Boxes** and **Targets**:
+
+- **Sell Food:** View your stored food and sell one or all units for the
+  listed virtual coin price. The item count and coin balance are saved.
+- **Mystery Boxes:** Claim **one free box each UTC day**, or use **55
+  in-game coins** for an additional box. Gifts contain bounded amounts of
+  virtual coins or treats. Rare boxes also appear along the solo running
+  trail; these do not use up your free daily claim. No real-money purchases,
+  advertisements, paid random rewards or cash withdrawals are involved.
+- **Daily targets:** Collect 8 treats (45 coins), jump 6 times (30 coins),
+  complete 1 solo run of at least 20 m (50 coins).
+- **Weekly targets:** Collect 60 treats (220 coins), sell 30 items
+  (170 coins), or complete 10 qualifying solo runs (250 coins).
+  Rewards need to be **claimed**, and each mission is claimable once per
+  period. Daily goals reset at **00:00 UTC**, and weekly goals reset
+  **Monday 00:00 UTC**.
+- **Player progress:** Food, daily/weekly progress, claimed rewards,
+  the free-box cooldown, coins, characters and best run are stored in the
+  **same browser localStorage save**, with older saves migrated
+  automatically.
+
+### 🌍 Travelling through the world
+
+The runner remains near the camera, but the environment has **depth
+layers**, equivalent to the animal moving through a stationary world:
+
+- Road and near scenery stream at the runner's forward speed.
+- Butterflies and middle-distance scenery move more slowly.
+- Distant clouds have subtle movement, while the 3D mountain horizon
+  and sky do not scroll with the track.
+- Ground and flower/crystal/town/park/glacier/farm scenery reuse seamless
+  chunks so the road doesn't pop out of existence when the run progresses.
+- Each biome has three themed **journey chapter labels** that rotate
+  as the player passes 240-metre landmarks (for example, Daisy Fields,
+  Carrot Grove and Blossom Hills).
+
+This is **camera-relative forward streaming**, not a finite open-world map.
+It gives the sense of reaching new scenery without requiring the player
+to physically leave the fixed 3-lane camera frame. The chapter names are
+lightweight milestones, not seven new downloadable maps.
+
+**Scope:** Virtual-food progression currently belongs to solo running;
+local two-player races still prioritize fair competition and independent
+world scenery. The shop remains available from the main game menu.
+
 ## 🎮 Gameplay and features
 
 | Feature | How it works |
@@ -330,6 +392,9 @@ penguin-game/
 ├── race.html                     Two-player race
 ├── src/
 │   ├── main.js                   Solo gameplay, world selection, rendering
+│   ├── gameEconomy.js            Food, inventory, selling, missions and boxes
+│   ├── foodArt.js                Animal-themed 3D collectible objects
+│   ├── worldMotion.js            Seamless ground streams and parallax layers
 │   ├── race.js                   Split-screen multiplayer logic
 │   ├── collisionMath.js          Swept hazard contact detection
 │   ├── raceMath.js               Race physics and fair obstacle generation
@@ -400,6 +465,9 @@ Run `npm run android:add` only if no Android project already exists. For subsequ
 - [x] Seven selectable characters with matching 3D environments
 - [x] Distinct road textures, landscape colours, props and landmarks
 - [x] Solo gameplay with coins, energy, shields and magnets
+- [x] Animal-specific food pickups, inventory and food-to-coin selling
+- [x] Daily/weekly missions and claimable surprise gift boxes
+- [x] Runner-speed ground chunks and separate near/far environmental motion
 - [x] Local, fair, same-screen two-player race
 - [x] Reliable high-speed swept collision logic and automated regression tests
 - [x] Custom sky shader, animated weather and world scenery

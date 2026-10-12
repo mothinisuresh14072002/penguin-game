@@ -43,6 +43,38 @@ test('Bella has two distinguishable oval hind feet, single cotton tail and slend
  disposeAnimal(bunny);
 });
 
+test('Bella uses one smooth sculpted torso, a compact head and paired rabbit hops',()=>{
+ const bunny=createAnimal('bunny');
+ const body=bunny.group.getObjectByName('bunny-smooth-body');
+ const head=bunny.group.getObjectByName('bunny-distinct-head');
+ assert.equal(body.geometry.type,'LatheGeometry');
+ assert.ok(head.scale.x<.50);
+ assert.ok(body.scale.y>head.scale.y);
+ const arms=[];
+ bunny.group.traverse(o=>{if(o.name==='bunny-slim-front-leg')arms.push(o)});
+ assert.equal(arms.length,2);
+ assert.ok(bunny.pivotL.position.x>-.43&&bunny.pivotR.position.x<.43,
+   'Arms should be attached to the body rather than floating at its sides');
+ animateAnimal(bunny,.2,true,false);
+ assert.ok(bunny.feet[0].rotation.x*bunny.feet[1].rotation.x>0,
+  'A real rabbit hops its rear feet together rather than walking like a human');
+ assert.ok(bunny.face.position.y>bunny.headRestY);
+ animateAnimal(bunny,.2,false,false);
+ assert.equal(bunny.face.position.y,bunny.headRestY);
+ disposeAnimal(bunny);
+});
+test('Penguin waddle and horse trot are visibly different from a bunny hop',()=>{
+ const penguin=createAnimal('penguin');
+ const horse=createAnimal('horse');
+ const bunny=createAnimal('bunny');
+ for(const actor of [penguin,horse,bunny])animateAnimal(actor,.27,true,false);
+ assert.ok(penguin.feet[0].rotation.x*penguin.feet[1].rotation.x<0);
+ assert.ok(horse.feet[0].rotation.x*horse.feet[1].rotation.x<0);
+ assert.ok(bunny.feet[0].rotation.x*bunny.feet[1].rotation.x>0);
+ assert.ok(Math.abs(penguin.group.rotation.z)>Math.abs(horse.group.rotation.z));
+ for(const actor of [penguin,horse,bunny])disposeAnimal(actor);
+});
+
 test('Each animal has its own body/head proportions and separated hind feet',()=>{
  const dimensions=[];
  for(const id of animals){

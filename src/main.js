@@ -15,6 +15,9 @@ import {createTownDetails} from './townArt.js';
 import {createParkDetails} from './parkArt.js';
 import {createGlacierDetails} from './glacierArt.js';
 import {createFarmDetails} from './farmArt.js';
+import {createPickupArtwork} from './foodArt.js';
+import {FOODS,FOOD_BY_ANIMAL,DAILY_GOALS,WEEKLY_GOALS,createEconomy,synchronizeEconomy,collectFood,sellFood,openSurpriseBox,recordEvent,goalProgress,claimGoal,dailyKey} from './gameEconomy.js';
+import {loopZ,layerTravel,journeyChapter} from './worldMotion.js';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
@@ -40,7 +43,7 @@ const LEGACY_KEY='penguin-ice-runner-v2';
 let saved;
 try { saved=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(LEGACY_KEY)||'{}'); } catch { saved={}; }
 const validIds=new Set(CHARS.map(c=>c.id));
-const profile={coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['bunny','penguin'],selected:saved.selected||'bunny'};
+const profile={coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['bunny','penguin'],selected:saved.selected||'bunny',economy:createEconomy(saved.economy)};
 for(const id of ['bunny','penguin'])if(!profile.unlocked.includes(id))profile.unlocked.push(id);
 if(!profile.unlocked.includes(profile.selected))profile.selected='penguin';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(profile))}catch{}};
@@ -57,7 +60,7 @@ function sound(frequency=440,duration=.08,type='sine',volume=.065){
   oscillator.start(t);oscillator.stop(t+duration+.01);
  } catch {}
 }
-let running=false,paused=false,ended=false,playerLane=1,targetLane=1,playerY=0,velocityY=0,sliding=0,shield=0,magnet=0,boost=0,energy=100,runCoins=0,distance=0,speed=10,clockTime=0,spawnNext=25,invincible=0;
+let running=false,paused=false,ended=false,playerLane=1,targetLane=1,playerY=0,velocityY=0,sliding=0,shield=0,magnet=0,boost=0,energy=100,runCoins=0,runFood=0,distance=0,speed=10,clockTime=0,spawnNext=25,invincible=0;
 const laneX=[-2.6,0,2.6],entities=[],decor=[],scrollItems=[],hue={ice:0x64c7ee,snow:0xecfaff,rock:0x50697c};
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x80caef);scene.fog=new THREE.FogExp2(0xb9e8ff,.014);
@@ -257,6 +260,9 @@ function makeObject(kind,lane,at){
   for(const x of [-.52,0,.52])orb(root,snowMat,x,1.98,0,.30,.11,.28);
   radius=1.05;
 }
+ else if(kind==='food'||kind==='box'){
+  root.add(createPickupArtwork(kind,profile.selected));radius=.45;
+ }
  else if(kind==='coin'){part(root,new THREE.TorusGeometry(.33,.11,9,18),gold,0,1.12,0);radius=.42;}
  else if(kind==='energy'){orb(root,energyMat,0,1.2,0,.35,.48,.35);orb(root,white,0,1.2,.3,.12,.25,.07);radius=.48;}
  else if(kind==='shield'||kind==='magnet'){part(root,new THREE.OctahedronGeometry(.44),kind==='shield'?iceMat:powerMat,0,1.27,0);radius=.5;}
@@ -281,6 +287,8 @@ function row(at){
  for(let lane=0;lane<3;lane++)if(!blocked.has(lane)){
    if(Math.random()<.92){for(let i=0;i<4;i++)makeObject('coin',lane,at+2.0+i*1.15);}
    if(Math.random()<.34)makeObject('energy',lane,at+5.9);
+   if(Math.random()<.60)makeObject('food',lane,at+8.8);
+   if(Math.random()<.022)makeObject('box',lane,at+12.5);
    if(Math.random()<.055)makeObject(Math.random()<.5?'shield':'magnet',lane,at+7);
  }
 }
@@ -292,7 +300,8 @@ function showScreen(title,message,buttons){
  for(const b of buttons){const btn=document.createElement('button');btn.textContent=b.text;btn.className=b.secondary?'secondary':'';btn.onclick=b.action;actions.appendChild(btn)}
 }
 let characterPreviews,importedBunnyPreview;
-function shop(){
+function shop(tab='characters'){
+ if(typeof tab!=='string')tab='characters';
  if(!characterPreviews)characterPreviews=renderCharacterPreviews(CHARS,BIOMES);
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.remove('hidden');$('overlay').classList.add('hidden');
  const grid=$('charGrid');grid.replaceChildren();
@@ -318,6 +327,7 @@ function shop(){
   }
  }
  $('wallet').textContent=profile.coins;
+ showShopTab(tab);
 }
 function menu(){
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.add('hidden');updateHUD();

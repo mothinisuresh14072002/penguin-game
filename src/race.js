@@ -342,7 +342,7 @@ function reset(){
 // Swap only the actual character mesh. Each viewport keeps its own shadow
 // and race state, and a late load from an older race cannot replace a rematch.
 function tryImportedRaceHero(player){
- if(player.ch.id!=='bunny')return;
+ // Optional authored GLB overrides are supported for all seven animals.
  loadImportedAnimal(player.ch.id).then(imported=>{
   if(!imported)return;
   if(racers[player.index]!==player){

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {loopZ} from './worldMotion.js';
 
 // Dodo Dog's lush looping park: low garden beds, soft clover flowers,
 // bushes and stepping-stone edges. Instancing keeps draw calls bounded.
@@ -94,12 +95,8 @@ export function createParkDetails(scene){
   }
  }
  function update(distance=0){
-  const length=PARK_STRIPS*PARK_STRIP_LENGTH;
-  const d=Math.max(0,distance)*.83;
-  for(let i=0;i<PARK_STRIPS;i++){
-   const n=((i*PARK_STRIP_LENGTH+d)%length+length)%length;
-   strips[i].position.z=14-n;
-  }
+  for(let i=0;i<strips.length;i++)
+   strips[i].position.z=loopZ(i,PARK_STRIP_LENGTH,Math.max(0,distance),PARK_STRIPS,14);
  }
  function dispose(){
   scene.remove(root);

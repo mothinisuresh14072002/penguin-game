@@ -14,7 +14,7 @@ export function createAnimal(id, palette = {}) {
   };
   const colors = {
     bunny:0xffeef5, unicorn:0xf9f4ff, horse:0xc58b60, cat:0xf5a94f,
-    dog:0xf6e2c5, penguin:0x718d9f, cow:0xfffcf5
+    dog:0xf4dcac, penguin:0x222936, cow:0xfffcf5
   };
   const mats = new Map();
   function m(hex, shiny=false) {
@@ -43,12 +43,12 @@ export function createAnimal(id, palette = {}) {
   ell(root,belly,0,.94,.405,.43,.53,.17);
   if(id==='bunny'){
     // A little pastel flower outfit / skirt like the character reference.
-    ell(root,m(0xf8cce4),0,.54,0,.67,.25,.54);
+    ell(root,m(0xffdce9),0,.54,0,.67,.25,.54);
     ell(root,m(0xd8f5bd),0,.77,.44,.35,.10,.08);
   }
   if(id==='dog'){
     ell(root,m(0xffffff),0,.9,.43,.45,.48,.17);
-    ell(root,m(0x739cc5),0,1.28,.24,.55,.085,.49);
+    ell(root,m(0xd65b66),0,1.28,.24,.55,.085,.49);
     ell(root,gold,0,1.19,.64,.13,.13,.07);
   }
   if(id==='cow'){
@@ -197,6 +197,69 @@ export function createAnimal(id, palette = {}) {
     ell(tail,id==='cat'?ivory:coat,.41,.47,-.06,.16,.19,.15);
   }else if(id==='cow')ell(tail,coat,.15,-.17,-.12,.10,.36,.10,-.30);
   else ell(tail,coat,0,-.12,0,.19,.24,.21);
+
+  // Rear-view artwork matters in an endless runner: the camera looks at -Z
+  // because the hero is turned toward -Z. These features sit on the *back*
+  // surface, not the forward-facing eyes, so every animal stays identifiable.
+  const rear=groupAt(root,0,0,0);
+  rear.name='character-rear-design-'+id;
+  if(id==='bunny'){
+    // Cream fur, visible pink inner-ear folds and a flower-skirt hem.
+    for(const side of [-1,1]){
+      ell(face,m(0xf4a9c7),side*.50,.95,-.148,.095,.40,.035,-side*.13);
+      ell(rear,m(0xfff5fd),side*.31,.55,-.42,.21,.14,.12);
+    }
+    ell(rear,m(0xffffff),0,1.0,-.475,.44,.46,.15);
+    ell(rear,cream,0,.85,-.60,.10,.10,.08);
+    for(let i=0;i<5;i++){
+      const a=i*Math.PI*2/5;
+      ell(rear,m(0xffffff),Math.cos(a)*.15,.64+Math.sin(a)*.14,-.55,.08,.08,.045);
+    }
+    ell(rear,m(0xffce65),0,.64,-.57,.075,.075,.05);
+  }else if(id==='unicorn'){
+    // Rainbow mane flowing down the neck; horn and tiny wings stay visible.
+    const mane=[0xff9ecf,0xa3d8ff,0xf8d58e,0xd8b3f3,0x93dcba];
+    for(let i=0;i<8;i++){
+      ell(rear,m(mane[i%5]),-.33+(i%4)*.2,2.22-Math.floor(i/4)*.30,-.45,.14,.22,.19,(i%2?-.3:.3));
+    }
+    for(let i=0;i<5;i++){
+      ell(rear,m(mane[i]),-.19+(i%3)*.18,1.56-i*.18,-.45,.12,.19,.16,(i%2?-.2:.2));
+    }
+    ell(rear,m(0xfdf3ff),0,.99,-.49,.36,.39,.14);
+    for(const side of [-1,1])ell(rear,cream,side*.69,1.25,-.37,.24,.37,.15,side*.65);
+  }else if(id==='horse'){
+    ell(rear,m(0xfff2d6),0,.92,-.45,.42,.46,.17);
+    ell(rear,m(0x855239),0,2.13,-.45,.20,.49,.22);
+    for(let i=0;i<4;i++)ell(rear,m(0x80543d),(i%2?-.1:.10),1.62-i*.15,-.48,.18,.20,.18);
+    for(const side of [-1,1])ell(rear,m(0xe9bb83),side*.46,1.0,-.33,.12,.34,.13);
+  }else if(id==='cat'){
+    const stripes=m(0xba7033);
+    for(let i=0;i<4;i++){
+      ell(rear,stripes,(i%2?-.16:.16),1.23-i*.27,-.47,.23,.075,.056,(i%2?-.35:.35));
+    }
+    for(let i=0;i<3;i++)ell(rear,stripes,0,2.22-i*.22,-.48,.24,.075,.07);
+    ell(rear,m(0xffcc8d),0,.80,-.46,.20,.23,.1);
+  }else if(id==='dog'){
+    ell(rear,m(0xfff2cf),0,1.03,-.48,.43,.50,.16);
+    ell(rear,m(0xb88555),0,2.17,-.49,.42,.22,.095);
+    for(const side of [-1,1])ell(face,m(0xba835a),side*.65,.18,-.12,.23,.36,.15,side*.47);
+    ell(rear,m(0xe85b5d),0,1.3,-.49,.51,.09,.12);
+    ell(rear,m(0xffd478),0,1.20,-.57,.13,.12,.10);
+  }else if(id==='penguin'){
+    ell(rear,m(0x172333),0,1.06,-.43,.50,.59,.15);
+    ell(rear,m(0x182536),0,1.94,-.46,.52,.51,.12);
+    for(const side of [-1,1]){
+      ell(rear,m(0x25344d),side*.48,.94,-.26,.22,.47,.19,side*.15);
+    }
+    ell(rear,m(0xffd181),0,.38,-.47,.22,.17,.17);
+  }else if(id==='cow'){
+    const spot=m(0x323138);
+    ell(rear,spot,-.25,1.24,-.43,.31,.31,.11,.28);
+    ell(rear,spot,.29,.75,-.42,.25,.20,.12,-.23);
+    ell(rear,spot,.05,2.21,-.48,.28,.26,.10);
+    for(const side of [-1,1])ell(face,m(0xf2b7c1),side*.77,.30,-.11,.21,.11,.08,side*.2);
+    ell(rear,m(0xf4d0d1),0,.55,-.50,.20,.18,.08);
+  }
   return {group:root,pivotL,pivotR,feet,ears,tail,face};
 }
 

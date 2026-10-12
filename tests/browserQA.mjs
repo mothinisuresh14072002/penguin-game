@@ -97,10 +97,12 @@ try{
   await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();
   await page.locator('.char-card').filter({hasText:'Pip Penguin'}).click();
   assert.equal((await state(page)).biome,'arctic');
+  assert.equal((await state(page)).meadowFlowerStrips,0,'Bunny flowers must be removed on world change');
   assert.match(await page.locator('#worldName').textContent(),/Penguin Glacier/);
   await snap(page,'03-penguin-glacier');
   await page.locator('.char-card').filter({hasText:'Bella Bunny'}).click();
   assert.equal((await state(page)).biome,'meadow');
+  assert.equal((await state(page)).meadowFlowerStrips,5,'Bunny Meadow should include the full daisy field');
   assert.match(await page.locator('#worldName').textContent(),/Bunny Meadow/);
   await close();
  });
@@ -126,6 +128,7 @@ try{
     const selected=await state(page);
     assert.equal(selected.selected,id);
     assert.equal(selected.biome,biome);
+    assert.equal(selected.meadowFlowerStrips,biome==='meadow'?5:0);
     assert.equal(await page.locator('#worldName').textContent(),label);
     // Remove only the modal's visibility for a frame so the artifact is a
     // truthful screenshot of the currently rendered 3D world, unobstructed.
@@ -195,6 +198,8 @@ try{
   const before=await state(page);
   assert.equal(before.players[0].id,'bunny');
   assert.equal(before.players[1].id,'penguin');
+  assert.equal(before.players[0].meadowFlowerStrips,5);
+  assert.equal(before.players[1].meadowFlowerStrips,0);
   await page.locator('#pauseRace').click();
   // The renderer may advance while Playwright delivers a click under software
   // WebGL. Measure *after* paused is true, not before initiating the click.

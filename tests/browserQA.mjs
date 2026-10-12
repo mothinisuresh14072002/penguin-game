@@ -396,9 +396,10 @@ try{
  });
  await test('Foreground world travels faster than distant clouds and mountains stand still',async()=>{
   const {page,close}=await openGame('/?qa=1');
-  const first=await state(page);
   await page.getByRole('button',{name:/SOLO RUN/}).click();
-  await page.waitForFunction(()=>window.__pawverseQA().distance>4,{timeout:30000});
+  await page.waitForFunction(()=>window.__pawverseQA().distance>2,{timeout:30000});
+  const first=await state(page);
+  await page.waitForFunction(()=>window.__pawverseQA().distance>7,{timeout:30000});
   const second=await state(page);
   assert.ok(second.distance>first.distance);
   assert.ok(Math.abs(second.terrainZ-first.terrainZ)>2);

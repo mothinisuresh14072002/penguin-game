@@ -112,6 +112,35 @@ scenery stays independent. As in phases 1 and 2, this remains
 hand-crafted procedural 3D rather than a cinematic textured animal
 model; physical-device performance and visual review are still needed.
 
+## 🏘️ Phase 4: Coco Cat and Cat Town
+
+**Coco Cat** now has a soft orange-tabby PBR coat, big green irises,
+rounded cheeks, a lavender scarf, stronger stripes on the back, and an
+upright striped tail that sways while running. These details are designed
+for the small rear-view runner silhouette as well as shop previews.
+
+**Cat Town** features:
+
+- Four looping street sections with **32 colourful pastel building façades**
+  in total, pitched roofs, individual doors, windows and white trim.
+- Flower-filled window boxes and warm lantern streetlamps, all made from
+  actual Three.js geometry.
+- A central village clock tower with gently moving clock hands.
+- Existing cobblestone track and the seven-world sky/background system.
+- GPU instancing to keep town detail bounded at approximately
+  **40 instanced draw calls**, instead of hundreds of separate meshes.
+
+Selecting Coco Cat creates the moving town; switching to another
+character disposes of the town meshes. Split-screen mode maintains each
+player's own environment. Unit tests cover cat details, animated tail,
+street recycling, clock rotation, and cleanup. The real browser suite
+also tests Cat Town against Bunny Meadow in a local two-player race.
+
+**Not yet a cinematic 3D asset pack:** The project's reference picture
+remains the visual goal. This phase improves the procedural art but does
+not add textured, fully rigged, film-quality cat models. Gameplay tests
+cannot establish an exact visual match or real-device FPS.
+
 ## 🎮 Gameplay and features
 
 | Feature | How it works |
@@ -221,6 +250,7 @@ penguin-game/
 │   ├── meadowArt.js              Instanced flowers and gravel for Bella Bunny
 │   ├── skylandArt.js             Floating islands and instanced Unicorn crystals
 │   ├── prairieArt.js             Instanced golden wheat, hay and countryside
+│   ├── townArt.js                Instanced pastel Cat Town buildings and lanterns
 │   ├── modelAssets.js            Optional GLB character loading and fallback
 │   ├── characterPreviews.js      3D portraits in the character shop
 │   ├── roadArt.js                Seven repeated illustrated road textures
@@ -273,6 +303,7 @@ Run `npm run android:add` only if no Android project already exists. For subsequ
 - [x] Bella Bunny Phase 1: plush rear-view details and flowing flower meadow
 - [x] Ula Unicorn Phase 2: animated mane, pearlescent coat and sparkling Rainbow Skyland
 - [x] Hugo Horse Phase 3: chestnut baby pony, golden wheatfields and animated windmills
+- [x] Coco Cat Phase 4: green-eyed tabby, moving tail, pastel village and clock tower
 - [x] Seven selectable characters with matching 3D environments
 - [x] Distinct road textures, landscape colours, props and landmarks
 - [x] Solo gameplay with coins, energy, shields and magnets

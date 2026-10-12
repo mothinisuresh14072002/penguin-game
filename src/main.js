@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import './style.css';
 import {createAnimal, animateAnimal} from './animalArt.js';
-import {populateHabitat} from './worldArt.js';
+import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
 import {renderCharacterPreviews, renderImportedPreview} from './characterPreviews.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 import {create3DBackdrop} from './visual3d.js';
@@ -145,7 +145,7 @@ function addScenery(parent,shape,color,x,y,z,sx,sy,sz){
 function clearScenery(){
  for(const o of biomeDecor){scene.remove(o);o.traverse(obj=>{
   if(obj.isMesh){
-   if(obj.geometry&&!SHARED_GEOMETRIES.has(obj.geometry))obj.geometry.dispose();
+   if(obj.geometry&&!SHARED_GEOMETRIES.has(obj.geometry)&&!WORLD_GEOMETRIES.has(obj.geometry))obj.geometry.dispose();
    if(obj.material&&sceneryMaterials.has(obj.material))obj.material.dispose();
   }
  })}

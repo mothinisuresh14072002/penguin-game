@@ -4,6 +4,8 @@ import {createAnimal, animateAnimal} from './animalArt.js';
 import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 import {create3DBackdrop} from './visual3d.js';
+import {createRoadArtwork} from './roadArt.js';
+import {createWorldLandmarks} from './landmarkArt.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
 const $ = id => document.getElementById(id);
@@ -29,7 +31,7 @@ renderer.setPixelRatio(Math.min(1.35,window.devicePixelRatio || 1));
 renderer.setSize(innerWidth,innerHeight);
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.18;
+renderer.toneMappingExposure=1.38;
 renderer.autoClear=false;
 renderer.domElement.style.touchAction='none';
 document.body.prepend(renderer.domElement);
@@ -62,10 +64,12 @@ function newRacePlayer(ch,index){
  scene.add(new THREE.HemisphereLight(0xecfbff,0x728da1,2.8));
  const sun=new THREE.DirectionalLight(0xfff5e5,2.4);sun.position.set(-8,15,6);scene.add(sun);
  const camera=new THREE.PerspectiveCamera(63,1,.1,290);
- camera.position.set(0,6.1,13.6);camera.lookAt(0,1.1,-17);
+ camera.position.set(0,5.5,12.7);camera.lookAt(0,1.3,-19);
  const biomeId={bunny:'meadow',unicorn:'rainbow',horse:'grassland',cat:'city',dog:'park',penguin:'arctic',cow:'farm'}[ch.id]||'meadow';
  const backdrop=create3DBackdrop(scene,biomeId);
  backdrop.setBiome(biomeId,ch.sky);
+ const landmarks=createWorldLandmarks(scene,biomeId);
+ const roadArt=createRoadArtwork(scene,biomeId,{length:260,centerZ:-105,surfaceY:.068,width:8.95});
  const turf=material(ch.ground),road=material(ch.road),border=material(ch.accent);
  piece(scene,geom.box,turf,0,-.74,-105,30,1.25,255);
  piece(scene,geom.box,road,0,-.04,-105,9.1,.17,255);
@@ -73,7 +77,8 @@ function newRacePlayer(ch,index){
  const laneMarks=[];
  const markMaterial=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.56,depthWrite:false});disposables.add(markMaterial);
  for(let i=0;i<48;i++){
-  const o=piece(scene,geom.box,markMaterial,i%2===0?-1.3:1.3,.06,0,.085,.026,1.9);
+  const o=piece(scene,geom.box,markMaterial,i%2===0?-1.3:1.3,.09,0,.085,.026,1.9);
+  o.visible=['arctic','rainbow'].includes(biomeId);
   laneMarks.push(o);
  }
  // Character-specific 3D horizon is supplied by visual3d.js.
@@ -85,11 +90,11 @@ function newRacePlayer(ch,index){
  }
  const scenery=[];
  for(let i=0;i<46;i++){
-  const x=(i%2===0?-1:1)*(9+(i%3)*1.7),z=14-Math.floor(i/2)*12;
+  const x=(i%2===0?-1:1)*(7.6+(i%3)*1.3),z=14-Math.floor(i/2)*12;
   scenery.push(prop(scene,ch.scenery,ch,x,z,i));
  }
  const hero=createHero(ch.id,scene);
- return {scene,camera,backdrop,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
+ return {scene,camera,backdrop,landmarks,roadArt,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
 }
 function obstacle(player,kind,lane,at){
  const root=new THREE.Group();root.position.set(LANE_POSITIONS[lane],0,2-(at-player.distance));player.scene.add(root);
@@ -127,6 +132,8 @@ function spawnRow(player){
 }
 function clearPlayer(player){
  player.backdrop?.dispose();
+ player.landmarks?.dispose();
+ player.roadArt?.dispose();
  if(player.hero?.imported&&player.hero.mixer)player.hero.mixer.stopAllAction();
  const geometries=new Set(),materials=new Set();
  player.scene.traverse(object=>{
@@ -211,6 +218,7 @@ function updatePlayer(p,dt){
   const cloud=p.skyClouds[i];
   cloud.position.set((i%2===0?-1:1)*(10+i%4*2)+Math.sin(p.time*.35+i),12+(i%4)*2,trackLoop(i,20,p.distance*.2,14));
  }
+ p.roadArt.update(p.distance);
  for(let i=0;i<p.laneMarks.length;i++)p.laneMarks[i].position.z=trackLoop(Math.floor(i/2),8,p.distance,24);
  p.hero.group.position.set(px,p.y,2);
  animateAnimal(p.hero,p.time,p.stun<=0,p.y>.05);
@@ -218,10 +226,10 @@ function updatePlayer(p,dt){
  p.hero.group.scale.y=p.slide>0?.57:(p.y>.05?1.04:1);
  p.hero.shadow.position.x=px;
  p.hero.shadow.material.opacity=.55-Math.min(.43,p.y*.15);
- const fov=62+(currentSpeed-22)*.33;
+ const fov=55+(currentSpeed-22)*.14;
  if(Math.abs(p.camera.fov-fov)>.025){p.camera.fov=THREE.MathUtils.damp(p.camera.fov,fov,3,dt);p.camera.updateProjectionMatrix()}
  p.camera.position.x=THREE.MathUtils.damp(p.camera.position.x,px*.23,4,dt);
- p.camera.lookAt(p.camera.position.x*.25,1.25,-19);
+ p.camera.lookAt(p.camera.position.x*.25,1.28,-19);
  const num=p.index+1;
  $('p'+num+'Distance').textContent=Math.floor(p.distance);
  $('p'+num+'Coins').textContent=p.coins;

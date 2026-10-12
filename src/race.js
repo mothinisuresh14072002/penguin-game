@@ -4,6 +4,7 @@ import {createAnimal, animateAnimal} from './animalArt.js';
 import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 import {create3DBackdrop} from './visual3d.js';
+import {sweptHazardContact} from './collisionMath.js';
 import {createRoadArtwork} from './roadArt.js';
 import {createWorldLandmarks} from './landmarkArt.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
@@ -182,6 +183,8 @@ function updatePlayer(p,dt){
  p.time+=dt;const currentSpeed=raceSpeed(p.distance),moving=p.stun>0?.37:1;
  p.stun=Math.max(0,p.stun-dt);p.invuln=Math.max(0,p.invuln-dt);
  const previousDistance=p.distance;
+ const previousX=LANE_POSITIONS[0]+(LANE_POSITIONS[2]-LANE_POSITIONS[0])*p.lane;
+ const previousY=p.y,previousSlide=p.slide;
  p.distance+=currentSpeed*moving*dt;
  p.energy=Math.max(0,p.energy-dt*(.96+currentSpeed*.014));
  p.lane=THREE.MathUtils.damp(p.lane,p.target,16,dt);
@@ -194,7 +197,12 @@ function updatePlayer(p,dt){
  for(const e of p.objects){
   e.root.position.z=2-(e.at-p.distance);
   if(e.pickup){e.root.rotation.y+=dt*3;e.root.position.y=Math.sin(p.time*4+e.at)*.07}
-  if(!e.taken&&crossedDistance(previousDistance,p.distance,e.at)){
+  const contact=!e.pickup&&!e.taken?sweptHazardContact({
+   kind:e.kind,obstacleDistance:e.at,obstacleX:e.root.position.x,
+   previousDistance,distance:p.distance,previousX,x:px,
+   previousY,y:p.y,slideStart:previousSlide,slideEnd:p.slide
+  }):null;
+  if(!e.taken&&(e.pickup?crossedDistance(previousDistance,p.distance,e.at):Boolean(contact))){
    if(e.pickup){
     const y=e.kind==='energy'?1.19:1.14;
     if(pickupTouch(e.root.position.x,e.root.position.z,y+e.root.position.y,px,2,p.y)){
@@ -202,8 +210,11 @@ function updatePlayer(p,dt){
      if(e.kind==='coin'){p.coins++;if(p.coins%10===0)showNotice(p,'✨ '+p.coins+' COINS!');beep(780+p.coins%6*43,.055,.016)}
      else {p.energy=Math.min(100,p.energy+28);showNotice(p,'⚡ ENERGY +28');beep(550,.12,.025)}
     }
-   }else if(Math.abs(e.root.position.x-px)<.91&&p.invuln<=0){
-    if(!(p.y>1.15||p.slide>.05&&e.kind==='log')){
+   }else{
+    // Once touched, hide this obstacle (including during brief immunity) so
+    // the animal never visibly runs through solid geometry.
+    e.taken=true;e.root.visible=false;
+    if(p.invuln<=0){
      p.hit++;p.energy=Math.max(0,p.energy-13);p.invuln=1.35;p.stun=1.1;
      showNotice(p,'💥 -13 ENERGY · SLOWED');beep(180,.25,.055);
     }

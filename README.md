@@ -165,6 +165,37 @@ world independence. The reference illustration is still an art-direction
 target; this does not yet replace Dodo with a professionally textured,
 skeletally rigged cinematic dog asset.
 
+## ❄️ Phase 6: Pip Penguin and Penguin Glacier
+
+**Pip Penguin** now has a softer charcoal PBR coat, a rounded white
+face mask, rosy cheeks, orange feet, little animated flippers, a
+light-blue winter scarf and a stitched snowflake badge. The scarf and
+back markings were placed for the actual small rear-view runner camera.
+
+**Penguin Glacier** now includes:
+
+- Four looping icy scenic strips containing **168 tall faceted crystal
+  spires**, blue ice pebbles, smaller shards and powdery snowbanks.
+- **210 falling snowflakes** in their own particle system, including
+  the independently rendered Penguin viewport in two-player races.
+- A crystalline portal above the running path, snow-covered ice pines,
+  soft snowdrifts and an igloo placed *off* the playable track.
+- Blue shimmering ice road, glacier mountains, and the existing
+  snowy sky colours matched to the selected Penguin biome.
+- Instanced Three.js ice meshes for reasonable GPU draw calls, without
+  loading external assets, textures or models.
+
+Snowfall and crystal strips are created only for Penguin, and disposed
+when selecting another animal. The game uses its older atmospheric
+particle field exclusively for Unicorn Skyland to avoid doubling snow
+in Penguin Glacier. Unit tests check ice-strip recycling, snowfall
+movement, animated flippers, scene cleanup and the over-road portal.
+Real Chromium tests verify Penguin-versus-Dog world separation.
+
+**Quality note:** The new details are real but procedural Three.js art.
+A pixel-exact recreation of the cinematic reference still requires
+professional textured, rigged 3D assets and device-specific visual testing.
+
 ## 🎮 Gameplay and features
 
 | Feature | How it works |
@@ -276,6 +307,7 @@ penguin-game/
 │   ├── prairieArt.js             Instanced golden wheat, hay and countryside
 │   ├── townArt.js                Instanced pastel Cat Town buildings and lanterns
 │   ├── parkArt.js                Instanced Puppy Park flowers, bushes and stone path
+│   ├── glacierArt.js             Instanced ice spires, snow drifts and particles
 │   ├── modelAssets.js            Optional GLB character loading and fallback
 │   ├── characterPreviews.js      3D portraits in the character shop
 │   ├── roadArt.js                Seven repeated illustrated road textures
@@ -330,6 +362,7 @@ Run `npm run android:add` only if no Android project already exists. For subsequ
 - [x] Hugo Horse Phase 3: chestnut baby pony, golden wheatfields and animated windmills
 - [x] Coco Cat Phase 4: green-eyed tabby, moving tail, pastel village and clock tower
 - [x] Dodo Dog Phase 5: floppy-ear puppy, garden scenery, lily pond and off-road gazebo
+- [x] Pip Penguin Phase 6: scarf, flippers, falling snow and crystalline glacier portal
 - [x] Seven selectable characters with matching 3D environments
 - [x] Distinct road textures, landscape colours, props and landmarks
 - [x] Solo gameplay with coins, energy, shields and magnets

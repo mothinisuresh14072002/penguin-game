@@ -19,10 +19,10 @@ export function createAnimal(id, palette = {}) {
   const mats = new Map();
   function m(hex, shiny=false) {
     const key = String(hex) + (shiny?'s':'m');
-    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn')&&!shiny
+    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn'||id==='horse')&&!shiny
       ? new THREE.MeshPhysicalMaterial({
          color:hex,roughness:.88,metalness:0,
-         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:0xffe9e2),
+         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:id==='horse'?0xffdcaa:0xffe9e2),
          clearcoat:.02
         })
       : new THREE.MeshStandardMaterial({
@@ -159,7 +159,14 @@ export function createAnimal(id, palette = {}) {
   }
   if(id==='horse'){
     const mane=m(0x80513d);
-    for(let i=0;i<5;i++)ell(face,mane,-.30+i*.15,.56+(i%2)*.13,-.12,.15,.26,.17);
+    for(let i=0;i<7;i++)ell(face,mane,-.35+i*.12,.55+(i%3)*.09,-.12,.16,.26,.17);
+    // Cream blaze and rounded muzzle contrast with the chestnut fur.
+    const blaze=ell(face,m(0xffead3),0,.12,.526,.15,.34,.05);
+    blaze.name='horse-face-blaze';
+    for(const side of [-1,1]){
+      ell(face,m(0xffd5b2),side*.48,-.24,.30,.18,.16,.12);
+      ell(face,m(0x9a6442),side*.28,-.48,.64,.045,.025,.025);
+    }
   }
   if(id==='cat'){
     // Small stripy forehead and six visible whiskers.
@@ -300,10 +307,32 @@ export function createAnimal(id, palette = {}) {
       ell(rear,m(0xdac8fd),side*.74,1.19,-.40,.20,.26,.12,side*.59);
     }
   }else if(id==='horse'){
-    ell(rear,m(0xfff2d6),0,.92,-.45,.42,.46,.17);
-    ell(rear,m(0x855239),0,2.13,-.45,.20,.49,.22);
-    for(let i=0;i<4;i++)ell(rear,m(0x80543d),(i%2?-.1:.10),1.62-i*.15,-.48,.18,.20,.18);
-    for(const side of [-1,1])ell(rear,m(0xe9bb83),side*.46,1.0,-.33,.12,.34,.13);
+    // A recognisable baby pony from behind: cream rump, rounded haunches,
+    // long dark mane and soft fetlocks all read at small runner scale.
+    const creamCoat=m(0xffedd5);
+    ell(rear,creamCoat,0,.99,-.47,.46,.51,.19);
+    for(const side of [-1,1]){
+      ell(rear,m(0xd7a073),side*.37,.74,-.35,.26,.38,.19,-side*.14);
+      ell(rear,creamCoat,side*.37,.47,-.37,.20,.16,.16);
+      ell(face,m(0xf6c8a9),side*.45,.72,-.19,.105,.20,.048);
+    }
+    const mane=groupAt(rear,0,1.81,-.48);
+    mane.name='horse-pony-mane';
+    const shades=[0x72452f,0x8d5a3c,0xa36b47,0x684230];
+    for(let i=0;i<11;i++){
+      const x=-.29+(i%5)*.145;
+      const y=.35-Math.floor(i/5)*.23;
+      const strand=ell(mane,m(shades[i%shades.length]),
+        x,y,-.08,.135,.24+Math.floor(i/5)*.035,.16,(i%5-2)*-.11);
+      strand.name='horse-mane-lock';
+    }
+    // Decorative saddlecloth in muted pastoral cream and dusty rose.
+    const blanket=groupAt(rear,0,.94,-.47);
+    blanket.name='horse-pony-blanket';
+    ell(blanket,m(0xffe5c9),0,0,0,.46,.19,.14);
+    for(const side of [-1,1]){
+      ell(blanket,m(0xe0a790),side*.37,-.11,-.07,.10,.27,.12,side*.18);
+    }
   }else if(id==='cat'){
     const stripes=m(0xba7033);
     for(let i=0;i<4;i++){
@@ -332,7 +361,8 @@ export function createAnimal(id, palette = {}) {
     for(const side of [-1,1])ell(face,m(0xf2b7c1),side*.77,.30,-.11,.21,.11,.08,side*.2);
     ell(rear,m(0xf4d0d1),0,.55,-.50,.20,.18,.08);
   }
-  const mane=id==='unicorn'?root.getObjectByName('unicorn-rainbow-mane'):null;
+  const mane=id==='unicorn'?root.getObjectByName('unicorn-rainbow-mane')
+    :id==='horse'?root.getObjectByName('horse-pony-mane'):null;
   const wings=id==='unicorn'
     ? [root.getObjectByName('unicorn-left-wing'),root.getObjectByName('unicorn-right-wing')]
     : null;

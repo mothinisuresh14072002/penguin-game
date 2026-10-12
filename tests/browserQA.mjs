@@ -330,6 +330,83 @@ try{
   await snap(page,'14-mimi-farm-vs-penguin-glacier');
   await close();
  });
+ await test('Shop food inventory sells exact quantities and saves coins',async()=>{
+  const {page,close}=await openGame('/?qa=1',{
+   profile:{coins:10,best:0,unlocked:['bunny','penguin'],selected:'bunny',
+    economy:{inventory:{carrot:9}}}
+  });
+  await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();
+  assert.equal(await page.locator('.shop-tab').count(),4);
+  await page.locator('.shop-tab[data-tab="sell"]').click();
+  const carrot=page.locator('.economy-item').filter({hasText:'Carrot'});
+  assert.match(await carrot.textContent(),/Owned: 9/);
+  await carrot.getByRole('button',{name:'SELL 1'}).click();
+  assert.equal((await state(page)).inventory.carrot,8);
+  assert.equal(await page.locator('#walletHud').textContent(),'13');
+  await page.locator('.economy-item').filter({hasText:'Carrot'})
+   .getByRole('button',{name:'SELL ALL'}).click();
+  assert.equal((await state(page)).inventory.carrot,0);
+  assert.equal(await page.locator('#walletHud').textContent(),'37');
+  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('penguin-ice-runner-v3')));
+  assert.equal(saved.economy.inventory.carrot,0);
+  assert.equal(saved.economy.weekly.sold,9);
+  await snap(page,'15-food-inventory-and-sell');
+  await close();
+ });
+ await test('Daily gift box can be claimed once and remains claimed after reload',async()=>{
+  const {page,close}=await openGame('/?qa=1');
+  await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();
+  await page.locator('.shop-tab[data-tab="boxes"]').click();
+  await page.getByRole('button',{name:'OPEN FREE'}).click();
+  const after=await page.evaluate(()=>JSON.parse(localStorage.getItem('penguin-ice-runner-v3')));
+  assert.ok(after.economy.freeBoxDay);
+  assert.equal(await page.getByRole('button',{name:'CLAIMED TODAY'}).isDisabled(),true);
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();
+  await page.locator('.shop-tab[data-tab="boxes"]').click();
+  assert.equal(await page.getByRole('button',{name:'CLAIMED TODAY'}).isDisabled(),true);
+  await snap(page,'16-daily-surprise-box');
+  await close();
+ });
+ await test('Quest progress and claimable daily reward display in shop',async()=>{
+  const {page,close}=await openGame('/?qa=1',{
+   profile:{coins:0,best:0,unlocked:['bunny','penguin'],selected:'bunny',
+    economy:{inventory:{carrot:8}}}
+  });
+  // Ensure mission progress is credited through real collection is covered in
+  // unit tests; this browser scenario tests the interactive goals UI.
+  await page.evaluate(()=>{
+   const p=JSON.parse(localStorage.getItem('penguin-ice-runner-v3'));
+   const d=new Date();
+   p.economy.daily={
+    key:d.toISOString().slice(0,10),food:8,sold:0,jumps:0,runs:0,claimed:[]
+   };
+   localStorage.setItem('penguin-ice-runner-v3',JSON.stringify(p));
+  });
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();
+  await page.locator('.shop-tab[data-tab="goals"]').click();
+  const goal=page.locator('.economy-item').filter({hasText:'Collect 8 animal treats'});
+  assert.match(await goal.textContent(),/8\/8/);
+  await goal.getByRole('button',{name:'CLAIM REWARD'}).click();
+  assert.equal(await page.locator('#walletHud').textContent(),'45');
+  assert.match(await page.locator('.economy-item').filter({hasText:'Collect 8 animal treats'}).textContent(),/CLAIMED/);
+  await snap(page,'17-daily-weekly-goals');
+  await close();
+ });
+ await test('Foreground world travels faster than distant clouds and mountains stand still',async()=>{
+  const {page,close}=await openGame('/?qa=1');
+  const first=await state(page);
+  await page.getByRole('button',{name:/SOLO RUN/}).click();
+  await page.waitForFunction(()=>window.__pawverseQA().distance>4,{timeout:30000});
+  const second=await state(page);
+  assert.ok(second.distance>first.distance);
+  assert.ok(Math.abs(second.terrainZ-first.terrainZ)>2);
+  assert.ok(Math.abs(second.farCloudZ-first.farCloudZ)<2);
+  assert.equal(second.horizonZ,first.horizonZ);
+  await snap(page,'18-moving-world-static-horizon');
+  await close();
+ });
  await test('Mobile portrait race renders a vertical pair with touch controls',async()=>{
   const {page,close}=await openGame('/race.html?qa=1',{viewport:{width:390,height:844},mobile:true,touch:true});
   await page.locator('#raceStart').click();

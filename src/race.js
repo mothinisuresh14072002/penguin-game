@@ -421,6 +421,8 @@ if(new URLSearchParams(location.search).has('qa')){
    puppyParkStrips:p.parkDetails?.strips.length??0,
    penguinGlacierStrips:p.glacierDetails?.strips.length??0,
    mimiFarmStrips:p.farmDetails?.strips.length??0,
+   physicalLandmarkZ:p.landmarks?.strips[2]?.position.z,
+   avatarFeet:p.hero.feet?.length??0,
    journeyChunks:p.journeyArt?.groups.length??0,biome:p.backdrop?.horizon?.name
   }))
  });

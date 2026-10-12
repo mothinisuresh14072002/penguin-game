@@ -409,6 +409,26 @@ try{
   await snap(page,'18-moving-world-static-horizon');
   await close();
  });
+ await test('Bunny has distinct hind feet and fixed roadside flowers move with the physical path',async()=>{
+  const {page,close}=await openGame('/?qa=1');
+  const ready=await state(page);
+  assert.equal(ready.selected,'bunny');
+  assert.equal(ready.avatarFeet,2);
+  assert.equal(ready.hasBunnyCottonTail,true);
+  assert.ok(ready.avatarHeadWidth<.60,'Bunny head should have a neat silhouette');
+  await page.getByRole('button',{name:/SOLO RUN/}).click();
+  await page.waitForFunction(()=>window.__pawverseQA().distance>2);
+  const first=await state(page);
+  await page.waitForFunction(()=>window.__pawverseQA().distance>8);
+  const second=await state(page);
+  const progress=second.distance-first.distance;
+  const flowersMoved=second.physicalLandmarkZ-first.physicalLandmarkZ;
+  const groundMoved=second.terrainZ-first.terrainZ;
+  assert.ok(Math.abs(flowersMoved-progress)<.75,'Fixed landmark flowers must move at running speed');
+  assert.ok(Math.abs(groundMoved-progress)<.75,'Terrain matches nearby flowers');
+  await snap(page,'19-clear-bunny-and-consistent-roadside');
+  await close();
+ });
  await test('Mobile portrait race renders a vertical pair with touch controls',async()=>{
   const {page,close}=await openGame('/race.html?qa=1',{viewport:{width:390,height:844},mobile:true,touch:true});
   await page.locator('#raceStart').click();

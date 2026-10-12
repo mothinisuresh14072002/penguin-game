@@ -8,6 +8,7 @@ import {create3DBackdrop} from './visual3d.js';
 import {sweptHazardContact} from './collisionMath.js';
 import {createRoadArtwork} from './roadArt.js';
 import {createWorldLandmarks} from './landmarkArt.js';
+import {createMeadowDetails} from './meadowArt.js';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
@@ -130,6 +131,7 @@ for(let i=0;i<14;i++){
 
 const roadArt=createRoadArtwork(scene,'arctic',{length:260,centerZ:-106,surfaceY:.29,width:8.95});
 let landmarks=null;
+let meadowDetails=null;
 // Fast-moving lane markings make the ice, meadow and farm roads feel alive.
 // This is decorative only: stable base track remains solid beneath every runner.
 const laneDashes=[];
@@ -199,6 +201,9 @@ function applyBiome(){
  for(const cliff of glacialCliffs)cliff.visible=picked.biome==='arctic';
  for(const marker of laneDashes)marker.visible=['arctic','rainbow'].includes(picked.biome);
  landmarks?.dispose();landmarks=createWorldLandmarks(scene,picked.biome);
+ meadowDetails?.dispose();
+ meadowDetails=picked.biome==='meadow'?createMeadowDetails(scene):null;
+ meadowDetails?.update(distance);
  deepIce.color.setHex(biome.edge);rockMat.color.setHex(biome.hazards.includes('spike')?0x6a8ea4:0x917e75);
  clearScenery();
  for(let i=0;i<60;i++){
@@ -428,6 +433,7 @@ function tick(now){
    b.wings[1].rotation.y=-Math.sin(clockTime*11+i)*.9;
   }
   roadArt.update(distance);
+  meadowDetails?.update(distance);
   for(let i=0;i<laneDashes.length;i++){
    const period=24*8;
    const offset=((Math.floor(i/2)*8-distance)%period+period)%period;

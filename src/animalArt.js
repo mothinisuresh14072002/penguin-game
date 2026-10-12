@@ -13,15 +13,21 @@ export function createAnimal(id, palette = {}) {
     torus: new THREE.TorusGeometry(1, .22, 8, 20)
   };
   const colors = {
-    bunny:0xffeef5, unicorn:0xf9f4ff, horse:0xc58b60, cat:0xf5a94f,
+    bunny:0xfffaf5, unicorn:0xf9f4ff, horse:0xc58b60, cat:0xf5a94f,
     dog:0xf4dcac, penguin:0x222936, cow:0xfffcf5
   };
   const mats = new Map();
   function m(hex, shiny=false) {
     const key = String(hex) + (shiny?'s':'m');
-    if (!mats.has(key)) mats.set(key, new THREE.MeshStandardMaterial({
-      color:hex, roughness:shiny?.19:.76, metalness:shiny?.03:0
-    }));
+    if (!mats.has(key)) mats.set(key,id==='bunny'&&!shiny
+      ? new THREE.MeshPhysicalMaterial({
+         color:hex,roughness:.88,metalness:0,
+         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(0xffe9e2),
+         clearcoat:.02
+        })
+      : new THREE.MeshStandardMaterial({
+         color:hex,roughness:shiny?.19:.76,metalness:shiny?.03:0
+        }));
     return mats.get(key);
   }
   const coat=m(palette.coat ?? colors[id] ?? colors.bunny);
@@ -105,6 +111,9 @@ export function createAnimal(id, palette = {}) {
       const ear=groupAt(face,side*.43,.49,-.07);
       ell(ear,coat,side*.10,.47,0,.22,.68,.17,-side*.12);
       ell(ear,m(0xf4b5cc),side*.10,.49,.145,.116,.49,.035,-side*.12);
+      // A second inset faces the rear camera (original model turned toward -Z).
+      ell(ear,m(0xf2a8bf),side*.10,.49,-.154,.124,.50,.038,-side*.12);
+      ell(ear,m(0xffe2e9),side*.08,.69,-.179,.067,.19,.026);
       ears.push(ear);
     }else if(id==='unicorn'||id==='horse'||id==='cat'){
       const ear=groupAt(face,side*.44,.47,-.04);
@@ -164,6 +173,13 @@ export function createAnimal(id, palette = {}) {
       }
     }
     ell(face,m(0xfae3ed),-.22,.52,.25,.18,.10,.06);
+    // Soft cheek fluff and a tiny forelock to reduce the toy-sphere profile.
+    const tuft= m(0xfffdf7);
+    for(const side of [-1,1]){
+      ell(face,tuft,side*.55,-.20,.23,.20,.27,.20,-side*.33);
+      ell(face,tuft,side*.50,-.35,.12,.18,.19,.16,-side*.22);
+    }
+    for(let i=0;i<3;i++)ell(face,tuft,(i-1)*.16,.51,.10,.15,.13,.15,(i-1)*.22);
   }
   if(id==='cow'){
     const fringe=m(0xece5d9);
@@ -204,12 +220,42 @@ export function createAnimal(id, palette = {}) {
   const rear=groupAt(root,0,0,0);
   rear.name='character-rear-design-'+id;
   if(id==='bunny'){
+    // Layered fluffy haunches, paws and an embroidered floral skirt, visible
+    // in the gameplay camera from behind; animations remain lightweight.
+    ell(rear,m(0xfffdf9),-.36,.73,-.34,.24,.37,.22,.19);
+    ell(rear,m(0xfffdf9),.36,.73,-.34,.24,.37,.22,-.19);
+    for(let side of [-1,1]){
+      ell(rear,m(0xf6d1df),side*.52,.48,-.33,.17,.16,.14);
+      ell(rear,m(0xffecf2),side*.36,.40,-.52,.22,.16,.17);
+      ell(rear,m(0xffe4ed),side*.32,1.24,-.42,.12,.35,.09,side*.17);
+    }
+    const petalMaterial=m(0xffc9dc);
+    const seamMaterial=m(0xfff3fb);
+    const dressBack=groupAt(rear,0,.57,-.44);
+    dressBack.name='bunny-dress-back';
+    ell(dressBack,m(0xffdce9),0,0,0,.59,.22,.23);
+    for(let i=0;i<9;i++){
+      const a=Math.PI*2*i/9;
+      ell(dressBack,petalMaterial,Math.cos(a)*.56,.045,Math.sin(a)*.43,.18,.14,.12);
+    }
+    // A five-petal daisy is legible even at the small third-person scale.
+    const flower=groupAt(rear,.22,.58,-.65);
+    flower.name='bunny-dress-flower';
+    for(let j=0;j<5;j++){
+      const a=j*Math.PI*2/5;
+      ell(flower,seamMaterial,Math.cos(a)*.13,Math.sin(a)*.13,0,.082,.092,.055);
+    }
+    ell(flower,m(0xffd36d),0,0,-.04,.075,.075,.055);
     // Cream fur, visible pink inner-ear folds and a flower-skirt hem.
     for(const side of [-1,1]){
       ell(face,m(0xf4a9c7),side*.50,.95,-.148,.095,.40,.035,-side*.13);
       ell(rear,m(0xfff5fd),side*.31,.55,-.42,.21,.14,.12);
     }
-    ell(rear,m(0xffffff),0,1.0,-.475,.44,.46,.15);
+    ell(rear,m(0xffffff),0,1.05,-.47,.40,.39,.15);
+    // Gentle shoulder fur ensures no hard edge between oversized head/body.
+    for(const side of [-1,1]){
+      ell(rear,m(0xfffdf9),side*.36,1.33,-.30,.26,.27,.23);
+    }
     ell(rear,cream,0,.85,-.60,.10,.10,.08);
     for(let i=0;i<5;i++){
       const a=i*Math.PI*2/5;

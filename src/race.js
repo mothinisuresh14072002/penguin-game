@@ -10,6 +10,7 @@ import {createWorldLandmarks} from './landmarkArt.js';
 import {createMeadowDetails} from './meadowArt.js';
 import {createSkylandDetails} from './skylandArt.js';
 import {createPrairieDetails} from './prairieArt.js';
+import {createTownDetails} from './townArt.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
 const $ = id => document.getElementById(id);
@@ -76,6 +77,7 @@ function newRacePlayer(ch,index){
  const meadowDetails=biomeId==='meadow'?createMeadowDetails(scene):null;
  const skylandDetails=biomeId==='rainbow'?createSkylandDetails(scene):null;
  const prairieDetails=biomeId==='grassland'?createPrairieDetails(scene):null;
+ const townDetails=biomeId==='city'?createTownDetails(scene):null;
  const roadArt=createRoadArtwork(scene,biomeId,{length:260,centerZ:-105,surfaceY:.068,width:8.95});
  const turf=material(ch.ground),road=material(ch.road),border=material(ch.accent);
  piece(scene,geom.box,turf,0,-.74,-105,30,1.25,255);
@@ -101,7 +103,7 @@ function newRacePlayer(ch,index){
   scenery.push(prop(scene,ch.scenery,ch,x,z,i));
  }
  const hero=createHero(ch.id,scene);
- return {scene,camera,backdrop,landmarks,meadowDetails,skylandDetails,prairieDetails,roadArt,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
+ return {scene,camera,backdrop,landmarks,meadowDetails,skylandDetails,prairieDetails,townDetails,roadArt,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
 }
 function obstacle(player,kind,lane,at){
  const root=new THREE.Group();root.position.set(LANE_POSITIONS[lane],0,2-(at-player.distance));player.scene.add(root);
@@ -145,6 +147,7 @@ function clearPlayer(player){
  player.meadowDetails?.dispose();
  player.skylandDetails?.dispose();
  player.prairieDetails?.dispose();
+ player.townDetails?.dispose();
  player.roadArt?.dispose();
  if(player.hero?.imported&&player.hero.mixer)player.hero.mixer.stopAllAction();
  const geometries=new Set(),materials=new Set();
@@ -244,6 +247,7 @@ function updatePlayer(p,dt){
  p.meadowDetails?.update(p.distance);
  p.skylandDetails?.update(p.distance,p.time);
  p.prairieDetails?.update(p.distance);
+ p.townDetails?.update(p.distance,p.time);
  p.landmarks?.update(p.time);
  for(let i=0;i<p.laneMarks.length;i++)p.laneMarks[i].position.z=trackLoop(Math.floor(i/2),8,p.distance,24);
  p.hero.group.position.set(px,p.y,2);
@@ -396,6 +400,7 @@ if(new URLSearchParams(location.search).has('qa')){
    y:p.y,slide:p.slide,meadowFlowerStrips:p.meadowDetails?.strips.length??0,
    rainbowCrystalStrips:p.skylandDetails?.strips.length??0,
    prairieWheatStrips:p.prairieDetails?.strips.length??0,
+   catTownStrips:p.townDetails?.strips.length??0,
    biome:p.backdrop?.horizon?.name
   }))
  });

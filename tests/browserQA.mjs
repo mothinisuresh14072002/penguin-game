@@ -137,6 +137,8 @@ try{
       'Only Coco Cat should get the pastel town strips');
     assert.equal(selected.puppyParkStrips,biome==='park'?4:0,
       'Dodo Dog must have puppy gardens only in Puppy Park');
+    assert.equal(selected.penguinGlacierStrips,biome==='arctic'?4:0,
+      'Pip Penguin glacier snow and ice should appear only in the Arctic biome');
     assert.equal(await page.locator('#worldName').textContent(),label);
     // Remove only the modal's visibility for a frame so the artifact is a
     // truthful screenshot of the currently rendered 3D world, unobstructed.
@@ -292,6 +294,22 @@ try{
   assert.equal(race.players[0].catTownStrips,0);
   assert.equal(race.players[1].catTownStrips,4);
   await snap(page,'12-dog-park-vs-cat-town');
+  await close();
+ });
+ await test('Pip Penguin receives falling snow while Dodo Dog keeps Puppy Park',async()=>{
+  const {page,close}=await openGame('/race.html?qa=1');
+  await page.locator('#p1Pick').selectOption('penguin');
+  await page.locator('#p2Pick').selectOption('dog');
+  await page.locator('#raceStart').click();
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2);
+  const race=await state(page);
+  assert.equal(race.players[0].id,'penguin');
+  assert.equal(race.players[1].id,'dog');
+  assert.equal(race.players[0].penguinGlacierStrips,4);
+  assert.equal(race.players[1].penguinGlacierStrips,0);
+  assert.equal(race.players[0].puppyParkStrips,0);
+  assert.equal(race.players[1].puppyParkStrips,4);
+  await snap(page,'13-penguin-glacier-vs-puppy-park');
   await close();
  });
  await test('Mobile portrait race renders a vertical pair with touch controls',async()=>{

@@ -133,6 +133,37 @@ Selecting a character applies its environment configuration using the `CHARS` an
 
 The earlier v2 saved profile is read if a v3 profile does not yet exist. Bella Bunny and Pip Penguin are both free; legacy unlocks for removed characters are not carried over as equivalents.
 
+## 🌄 Upgraded Three.js 3D Environments
+
+The game already had real Three.js characters, collision handling and third-person
+cameras. Its latest visual upgrade replaces the old shared Arctic background
+mountains with biome-specific **three-dimensional horizons** and a lightweight
+**camera-following spherical sky shader**.
+
+| World | Distant 3D scenery |
+|---|---|
+| 🌷 Bunny Meadow | Layered green rolling hills |
+| 🌈 Unicorn Skyland | Floating magical islands |
+| 🌾 Horse Prairie | Soft grassy ridges |
+| 🏘️ Cat Town | Distant town skyline |
+| 🌳 Puppy Park | Leaf-green hills |
+| ❄️ Penguin Glacier | Layered icy mountain peaks |
+| 🚜 Mimi Farm | Countryside hills |
+
+- Animated clouds, butterflies, detailed habitat props, and scrolling road
+  markers provide depth cues in both solo and two-player modes.
+- All seven habitats reuse five common environment geometry buffers, reducing
+  repeated GPU allocations and simplifying cleanup between races.
+- The skyline shader and biome configurations have automated geometry tests.
+- The imported high-quality bunny GLB remains **optional and not checked into
+  this repository**. The current procedural fallback characters are genuine
+  animated 3D meshes, but their appearance is not equivalent to high-end
+  textured, rigged models from cinematic concept art.
+
+**Performance note:** Production build and unit tests are automated. FPS,
+lighting and asset appearance still require testing on physical phones and in
+desktop browsers.
+
 ## ✨ Three.js Visual Experience
 
 <table>
@@ -223,6 +254,7 @@ penguin-game/
 │   ├── main.js                 # Solo 3D runner + immersive animal biomes
 │   ├── animalArt.js            # Seven detailed animated character meshes
 │   ├── worldArt.js             # Seven themed 3D nature / environment prop sets
+│   ├── visual3d.js             # GPU sky dome and biome-specific 3D horizons
 │   ├── characterPreviews.js    # Renders shop thumbnails from actual game models
 │   ├── style.css               # Solo UI
 │   ├── race.js                 # Local two-player split-screen game
@@ -284,6 +316,8 @@ The game **has not yet been signed, published or confirmed through a complete An
 - [x] GitHub Actions build workflow with deterministic race-physics unit tests
 - [x] Two friends racing on the same screen (desktop split view, portrait stacked view)
 - [x] Faster acceleration, animated lane markers, moving nature and sky clouds
+- [x] Spherical 3D shader sky and custom distant terrain for seven habitats
+- [x] Reusable environment geometry buffers and horizon tests
 - [x] GitHub Actions production build verified
 - [ ] Add automated gameplay/browser tests
 - [ ] Higher-fidelity character meshes, textures and skeletal animation

@@ -133,6 +133,8 @@ try{
       'Unicorn crystals should only exist in Rainbow Skyland');
     assert.equal(selected.prairieWheatStrips,biome==='grassland'?5:0,
       'Only Hugo Horse should create the golden wheat fields');
+    assert.equal(selected.catTownStrips,biome==='city'?4:0,
+      'Only Coco Cat should get the pastel town strips');
     assert.equal(await page.locator('#worldName').textContent(),label);
     // Remove only the modal's visibility for a frame so the artifact is a
     // truthful screenshot of the currently rendered 3D world, unobstructed.
@@ -256,6 +258,22 @@ try{
   assert.equal(race.players[1].prairieWheatStrips,0);
   assert.equal(race.players[1].meadowFlowerStrips,0);
   await snap(page,'10-horse-vs-dog');
+  await close();
+ });
+ await test('Coco Cat races in pastel town while Bunny keeps flower meadow',async()=>{
+  const {page,close}=await openGame('/race.html?qa=1');
+  await page.locator('#p1Pick').selectOption('cat');
+  await page.locator('#p2Pick').selectOption('bunny');
+  await page.locator('#raceStart').click();
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2);
+  const race=await state(page);
+  assert.equal(race.players[0].id,'cat');
+  assert.equal(race.players[1].id,'bunny');
+  assert.equal(race.players[0].catTownStrips,4);
+  assert.equal(race.players[1].catTownStrips,0);
+  assert.equal(race.players[0].meadowFlowerStrips,0);
+  assert.equal(race.players[1].meadowFlowerStrips,5);
+  await snap(page,'11-cat-town-vs-bunny-meadow');
   await close();
  });
  await test('Mobile portrait race renders a vertical pair with touch controls',async()=>{

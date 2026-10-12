@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {loopZ} from './worldMotion.js';
 
 // Golden countryside detail which loops with the runner's distance.
 // Real instanced 3D wheat/hay keeps hundreds of plants cheap to render.
@@ -91,12 +92,8 @@ export function createPrairieDetails(scene){
   }
  }
  function update(distance=0){
-  const cycle=PRAIRIE_STRIPS*PRAIRIE_STRIP_LENGTH;
-  const forward=Math.max(0,distance)*.84;
-  for(let i=0;i<strips.length;i++){
-   const n=((i*PRAIRIE_STRIP_LENGTH+forward)%cycle+cycle)%cycle;
-   strips[i].position.z=14-n;
-  }
+  for(let i=0;i<strips.length;i++)
+   strips[i].position.z=loopZ(i,PRAIRIE_STRIP_LENGTH,Math.max(0,distance),PRAIRIE_STRIPS,14);
  }
  function dispose(){
   scene.remove(root);

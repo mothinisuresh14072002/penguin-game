@@ -418,15 +418,16 @@ function menu(){
  ]);
 }
 function start(){
- ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;distance=0;speed=18;spawnNext=26;invincible=1;combo=0;lastCoinDistance=-100;lastMilestone=0;noticeUntil=0;$('speedNotice')?.classList.add('hidden');
+ ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;runFood=0;distance=0;speed=18;spawnNext=26;invincible=1;combo=0;lastCoinDistance=-100;lastMilestone=0;noticeUntil=0;$('speedNotice')?.classList.add('hidden');
  clearObjects();$('overlay').classList.add('hidden');$('shop').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';
  for(let i=0;i<8;i++){row(spawnNext);spawnNext+=17;}
 }
 function finish(reason){
  if(ended)return;ended=true;running=false;paused=false;$('pauseBanner').classList.add('hidden');
  const points=Math.floor(distance);
+ if(points>=20)recordEvent(profile,'run');
  profile.coins+=runCoins;profile.best=Math.max(profile.best,points);save();updateHUD();
- showScreen('RUN COMPLETE',reason+' Distance: '+points+'m · Coins: +'+runCoins+' · Best: '+profile.best+'m',[
+ showScreen('RUN COMPLETE',reason+' Distance: '+points+'m · Coins: +'+runCoins+' · Treats: '+runFood+' · Best: '+profile.best+'m',[
   {text:'RUN AGAIN',action:start},{text:'CHARACTER SHOP',secondary:true,action:shop}
  ]);
 }
@@ -435,10 +436,14 @@ function crash(){
  sound(140,.22,'sawtooth');finish('You hit an obstacle.');
 }
 function moveLane(n){if(!running||paused)return;targetLane=THREE.MathUtils.clamp(targetLane+n,0,2);}
-function jump(){if(running&&!paused&&playerY<=.02&&sliding<=0){velocityY=10.0;sound(420,.12,'triangle')}}
+function jump(){if(running&&!paused&&playerY<=.02&&sliding<=0){velocityY=10.0;recordEvent(profile,'jump');save();sound(420,.12,'triangle')}}
 function slide(){if(running&&!paused&&playerY<=.02){sliding=.8;sound(260,.1,'triangle',.035)}}
 function updateHUD(){
  $('distance').textContent=Math.floor(distance);$('coins').textContent=runCoins;$('energy').textContent=Math.ceil(energy);
+ $('foodCount').textContent=runFood;
+ const food=FOOD_BY_ANIMAL[profile.selected]||FOOD_BY_ANIMAL.bunny;
+ const foodHud=$('foodHud');foodHud.firstChild.nodeValue=food.emoji+' ';
+ foodHud.title=food.label+' collected during this run';
  $('energyFill').style.width=energy+'%';
  $('walletHud').textContent=profile.coins;
  $('power').textContent=shield>0?'🛡 '+Math.ceil(shield)+'s':magnet>0?'🧲 '+Math.ceil(magnet)+'s':'';
@@ -490,8 +495,14 @@ function tick(now){
   const previousDistance=distance;
   const previousLane=playerLane,previousPlayerY=playerY,previousSlide=sliding;
   distance+=speed*dt;
-  const milestone=Math.floor(distance/250);
-  if(milestone>lastMilestone){lastMilestone=milestone;showSpeedNotice('⚡ SPEED UP!  '+Math.round(speed)+' RUN SPEED');sound(790,.15,'triangle',.04)}
+  const milestone=Math.floor(distance/240);
+  if(milestone>lastMilestone){
+   lastMilestone=milestone;
+   const chapter=journeyChapter(CHARS.find(c=>c.id===profile.selected)?.biome,distance);
+   $('worldName').textContent=currentTheme.name+' · '+chapter.name;
+   showSpeedNotice('🌍 NEW AREA: '+chapter.name.toUpperCase());
+   sound(790,.15,'triangle',.04);
+  }
   energy=Math.max(0,energy-dt*(1.1+speed*.025));if(energy<=0)finish('You ran out of energy.');
   playerLane=THREE.MathUtils.damp(playerLane,targetLane,13,dt);
   if(playerY>.001||velocityY>0){velocityY-=25*dt;playerY=Math.max(0,playerY+velocityY*dt);if(playerY===0)velocityY=0;}
@@ -499,11 +510,11 @@ function tick(now){
   while(spawnNext<distance+150){row(spawnNext);spawnNext+=Math.max(28,speed*0.9);}
   for(const e of [...entities]){
    e.root.position.z=2-(e.at-distance);
-   if(e.kind==='coin'||e.kind==='energy'||e.kind==='shield'||e.kind==='magnet'){
+   if(['coin','energy','shield','magnet','food','box'].includes(e.kind)){
      e.root.rotation.y+=dt*2.8;e.root.position.y=Math.sin(clockTime*4+e.at)*.09;
      if(magnet>0&&e.kind==='coin'&&Math.abs(e.at-distance)<3&&Math.abs(e.root.position.x-(laneX[0]+(laneX[2]-laneX[0])*playerLane/2))<1.7)e.root.position.x=THREE.MathUtils.damp(e.root.position.x,laneX[0]+(laneX[2]-laneX[0])*playerLane/2,5,dt);
    } else if(e.kind==='lion') e.root.rotation.y=Math.sin(clockTime*3)*.25;
-   const isPick=['coin','energy','shield','magnet'].includes(e.kind);
+   const isPick=['coin','energy','shield','magnet','food','box'].includes(e.kind);
    const playerX=laneX[0]+(laneX[2]-laneX[0])*playerLane/2;
    const dx=Math.abs(e.root.position.x-playerX);
    // A pickup requires actual horizontal AND vertical contact; adjacent lanes never auto-collect.
@@ -523,6 +534,14 @@ function tick(now){
    )){
     if(isPick){
       if(e.kind==='coin'){combo=distance-lastCoinDistance<9?combo+1:1;lastCoinDistance=distance;runCoins++;sound(760+Math.min(combo,8)*35,.07,'sine',.04);if(combo===5||combo===10||combo===20)showSpeedNotice('✨ '+combo+' COIN STREAK!')}
+      if(e.kind==='food'){
+       const food=collectFood(profile,profile.selected);
+       if(food){runFood++;save();sound(700,.08,'triangle',.04);showSpeedNotice(food.emoji+' '+food.label.toUpperCase()+' COLLECTED!')}
+      }
+      if(e.kind==='box'){
+       const prize=openSurpriseBox(profile,{found:true,animal:profile.selected});
+       if(prize){save();showSpeedNotice('🎁 '+prize.label);sound(840,.17,'triangle',.06)}
+      }
       if(e.kind==='energy'){energy=Math.min(100,energy+29);sound(660,.18,'triangle')}
       if(e.kind==='shield'){shield=13;sound(540,.22,'triangle')}
       if(e.kind==='magnet'){magnet=11;sound(510,.22,'triangle')}
@@ -537,20 +556,20 @@ function tick(now){
    if(e.at<distance-13){if(e.kind==='coin'&&!e.taken&&magnet<=0)combo=0;scene.remove(e.root);disposeGroup(e.root);entities.splice(entities.indexOf(e),1)}
   }
   // Background scenery and lane dashes wrap ahead of the player, never exposing track gaps.
-  for(let i=0;i<biomeDecor.length;i++){
-   const period=30*11.5;
-   const offset=((Math.floor(i/2)*11.5-distance*.78)%period+period)%period;
-   biomeDecor[i].position.z=14-offset;
-  }
+  // Foreground ground and props stream past at run speed; distant clouds
+  // and the stable mountain horizon make it feel like visiting new places.
+  for(let i=0;i<scrollItems.length;i++)
+   scrollItems[i].position.z=loopZ(i,18,layerTravel(distance,'track'),scrollItems.length,10);
+  for(let i=0;i<biomeDecor.length;i++)
+   biomeDecor[i].position.z=loopZ(Math.floor(i/2),11.5,layerTravel(distance,'near'),30,14);
   for(let i=0;i<skyClouds.length;i++){
-   const period=15*19;
-   const offset=((i*19-distance*.18)%period+period)%period;
-   skyClouds[i].position.set((i%2?-1:1)*(13+(i%4)*2)+Math.sin(clockTime*.25+i)*1.5,11+(i%5)*2.2,13-offset);
+   skyClouds[i].position.set((i%2?-1:1)*(13+(i%4)*2)+Math.sin(clockTime*.25+i)*1.5,
+    11+(i%5)*2.2,loopZ(i,19,layerTravel(distance,'far'),15,13));
   }
   for(let i=0;i<butterflies.length;i++){
-   const b=butterflies[i],period=10*27;
-   const offset=((i*27-distance*.42)%period+period)%period;
-   b.g.position.set((i%2?-1:1)*(5.6+(i%3)*1.2),1.9+Math.sin(clockTime*2+i)*.32,12-offset);
+   const b=butterflies[i];
+   b.g.position.set((i%2?-1:1)*(5.6+(i%3)*1.2),1.9+Math.sin(clockTime*2+i)*.32,
+    loopZ(i,27,layerTravel(distance,'mid'),10,12));
    b.wings[0].rotation.y=Math.sin(clockTime*11+i)*.9;
    b.wings[1].rotation.y=-Math.sin(clockTime*11+i)*.9;
   }
@@ -564,9 +583,7 @@ function tick(now){
   farmDetails?.update(distance);
   landmarks?.update(clockTime);
   for(let i=0;i<laneDashes.length;i++){
-   const period=24*8;
-   const offset=((Math.floor(i/2)*8-distance)%period+period)%period;
-   laneDashes[i].position.z=11-offset;
+   laneDashes[i].position.z=loopZ(Math.floor(i/2),8,distance,24,11);
   }
   if(flakes.visible)for(let i=0;i<350;i++){
    snowPos[i*3+1]-=dt*(.9+(i%5)*.2);
@@ -621,7 +638,11 @@ if(new URLSearchParams(location.search).has('qa')){
   puppyParkStrips:parkDetails?.strips.length??0,
   penguinGlacierStrips:glacierDetails?.strips.length??0,
   mimiFarmStrips:farmDetails?.strips.length??0,
-  visibleObstacles:entities.filter(e=>!e.taken&&!['coin','energy','shield','magnet'].includes(e.kind)).length
+  foodCount:runFood,
+  inventory:{...profile.economy.inventory},
+  dailyProgress:{food:profile.economy.daily.food,jumps:profile.economy.daily.jumps,runs:profile.economy.daily.runs},
+  visibleFood:entities.filter(e=>!e.taken&&e.kind==='food').length,
+  visibleObstacles:entities.filter(e=>!e.taken&&['rock','log','spike','lion'].includes(e.kind)).length
  });
 }
 menu();requestAnimationFrame(tick);

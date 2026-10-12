@@ -485,6 +485,7 @@ if(new URLSearchParams(location.search).has('qa')){
   biome:CHARS.find(c=>c.id===profile.selected)?.biome,
   running,paused,ended,distance,energy,lane:playerLane,
   targetLane,playerY,sliding,coins:runCoins,
+  meadowFlowerStrips:meadowDetails?.strips.length??0,
   visibleObstacles:entities.filter(e=>!e.taken&&!['coin','energy','shield','magnet'].includes(e.kind)).length
  });
 }

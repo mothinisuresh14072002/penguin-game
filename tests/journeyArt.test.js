@@ -28,7 +28,7 @@ test('each world streams four different mid-distance places safely outside lanes
   assert.equal(scene.children.includes(world.root),false);
  }
 });
-test('mid-distance landmark groups move less than full-speed ground',()=>{
+test('grounded mid-distance landmarks travel at physical road speed',()=>{
  const world=createJourneyArt(new THREE.Scene(),'farm');
  const old=world.groups[1].position.z;
  world.update(4);

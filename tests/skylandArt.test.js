@@ -28,6 +28,9 @@ test('Ula Unicorn has pearlescent fur, golden horn and a long rainbow rear mane'
  assert.ok(colors.size>12);
  animateAnimal(actor,.19,true,false);
  assert.notEqual(actor.pivotL.rotation.x,0);
+ assert.ok(Math.abs(actor.mane.rotation.z)>0);
+ assert.ok(Math.abs(actor.wings[0].rotation.z)>0);
+ assert.ok(Math.abs(actor.wings[1].rotation.z)>0);
  for(const g of geos)g.dispose();
  for(const m of mats)m.dispose();
 });

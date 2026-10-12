@@ -54,7 +54,7 @@ const laneX=[-2.6,0,2.6],entities=[],decor=[],scrollItems=[],hue={ice:0x64c7ee,s
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x80caef);scene.fog=new THREE.FogExp2(0xb9e8ff,.014);
 const camera=new THREE.PerspectiveCamera(57,innerWidth/innerHeight,.1,300);
-camera.position.set(0,5.4,12.6);camera.lookAt(0,1.35,-19.0);
+camera.position.set(0,6.7,16.9);camera.lookAt(0,1.38,-21);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6));
 renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.42;
@@ -428,15 +428,17 @@ function tick(now){
  const run=running&&!paused;
  animateAnimal(character,clockTime,run,playerY>.05);
  character.update?.(dt,clockTime,run,playerY>.05);
- character.group.scale.y=sliding>0?.53:(playerY>.05?1.04:1);
+ // Characters occupy the lower part of the view like the reference art.
+ character.group.scale.x=.90;character.group.scale.z=.90;
+ character.group.scale.y=.90*(sliding>0?.53:(playerY>.05?1.04:1));
  if(run&&playerY<=.02&&sliding<=0&&clockTime-lastStepSound>.25){lastStepSound=clockTime;sound(165+(Math.floor(clockTime*10)%3)*21,.047,'triangle',.014)}
  // Wider field of view at higher speeds makes acceleration more noticeable.
- const desiredFov=54+(Math.min(58,speed)-18)*.16;
+ const desiredFov=55+(Math.min(58,speed)-18)*.15;
  const newFov=THREE.MathUtils.damp(camera.fov,desiredFov,2.8,dt);
  if(Math.abs(newFov-camera.fov)>.02){camera.fov=newFov;camera.updateProjectionMatrix()}
  const desiredX=character.group.position.x*.28;
  camera.position.x=THREE.MathUtils.damp(camera.position.x,desiredX,2,dt);
- camera.lookAt(camera.position.x*.3,1.3,-19);
+ camera.lookAt(camera.position.x*.3,1.38,-21);
  // Keep the 3D sky infinite while road scenery and mountains retain parallax.
  backdrop.update(clockTime,camera);
  renderer.render(scene,camera);

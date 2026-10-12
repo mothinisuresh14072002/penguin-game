@@ -64,7 +64,7 @@ function newRacePlayer(ch,index){
  scene.add(new THREE.HemisphereLight(0xecfbff,0x728da1,2.8));
  const sun=new THREE.DirectionalLight(0xfff5e5,2.4);sun.position.set(-8,15,6);scene.add(sun);
  const camera=new THREE.PerspectiveCamera(63,1,.1,290);
- camera.position.set(0,5.5,12.7);camera.lookAt(0,1.3,-19);
+ camera.position.set(0,6.7,16.9);camera.lookAt(0,1.38,-21);
  const biomeId={bunny:'meadow',unicorn:'rainbow',horse:'grassland',cat:'city',dog:'park',penguin:'arctic',cow:'farm'}[ch.id]||'meadow';
  const backdrop=create3DBackdrop(scene,biomeId);
  backdrop.setBiome(biomeId,ch.sky);
@@ -223,13 +223,14 @@ function updatePlayer(p,dt){
  p.hero.group.position.set(px,p.y,2);
  animateAnimal(p.hero,p.time,p.stun<=0,p.y>.05);
  p.hero.update?.(dt,p.time,p.stun<=0,p.y>.05);
- p.hero.group.scale.y=p.slide>0?.57:(p.y>.05?1.04:1);
+ p.hero.group.scale.x=.90;p.hero.group.scale.z=.90;
+ p.hero.group.scale.y=.90*(p.slide>0?.57:(p.y>.05?1.04:1));
  p.hero.shadow.position.x=px;
  p.hero.shadow.material.opacity=.55-Math.min(.43,p.y*.15);
- const fov=55+(currentSpeed-22)*.14;
+ const fov=55+(currentSpeed-22)*.13;
  if(Math.abs(p.camera.fov-fov)>.025){p.camera.fov=THREE.MathUtils.damp(p.camera.fov,fov,3,dt);p.camera.updateProjectionMatrix()}
  p.camera.position.x=THREE.MathUtils.damp(p.camera.position.x,px*.23,4,dt);
- p.camera.lookAt(p.camera.position.x*.25,1.28,-19);
+ p.camera.lookAt(p.camera.position.x*.25,1.38,-21);
  const num=p.index+1;
  $('p'+num+'Distance').textContent=Math.floor(p.distance);
  $('p'+num+'Coins').textContent=p.coins;

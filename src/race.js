@@ -14,6 +14,7 @@ import {createTownDetails} from './townArt.js';
 import {createParkDetails} from './parkArt.js';
 import {createGlacierDetails} from './glacierArt.js';
 import {createFarmDetails} from './farmArt.js';
+import {createJourneyArt} from './journeyArt.js';
 import {loopZ,layerTravel} from './worldMotion.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
@@ -78,6 +79,7 @@ function newRacePlayer(ch,index){
  const backdrop=create3DBackdrop(scene,biomeId);
  backdrop.setBiome(biomeId,ch.sky);
  const landmarks=createWorldLandmarks(scene,biomeId);
+ const journeyArt=createJourneyArt(scene,biomeId);
  const meadowDetails=biomeId==='meadow'?createMeadowDetails(scene):null;
  const skylandDetails=biomeId==='rainbow'?createSkylandDetails(scene):null;
  const prairieDetails=biomeId==='grassland'?createPrairieDetails(scene):null;
@@ -110,7 +112,7 @@ function newRacePlayer(ch,index){
   scenery.push(prop(scene,ch.scenery,ch,x,z,i));
  }
  const hero=createHero(ch.id,scene);
- return {scene,camera,backdrop,landmarks,meadowDetails,skylandDetails,prairieDetails,townDetails,parkDetails,glacierDetails,farmDetails,roadArt,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
+ return {scene,camera,backdrop,landmarks,journeyArt,meadowDetails,skylandDetails,prairieDetails,townDetails,parkDetails,glacierDetails,farmDetails,roadArt,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
 }
 function obstacle(player,kind,lane,at){
  const root=new THREE.Group();root.position.set(LANE_POSITIONS[lane],0,2-(at-player.distance));player.scene.add(root);
@@ -151,6 +153,7 @@ function spawnRow(player){
 function clearPlayer(player){
  player.backdrop?.dispose();
  player.landmarks?.dispose();
+ player.journeyArt?.dispose();
  player.meadowDetails?.dispose();
  player.skylandDetails?.dispose();
  player.prairieDetails?.dispose();
@@ -262,6 +265,7 @@ function updatePlayer(p,dt){
  p.glacierDetails?.update(p.distance,p.time);
  p.farmDetails?.update(p.distance);
  p.landmarks?.update(p.time);
+ p.journeyArt?.update(p.distance);
  for(let i=0;i<p.laneMarks.length;i++)p.laneMarks[i].position.z=loopZ(Math.floor(i/2),8,p.distance,24,14);
  p.hero.group.position.set(px,p.y,2);
  animateAnimal(p.hero,p.time,p.stun<=0,p.y>.05);
@@ -417,7 +421,7 @@ if(new URLSearchParams(location.search).has('qa')){
    puppyParkStrips:p.parkDetails?.strips.length??0,
    penguinGlacierStrips:p.glacierDetails?.strips.length??0,
    mimiFarmStrips:p.farmDetails?.strips.length??0,
-   biome:p.backdrop?.horizon?.name
+   journeyChunks:p.journeyArt?.groups.length??0,biome:p.backdrop?.horizon?.name
   }))
  });
 }

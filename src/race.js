@@ -41,7 +41,7 @@ renderer.setPixelRatio(Math.min(1.35,window.devicePixelRatio || 1));
 renderer.setSize(innerWidth,innerHeight);
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.38;
+renderer.toneMappingExposure=1.18;
 renderer.autoClear=false;
 renderer.domElement.style.touchAction='none';
 document.body.prepend(renderer.domElement);
@@ -70,7 +70,7 @@ function prop(scene,type,ch,x,z,index){
 }
 function newRacePlayer(ch,index){
  const scene=new THREE.Scene();
- scene.background=new THREE.Color(ch.sky);scene.fog=new THREE.FogExp2(ch.sky,.012);
+ scene.background=new THREE.Color(ch.sky);scene.fog=new THREE.FogExp2(ch.sky,.0075);
  scene.add(new THREE.HemisphereLight(0xecfbff,0x728da1,2.8));
  const sun=new THREE.DirectionalLight(0xfff5e5,2.4);sun.position.set(-8,15,6);scene.add(sun);
  const camera=new THREE.PerspectiveCamera(63,1,.1,290);
@@ -264,14 +264,14 @@ function updatePlayer(p,dt){
  p.parkDetails?.update(p.distance);
  p.glacierDetails?.update(p.distance,p.time);
  p.farmDetails?.update(p.distance);
- p.landmarks?.update(p.time);
+ p.landmarks?.update(p.time,p.distance);
  p.journeyArt?.update(p.distance);
  for(let i=0;i<p.laneMarks.length;i++)p.laneMarks[i].position.z=loopZ(Math.floor(i/2),8,p.distance,24,14);
  p.hero.group.position.set(px,p.y,2);
  animateAnimal(p.hero,p.time,p.stun<=0,p.y>.05);
  p.hero.update?.(dt,p.time,p.stun<=0,p.y>.05);
- p.hero.group.scale.x=.90;p.hero.group.scale.z=.90;
- p.hero.group.scale.y=.90*(p.slide>0?.57:(p.y>.05?1.04:1));
+ p.hero.group.scale.x=1.03;p.hero.group.scale.z=1.03;
+ p.hero.group.scale.y=1.03*(p.slide>0?.57:(p.y>.05?1.04:1));
  p.hero.shadow.position.x=px;
  p.hero.shadow.material.opacity=.55-Math.min(.43,p.y*.15);
  const fov=55+(currentSpeed-22)*.13;

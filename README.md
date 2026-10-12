@@ -41,6 +41,32 @@ The game runs in the browser with **Three.js + Vite**. It uses lightweight proce
 
 **Change the character → change the world.** World transitions happen when choosing a hero in the Character Shop. The two-player mode creates each runner's biome separately.
 
+## 🌸 Phase 1: Bella Bunny visual upgrade
+
+Bella Bunny and Bunny Meadow are the first world receiving additional
+hand-crafted procedural visual detail based on the supplied seven-world
+reference image:
+
+- Bella now has **cream-coloured PBR sheen fur**, visible pink inner-ear
+  surfaces from behind, softer cheek tufts, rounded haunches, a full flower
+  skirt and a decorative daisy on her dress.
+- Bunny Meadow includes **680 tiny flower clusters**, thousands of petals and
+  leaves, tufts of grass, and a light pebble path border. The details use
+  instanced Three.js meshes in five repeating scenery strips rather than
+  separate draw calls for every flower.
+- Flowering trees, pastel hedges and a **rabbit-ear burrow** provide a more
+  recognizable spring meadow setting.
+- The new meadow scenery is attached **only** to Bella's world, moves with
+  the runner, and is disposed when the player changes character or restarts
+  a two-player race.
+- Automated tests cover the instancing budget, bunny detail meshes, scene
+  cleanup, real-browser switching between worlds, and solo/duo gameplay.
+
+**Current limitation:** These are polished procedural mesh additions, not a
+licensed animated film-quality model. The supplied concept image is still a
+target for future textured/rigged assets and art review. Real GPU/FPS
+measurements and manual visual approval are also pending.
+
 ## 🎮 Gameplay and features
 
 | Feature | How it works |
@@ -147,6 +173,7 @@ penguin-game/
 │   ├── collisionMath.js          Swept hazard contact detection
 │   ├── raceMath.js               Race physics and fair obstacle generation
 │   ├── animalArt.js              Seven procedural animated chibi animals
+│   ├── meadowArt.js              Instanced flowers and gravel for Bella Bunny
 │   ├── modelAssets.js            Optional GLB character loading and fallback
 │   ├── characterPreviews.js      3D portraits in the character shop
 │   ├── roadArt.js                Seven repeated illustrated road textures
@@ -196,6 +223,7 @@ Run `npm run android:add` only if no Android project already exists. For subsequ
 
 ## 🛣️ Roadmap
 
+- [x] Bella Bunny Phase 1: plush rear-view details and flowing flower meadow
 - [x] Seven selectable characters with matching 3D environments
 - [x] Distinct road textures, landscape colours, props and landmarks
 - [x] Solo gameplay with coins, energy, shields and magnets

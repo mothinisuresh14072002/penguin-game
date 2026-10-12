@@ -19,10 +19,10 @@ export function createAnimal(id, palette = {}) {
   const mats = new Map();
   function m(hex, shiny=false) {
     const key = String(hex) + (shiny?'s':'m');
-    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn'||id==='horse'||id==='cat'||id==='dog')&&!shiny
+    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn'||id==='horse'||id==='cat'||id==='dog'||id==='penguin')&&!shiny
       ? new THREE.MeshPhysicalMaterial({
          color:hex,roughness:.88,metalness:0,
-         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:id==='horse'?0xffdcaa:id==='cat'?0xffd9b2:id==='dog'?0xffedc9:0xffe9e2),
+         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:id==='horse'?0xffdcaa:id==='cat'?0xffd9b2:id==='dog'?0xffedc9:id==='penguin'?0xaac9ea:0xffe9e2),
          clearcoat:.02
         })
       : new THREE.MeshStandardMaterial({
@@ -69,7 +69,14 @@ export function createAnimal(id, palette = {}) {
   const face=groupAt(root,0,1.82,.035);
   ell(face,coat,0,0,0,.66,.60,.54);
   if(id==='penguin'){
-    ell(face,ivory,0,-.06,.43,.55,.52,.16);
+    // The little penguin has a prominent rounded white mask and gentle
+    // powder-blue highlights instead of looking like a featureless dark ball.
+    const mask=ell(face,ivory,0,-.06,.43,.55,.52,.16);
+    mask.name='penguin-cream-face-mask';
+    for(const side of [-1,1]){
+      ell(face,m(0xffb5ba),side*.46,-.24,.41,.11,.075,.05);
+      ell(face,m(0x47556d),side*.58,-.03,-.08,.15,.35,.20,side*.30);
+    }
   }else if(id==='dog'){
     ell(face,ivory,0,-.22,.42,.48,.24,.18);
     ell(face,m(0xb78153),-.32,.14,.42,.20,.28,.14,.18);
@@ -140,8 +147,11 @@ export function createAnimal(id, palette = {}) {
       ears.push(ear);
       triangle(face,ivory,side*.28,.62,-.05,.14,.33);
     }else if(id==='penguin'){
-      // Soft crown feathers; no mammal ears.
-      if(side===1)for(let i=0;i<3;i++)ell(face,coat,(i-1)*.12,.58,-.07,.12,.23,.13,(i-1)*-.2);
+      // The forehead's little feather crest is readable in shop previews.
+      if(side===1)for(let i=0;i<3;i++){
+        const tuft=ell(face,coat,(i-1)*.13,.61,-.06,.12,.22,.13,(i-1)*-.2);
+        tuft.name='penguin-crown-tuft';
+      }
     }
   }
   if(id==='unicorn'){
@@ -224,8 +234,15 @@ export function createAnimal(id, palette = {}) {
   const pivotR=groupAt(root,.55,1.35,0);
   for(const side of [-1,1]){
     const pivot=side===-1?pivotL:pivotR;
-    ell(pivot,coat,side*.07,-.28,.04,.21,.36,.21,-side*.12);
-    ell(pivot,id==='penguin'?coat:ivory,side*.08,-.55,.16,.18,.11,.22);
+    if(id==='penguin'){
+      // Dark tapered flippers swing with the existing gait animation.
+      const flipper=ell(pivot,coat,side*.21,-.30,-.03,.24,.44,.15,-side*.36);
+      flipper.name='penguin-flipper';
+      ell(pivot,m(0x41516a),side*.27,-.56,-.08,.18,.21,.09,-side*.38);
+    }else{
+      ell(pivot,coat,side*.07,-.28,.04,.21,.36,.21,-side*.12);
+      ell(pivot,ivory,side*.08,-.55,.16,.18,.11,.22);
+    }
   }
   const feet=[];
   for(const side of [-1,1]){
@@ -403,12 +420,31 @@ export function createAnimal(id, palette = {}) {
     const heart=ell(badge,m(0xeb7795),0,-.09,-.025,.15,.13,.06);
     heart.rotation.z=Math.PI/4;
   }else if(id==='penguin'){
-    ell(rear,m(0x172333),0,1.06,-.43,.50,.59,.15);
-    ell(rear,m(0x182536),0,1.94,-.46,.52,.51,.12);
+    // Oversized soft charcoal head, pale feather trim and adorable ice-blue
+    // scarf are designed for the behind-the-runner camera.
+    const black=m(0x202c40);
+    const feather=m(0x34475f);
+    const trim=m(0xd6f5ff);
+    ell(rear,black,0,1.12,-.43,.52,.62,.16);
+    ell(rear,black,0,2.02,-.44,.56,.54,.16);
     for(const side of [-1,1]){
-      ell(rear,m(0x25344d),side*.48,.94,-.26,.22,.47,.19,side*.15);
+      ell(rear,feather,side*.43,1.2,-.26,.21,.45,.17,side*.16);
+      ell(rear,trim,side*.43,.78,-.32,.13,.22,.10,side*.22);
+      ell(rear,m(0xffd38c),side*.26,.36,-.34,.24,.12,.25);
     }
-    ell(rear,m(0xffd181),0,.38,-.47,.22,.17,.17);
+    const scarf=groupAt(rear,0,1.36,-.48);
+    scarf.name='penguin-blue-scarf';
+    ell(scarf,m(0x83dafa),0,0,-.015,.51,.14,.18);
+    ell(scarf,m(0x60bce8),-.34,-.27,-.15,.17,.34,.14,.11);
+    ell(scarf,trim,-.36,-.55,-.17,.17,.08,.14);
+    // Single stitched snowflake emblem stands out from the dark coat.
+    const badge=groupAt(rear,.20,.81,-.61);
+    badge.name='penguin-snowflake-badge';
+    ell(badge,trim,0,0,0,.12,.12,.04);
+    for(let k=0;k<6;k++){
+      const a=k*Math.PI/3;
+      ell(badge,m(0xb6ecff),Math.cos(a)*.17,Math.sin(a)*.17,-.015,.068,.067,.04);
+    }
   }else if(id==='cow'){
     const spot=m(0x323138);
     ell(rear,spot,-.25,1.24,-.43,.31,.31,.11,.28);

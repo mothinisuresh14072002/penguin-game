@@ -329,10 +329,92 @@ function shop(tab='characters'){
  $('wallet').textContent=profile.coins;
  showShopTab(tab);
 }
+// Four real shop sections, keeping the old seven-character shop intact.
+function showShopTab(tab='characters'){
+ const names=['characters','sell','boxes','goals'];
+ if(!names.includes(tab))tab='characters';
+ const panel=$('economyPanel'),grid=$('charGrid');
+ grid.hidden=tab!=='characters';
+ panel.hidden=tab==='characters';
+ for(const button of document.querySelectorAll('.shop-tab')){
+  button.classList.toggle('active',button.dataset.tab===tab);
+  button.setAttribute('aria-pressed',String(button.dataset.tab===tab));
+ }
+ $('wallet').textContent=profile.coins;
+ if(tab==='characters'){panel.replaceChildren();return;}
+ synchronizeEconomy(profile);save();panel.replaceChildren();
+ const heading=(title,description)=>{
+  const h=document.createElement('h2');h.textContent=title;panel.append(h);
+  const p=document.createElement('p');p.textContent=description;panel.append(p);
+ };
+ const row=(title,subtitle,actions)=>{
+  const item=document.createElement('div');item.className='economy-item';
+  const info=document.createElement('div');info.className='economy-info';
+  const name=document.createElement('strong');name.textContent=title;
+  const details=document.createElement('small');details.textContent=subtitle;
+  info.append(name,details);item.append(info);
+  const controls=document.createElement('div');controls.className='economy-actions';
+  for(const [label,disabled,action] of actions){
+   const btn=document.createElement('button');btn.type='button';btn.className='secondary';
+   btn.textContent=label;btn.disabled=disabled;btn.onclick=action;controls.append(btn);
+  }
+  item.append(controls);panel.append(item);
+ };
+ const notice=(message)=>{$('shopMessage').textContent=message;updateHUD();};
+ if(tab==='sell'){
+  heading('🧺 Food inventory','Collect animal treats while running, then sell them for in-game coins. Your food is saved automatically.');
+  for(const food of FOODS){
+   const amount=profile.economy.inventory[food.id];
+   const sell=(quantity)=>{
+    const result=sellFood(profile,food.id,quantity);
+    if(!result)return;
+    save();showShopTab('sell');
+    notice('Sold '+quantity+' '+food.label+' for '+result.coins+' coins!');
+   };
+   row(food.emoji+' '+food.label,'Owned: '+amount+' · '+food.price+' coins each',[
+    ['SELL 1',amount<1,()=>sell(1)],['SELL ALL',amount<1,()=>sell(amount)]
+   ]);
+  }
+ }else if(tab==='boxes'){
+  const freeAvailable=profile.economy.freeBoxDay!==dailyKey();
+  heading('🎁 Surprise gifts','Claim one free daily gift or spend 55 earned coins for another. All prizes are virtual game rewards, never real money.');
+  const open=(free)=>{
+   const result=openSurpriseBox(profile,{free,animal:profile.selected});
+   if(!result){notice(free?'Today’s free gift was already opened.':'You need 55 coins for this box.');return;}
+   save();showShopTab('boxes');notice('SURPRISE! '+result.label);
+  };
+  row('🎈 Daily free mystery box',freeAvailable?'Ready to open!':'Come back after the daily UTC reset',[
+   [freeAvailable?'OPEN FREE':'CLAIMED TODAY',!freeAvailable,()=>open(true)]
+  ]);
+  row('🎁 Coin mystery box','55 coins · coins or your animal’s food',[
+   ['OPEN FOR 55 🪙',profile.coins<55,()=>open(false)]
+  ]);
+ }else{
+  heading('🎯 Daily & weekly goals','Collect food, jump, finish runs and sell treats. Claim rewards after reaching each target. Targets reset on UTC calendar boundaries.');
+  for(const [period,goals] of [['daily',DAILY_GOALS],['weekly',WEEKLY_GOALS]]){
+   const label=document.createElement('h3');label.textContent=period==='daily'?'☀️ Daily targets':'📅 Weekly targets';panel.append(label);
+   for(const goal of goals){
+    const progress=goalProgress(profile,period,goal.id);
+    const claim=()=>{
+     const reward=claimGoal(profile,period,goal.id);
+     if(!reward)return;
+     save();showShopTab('goals');notice('Target complete! +'+reward.coins+' coins');
+    };
+    row(goal.label,progress.progress+'/'+goal.target+' · Reward: '+goal.reward+' coins',[
+     [progress.claimed?'CLAIMED':progress.complete?'CLAIM REWARD':'IN PROGRESS',
+       progress.claimed||!progress.complete,claim]
+    ]);
+   }
+  }
+ }
+}
+for(const button of document.querySelectorAll('.shop-tab')){
+ button.onclick=()=>showShopTab(button.dataset.tab);
+}
 function menu(){
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.add('hidden');updateHUD();
  showScreen('PAWVERSE DASH','A cute animal adventure across magical worlds. Switch lanes, jump obstacles, collect energy and unlock new animal friends.',[
-  {text:'🏃 SOLO RUN',action:start},{text:'🏁 2 FRIEND RACE',action:()=>location.assign('./race.html')},{text:'CHARACTERS & SHOP',secondary:true,action:shop}
+  {text:'🏃 SOLO RUN',action:start},{text:'🏁 2 FRIEND RACE',action:()=>location.assign('./race.html')},{text:'CHARACTERS & SHOP',secondary:true,action:()=>shop('characters')},{text:'🧺 SELL FOOD',secondary:true,action:()=>shop('sell')},{text:'🎯 DAILY & WEEKLY',secondary:true,action:()=>shop('goals')}
  ]);
 }
 function start(){

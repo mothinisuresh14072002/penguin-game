@@ -111,16 +111,16 @@ export function openSurpriseBox(profile,{free=false,found=false,animal='bunny',r
  // Weighted, bounded virtual-reward prize table; no cash or payment.
  const roll=Math.min(.99999,Math.max(0,Number(rng())||0));
  if(roll<.50){
-  const coins=free?25:20;
+  const coins=(free||found)?25:20;
   profile.coins=whole(profile.coins)+coins;
   return {type:'coins',coins,free,label:'🪙 '+coins+' coins'};
  }
  if(roll<.84){
   const food=FOOD_BY_ANIMAL[animal]||FOOD_BY_ANIMAL.bunny;
-  e.inventory[food.id]+=free?6:10;
-  return {type:'food',food,quantity:free?6:10,free,label:food.emoji+' '+(free?6:10)+' '+food.label};
+  e.inventory[food.id]+=(free||found)?6:10;
+  return {type:'food',food,quantity:(free||found)?6:10,free,label:food.emoji+' '+((free||found)?6:10)+' '+food.label};
  }
- const coins=free?75:80;
+ const coins=(free||found)?75:80;
  profile.coins=whole(profile.coins)+coins;
  return {type:'coins',coins,free,label:'✨ '+coins+' bonus coins'};
 }

@@ -65,8 +65,9 @@ test('Puppy Park has pond, lily blossoms, benches and off-road gazebo',()=>{
  const park=createWorldLandmarks(scene,'park');
  assert.equal(park.theme,'park');
  assert.ok(park.meshCount>130);
+ scene.updateMatrixWorld(true);
  const positions=[];
- park.root.traverse(o=>{if(o.isMesh)positions.push(o.position);});
+ park.root.traverse(o=>{if(o.isMesh)positions.push(o.getWorldPosition(new THREE.Vector3()));});
  // Gazebo roof is off the roadway, not at x=0 where it was previously.
  const roof=positions.find(v=>Math.abs(v.y-6.75)<.001&&Math.abs(v.z+88)<.001);
  assert.ok(roof);

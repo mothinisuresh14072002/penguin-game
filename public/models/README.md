@@ -1,34 +1,57 @@
-# Imported 3D animal models
+# High-detail character models (optional)
 
-Place **bunny.glb** in this folder to enable the detailed Bella Bunny model.
+Pawverse Dash can use **one textured and animated GLB model per animal**.
+Drop your legitimately owned or openly licensed models in this folder:
 
-The game checks `/models/bunny.glb` at runtime. If it is not present, the
-existing procedural bunny is shown, so the game remains playable.
+| Animal | Required filename | Biome |
+| --- | --- | --- |
+| Bella Bunny | `bunny.glb` | Bunny Meadow |
+| Ula Unicorn | `unicorn.glb` | Unicorn Skyland |
+| Hugo Horse | `horse.glb` | Horse Prairie |
+| Coco Cat | `cat.glb` | Cat Town |
+| Dodo Dog | `dog.glb` | Puppy Park |
+| Pip Penguin | `penguin.glb` | Penguin Glacier |
+| Mimi Cow | `cow.glb` | Mimi Farm |
 
-## Install the model
+The same model override is used in solo play, split-screen multiplayer
+and the character shop. If a file is absent or invalid, the game uses
+the existing animated procedural animal rather than showing a broken
+asset. `src/modelAssets.js` controls the allowlisted local paths.
 
-1. Download the **bunny.glb** attached in the ChatGPT conversation. It is
-   the user's original `white_mesh.glb` renamed; about 5.7 MB.
-2. Copy it into this folder as `public/models/bunny.glb`.
-3. Commit and push that binary file, or upload it using GitHub's **Add file →
-   Upload files** while browsing `public/models/`.
+## What makes a GLB look like the reference?
+
+- A true 3D sculpt, not a 2D concept image, with a **readable back view**.
+- Embedded PBR colour/normal/roughness textures (ideally 1K–2K), not a
+  single solid-white material.
+- Correct distinct ears, body shape, hind legs/hooves/paws and tail.
+- A skeleton and named idle/run/jump animations are preferred; at minimum
+  a run animation clip should be included. Current importer starts the
+  first available embedded clip.
+- Feet placed at ground height, proportions suited to about 2.55 world
+  units tall, and orientation facing the runner direction after import.
+- A license permitting your desired game redistribution and commercial
+  distribution if applicable. Preserve attributions when required.
+
+## Install from Windows CMD
+
+From the root `penguin-game` folder, after adding the seven GLBs:
 
 ```cmd
-git add public/models/bunny.glb
-git commit -m "Add Bella Bunny imported 3D model"
+git add public/models/*.glb
+git commit -m "Add textured and animated Pawverse animal models"
 git push origin main
+npm install
 npm run dev
 ```
 
-When present, the GLB is loaded asynchronously in both **Solo** and
-**Two-Friend Race**, normalized to the runner height, displayed in the
-character shop, and given temporary bounce motion if it has no built-in
-animations.
+Try `http://localhost:5173/?quality=hd` for higher desktop render
+resolution. Use `?quality=balanced` to compare performance.
 
-**Important:** The uploaded `white_mesh.glb` has one mesh and no skins,
-animation clips, or embedded material textures. It will not yet have the
-cinematic fur/eyes or skeletal running animations seen in reference artwork.
-Those need additional texturing and rigging.
+**Important:** A previously supplied file called `white_mesh.glb` had a
+single untextured mesh, with no painted colours, skin or animation clips.
+It is **not** enough to create the detailed HD reference appearance.
+The importer intentionally rejects unpainted white meshes.
 
-The game code does not require downloading models from third-party sites at
-runtime; this folder is the only asset location.
+No production-ready, textured and rigged 3D animal binary is included
+in this repository by these code changes. You must supply such GLBs
+before the character appearance can approach the cinematic reference.

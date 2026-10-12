@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {loopZ} from './worldMotion.js';
 
 // The Unicorn Skyland has its own lightweight, looping fantasy scenery.
 // Crystals and stardust are instanced, while floating islands share geometry.
@@ -109,12 +110,8 @@ export function createSkylandDetails(scene){
   }
  }
  function update(distance=0,time=0){
-  const progress=Math.max(0,distance)*.83;
-  const period=SKYLAND_STRIPS*SKYLAND_STRIP_LENGTH;
-  for(let i=0;i<strips.length;i++){
-   const d=((i*SKYLAND_STRIP_LENGTH+progress)%period+period)%period;
-   strips[i].position.z=14-d;
-  }
+  for(let i=0;i<strips.length;i++)
+   strips[i].position.z=loopZ(i,SKYLAND_STRIP_LENGTH,Math.max(0,distance),SKYLAND_STRIPS,14);
   // No per-frame allocation or geometry rebuild.
   for(const c of cloudClusters){
    c.island.position.y=9.0+noise(c.seed+5)*3+Math.sin(time*.55+c.seed)*.26;

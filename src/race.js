@@ -14,6 +14,7 @@ import {createTownDetails} from './townArt.js';
 import {createParkDetails} from './parkArt.js';
 import {createGlacierDetails} from './glacierArt.js';
 import {createFarmDetails} from './farmArt.js';
+import {loopZ,layerTravel} from './worldMotion.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
 const $ = id => document.getElementById(id);
@@ -247,10 +248,10 @@ function updatePlayer(p,dt){
  for(let i=p.objects.length-1;i>=0;i--){
   if(p.objects[i].at<p.distance-12){p.scene.remove(p.objects[i].root);p.objects.splice(i,1)}
  }
- for(let i=0;i<p.scenery.length;i++)p.scenery[i].position.z=trackLoop(Math.floor(i/2),12,p.distance*.82,23);
+ for(let i=0;i<p.scenery.length;i++)p.scenery[i].position.z=loopZ(Math.floor(i/2),12,layerTravel(p.distance,'near'),23,14);
  for(let i=0;i<p.skyClouds.length;i++){
   const cloud=p.skyClouds[i];
-  cloud.position.set((i%2===0?-1:1)*(10+i%4*2)+Math.sin(p.time*.35+i),12+(i%4)*2,trackLoop(i,20,p.distance*.2,14));
+  cloud.position.set((i%2===0?-1:1)*(10+i%4*2)+Math.sin(p.time*.35+i),12+(i%4)*2,loopZ(i,20,layerTravel(p.distance,'far'),14,14));
  }
  p.roadArt.update(p.distance);
  p.meadowDetails?.update(p.distance);
@@ -261,7 +262,7 @@ function updatePlayer(p,dt){
  p.glacierDetails?.update(p.distance,p.time);
  p.farmDetails?.update(p.distance);
  p.landmarks?.update(p.time);
- for(let i=0;i<p.laneMarks.length;i++)p.laneMarks[i].position.z=trackLoop(Math.floor(i/2),8,p.distance,24);
+ for(let i=0;i<p.laneMarks.length;i++)p.laneMarks[i].position.z=loopZ(Math.floor(i/2),8,p.distance,24,14);
  p.hero.group.position.set(px,p.y,2);
  animateAnimal(p.hero,p.time,p.stun<=0,p.y>.05);
  p.hero.update?.(dt,p.time,p.stun<=0,p.y>.05);

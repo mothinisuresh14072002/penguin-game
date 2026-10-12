@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { fitImportedCharacter,animalAssetUrl,CHARACTER_ASSETS } from '../src/modelAssets.js';
+import { fitImportedCharacter,animalAssetUrl,CHARACTER_ASSETS,hasPaintedAppearance } from '../src/modelAssets.js';
 
 test('only an exported bunny GLB is configured to override a procedural animal',()=>{
  assert.equal(CHARACTER_ASSETS.bunny,'models/bunny.glb');
@@ -23,4 +23,16 @@ test('imported GLB geometry is centered on the lane and sits on the road',()=>{
 });
 test('empty GLB meshes are rejected without invalid scaling',()=>{
  assert.throws(()=>fitImportedCharacter(new THREE.Group()),/usable vertical bounds/);
+});
+
+test('an untextured white Meshy shape never hides the coloured playable bunny',()=>{
+ const group=new THREE.Group();
+ const mesh=new THREE.Mesh(new THREE.SphereGeometry(1,8,6),new THREE.MeshStandardMaterial({color:0xffffff}));
+ group.add(mesh);
+ assert.equal(hasPaintedAppearance(group),false);
+ const nose=new THREE.Mesh(new THREE.SphereGeometry(1,8,6),new THREE.MeshStandardMaterial({color:0xf6aac8}));
+ const eye=new THREE.Mesh(new THREE.SphereGeometry(1,8,6),new THREE.MeshStandardMaterial({color:0x1b1d29}));
+ group.add(nose,eye);
+ assert.equal(hasPaintedAppearance(group),true);
+ for(const item of [mesh,nose,eye]){item.geometry.dispose();item.material.dispose();}
 });

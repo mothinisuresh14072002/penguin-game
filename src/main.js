@@ -84,7 +84,7 @@ function model(id){return createAnimal(id)}
 let character=model(profile.selected);scene.add(character.group);
 let characterLoadSequence=0;
 function attemptImportedCharacter(id, sequence){
- if(id!=='bunny')return;
+ // Optional authored GLB overrides are supported for all seven animals.
  loadImportedAnimal(id).then(imported=>{
   if(!imported)return;
   if(sequence!==characterLoadSequence||profile.selected!==id){

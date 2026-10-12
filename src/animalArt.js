@@ -272,7 +272,7 @@ export function createAnimal(id, palette = {}) {
   const feet=[];
   for(const side of [-1,1]){
     const rearFacing=id==='bunny'||id==='horse'||id==='cow'||id==='dog';
-    const foot=groupAt(root,side*(id==='bunny'?.25:.31),.46,rearFacing?-.15:.04);
+    const foot=groupAt(root,side*(id==='bunny'?.285:.31),.46,rearFacing?-.15:.04);
     foot.name=id+'-'+(side<0?'left':'right')+'-hind-foot';
     if(id==='bunny'){
       // Exaggerated *long* bunny hind feet, two clearly separate shapes.

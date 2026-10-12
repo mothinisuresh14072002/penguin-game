@@ -98,6 +98,38 @@ try{
   assert.match(await page.locator('#worldName').textContent(),/Bunny Meadow/);
   await close();
  });
+ await test('All seven characters switch their real-time 3D worlds without browser errors',async()=>{
+  const heroes=[
+    ['bunny','meadow','Bunny Meadow'],
+    ['unicorn','rainbow','Unicorn Skyland'],
+    ['horse','grassland','Horse Prairie'],
+    ['cat','city','Cat Town'],
+    ['dog','park','Puppy Park'],
+    ['penguin','arctic','Penguin Glacier'],
+    ['cow','farm','Mimi Farm']
+  ];
+  const {page,close}=await openGame('/?qa=1',{
+    profile:{coins:0,best:0,unlocked:heroes.map(h=>h[0]),selected:'bunny'}
+  });
+  await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();
+  for(const [id,biome,label] of heroes){
+    await page.locator('.char-card').filter({hasText:label=== 'Penguin Glacier'?'Pip Penguin':
+      ({bunny:'Bella Bunny',unicorn:'Ula Unicorn',horse:'Hugo Horse',
+        cat:'Coco Cat',dog:'Dodo Dog',cow:'Mimi Cow'})[id]
+    }).click();
+    const selected=await state(page);
+    assert.equal(selected.selected,id);
+    assert.equal(selected.biome,biome);
+    assert.equal(await page.locator('#worldName').textContent(),label);
+    // Remove only the modal's visibility for a frame so the artifact is a
+    // truthful screenshot of the currently rendered 3D world, unobstructed.
+    await page.locator('#shop').evaluate(node=>node.style.display='none');
+    await wait(180);
+    await snap(page,'world-'+id);
+    await page.locator('#shop').evaluate(node=>node.style.display='');
+  }
+  await close();
+ });
  await test('Buying a new animal persists coins, selection and world',async()=>{
   const {page,close}=await openGame('/?qa=1',{
    profile:{coins:500,best:0,unlocked:['bunny','penguin'],selected:'bunny'}

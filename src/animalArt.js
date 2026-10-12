@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {createSoftEarGeometry,createRoundedTriangleGeometry} from './chibiGeometry.js';
 
 // Shared character design system for solo and split-screen play.
 // These are genuine animated Three.js meshes (not flat screenshots or image cards).
@@ -140,24 +141,66 @@ export function createAnimal(id, palette = {}) {
       // Tall tapered rabbit ears attach to the skull, not a halo of fluff.
       const ear=groupAt(face,side*.32,.37,-.055);
       ear.name=side<0?'bunny-left-ear':'bunny-right-ear';
-      ell(ear,coat,side*.025,.48,0,.14,.57,.115,-side*.11);
-      ell(ear,m(0xf4b5cc),side*.025,.49,.107,.075,.40,.029,-side*.11);
-      // Visible pink inset from the actual rear gameplay camera.
-      ell(ear,m(0xecafc4),side*.025,.49,-.107,.080,.41,.032,-side*.11);
+      const outer=new THREE.Mesh(
+        createSoftEarGeometry({height:1.11,width:.305,depth:.16}),
+        coat
+      );
+      outer.name='bunny-sculpted-ear';
+      outer.position.x=side*.02;
+      outer.rotation.z=-side*.075;
+      outer.castShadow=true;outer.receiveShadow=true;ear.add(outer);
+      // Two tiny, flush inset shapes are readable from the shop and the
+      // rear-facing in-game camera without standing off as ear puffs.
+      for(const direction of [-1,1]){
+        const inset=new THREE.Mesh(
+          createSoftEarGeometry({height:.81,width:.157,depth:.028}),
+          m(0xf2b8cb)
+        );
+        inset.position.set(side*.02,.17,direction*.101);
+        inset.rotation.z=-side*.075;
+        inset.name='bunny-pink-inner-ear';
+        ear.add(inset);
+      }
       ears.push(ear);
     }else if(id==='unicorn'||id==='horse'||id==='cat'){
-      const ear=groupAt(face,side*.44,.47,-.04);
-      const shape=triangle(ear,coat,0,.26,0,.24,.54);
+      const ear=groupAt(face,side*(id==='cat'?.42:.39),.42,-.04);
+      ear.name=id+'-'+(side<0?'left':'right')+'-ear';
+      const isCat=id==='cat';
+      const shape=new THREE.Mesh(createRoundedTriangleGeometry({
+        width:isCat?.37:.31,height:isCat?.47:.41,depth:.14
+      }),coat);
       shape.rotation.z=-side*.18;
-      ell(ear,m(0xf6b4c8),0,.26,.13,.095,.17,.05);
+      shape.castShadow=true;ear.add(shape);
+      const pink=new THREE.Mesh(createRoundedTriangleGeometry({
+        width:isCat?.18:.16,height:isCat?.30:.26,depth:.015
+      }),m(0xf6b4c8));
+      pink.position.set(0,.085,.11);
+      pink.rotation.z=-side*.18;
+      ear.add(pink);
+      // Rear ear colour helps all three species read from behind.
+      const backPink=pink.clone();
+      backPink.position.z=-.11;
+      ear.add(backPink);
       ears.push(ear);
     }else if(id==='dog'){
-      // Long ears are hinged so they flop and trail during running.
-      const ear=groupAt(face,side*.53,.30,-.02);
+      // A single rounded hanging ear on each side, rather than three
+      // overlapping circles, stays recognizable in the tiny rear camera.
+      const ear=groupAt(face,side*.50,.27,-.02);
       ear.name=side<0?'dog-left-floppy-ear':'dog-right-floppy-ear';
-      ell(ear,m(0xb78156),side*.20,-.20,-.02,.24,.45,.19,side*.49);
-      ell(ear,m(0xe6b18b),side*.28,-.31,-.19,.15,.23,.075,side*.42);
-      ell(ear,m(0xf6cfad),side*.33,-.47,-.17,.12,.13,.09);
+      const outer=new THREE.Mesh(
+        createSoftEarGeometry({height:.72,width:.31,depth:.17,flop:side*.05}),
+        m(0xb78156)
+      );
+      outer.rotation.z=Math.PI-side*.27;
+      outer.position.set(side*.13,-.015,-.025);
+      outer.castShadow=true;ear.add(outer);
+      const inner=new THREE.Mesh(
+        createSoftEarGeometry({height:.46,width:.14,depth:.027}),
+        m(0xe6b18b)
+      );
+      inner.rotation.z=Math.PI-side*.27;
+      inner.position.set(side*.14,-.135,-.115);
+      ear.add(inner);
       ears.push(ear);
     }else if(id==='cow'){
       const ear=groupAt(face,side*.61,.27,-.08);

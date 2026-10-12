@@ -141,6 +141,30 @@ remains the visual goal. This phase improves the procedural art but does
 not add textured, fully rigged, film-quality cat models. Gameplay tests
 cannot establish an exact visual match or real-device FPS.
 
+## 🌳 Phase 5: Dodo Dog and Puppy Park
+
+**Dodo Dog** now has a softer honey-coloured PBR coat, cream chest
+and haunch fluff, a red collar with a golden tag, and expressive
+**hinged floppy ears and wagging tail**. The flopping ears, swinging tail
+and tiny heart patch remain visible when running away from the camera.
+
+**Puppy Park** now contains:
+
+- Four looping garden strips with **416 flower clusters**, colourful
+  petals, grass foliage, rounded hedges and light stepping-stone borders.
+- A layered blue pond with lily pads, flowers and shoreline pebbles.
+- Wooden benches, blossom trees, warm park colours and a shaded gazebo.
+- A gazebo safely **beside** the running track, rather than in the
+  centre lane where it could visually obscure obstacles.
+- Lightweight GPU-instanced plant geometry and appropriate cleanup
+  whenever the animal changes or a multiplayer race ends.
+
+The automated suite checks the running animation, garden recycling,
+model materials, gazebo placement, and Dog-versus-Cat split-screen
+world independence. The reference illustration is still an art-direction
+target; this does not yet replace Dodo with a professionally textured,
+skeletally rigged cinematic dog asset.
+
 ## 🎮 Gameplay and features
 
 | Feature | How it works |
@@ -251,6 +275,7 @@ penguin-game/
 │   ├── skylandArt.js             Floating islands and instanced Unicorn crystals
 │   ├── prairieArt.js             Instanced golden wheat, hay and countryside
 │   ├── townArt.js                Instanced pastel Cat Town buildings and lanterns
+│   ├── parkArt.js                Instanced Puppy Park flowers, bushes and stone path
 │   ├── modelAssets.js            Optional GLB character loading and fallback
 │   ├── characterPreviews.js      3D portraits in the character shop
 │   ├── roadArt.js                Seven repeated illustrated road textures
@@ -304,6 +329,7 @@ Run `npm run android:add` only if no Android project already exists. For subsequ
 - [x] Ula Unicorn Phase 2: animated mane, pearlescent coat and sparkling Rainbow Skyland
 - [x] Hugo Horse Phase 3: chestnut baby pony, golden wheatfields and animated windmills
 - [x] Coco Cat Phase 4: green-eyed tabby, moving tail, pastel village and clock tower
+- [x] Dodo Dog Phase 5: floppy-ear puppy, garden scenery, lily pond and off-road gazebo
 - [x] Seven selectable characters with matching 3D environments
 - [x] Distinct road textures, landscape colours, props and landmarks
 - [x] Solo gameplay with coins, energy, shields and magnets

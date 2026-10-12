@@ -16,6 +16,18 @@ export function createAnimal(id, palette = {}) {
       new THREE.Vector2(.96,-.1),new THREE.Vector2(.81,.47),
       new THREE.Vector2(.63,.83),new THREE.Vector2(0,1)
     ],28),
+    // Shared clean, pear-like trunk for the remaining chibi animals.
+    // Colour, width, height, ears, paws and tails create species identity.
+    softBody: new THREE.LatheGeometry([
+      new THREE.Vector2(0,-1),
+      new THREE.Vector2(.48,-.97),
+      new THREE.Vector2(.83,-.79),
+      new THREE.Vector2(1,-.43),
+      new THREE.Vector2(.95,.08),
+      new THREE.Vector2(.79,.57),
+      new THREE.Vector2(.45,.89),
+      new THREE.Vector2(0,1)
+    ],28),
     box: new THREE.BoxGeometry(1, 1, 1),
     cone: new THREE.ConeGeometry(1, 1, 12),
     cylinder: new THREE.CylinderGeometry(1, 1, 10, 12),
@@ -65,9 +77,9 @@ export function createAnimal(id, palette = {}) {
     cow:{body:[.56,.62,.48],head:[.59,.53,.49],belly:[.45,.49,.14]}
   };
   const shape=shapes[id]||shapes.bunny;
-  const torso=id==='bunny'
-    ?part(root,geometries.bunnyBody,coat,0,1.02,0,...shape.body)
-    :ell(root,coat,0,1.01,0,...shape.body);
+  const torso=part(root,
+    id==='bunny'?geometries.bunnyBody:geometries.softBody,
+    coat,0,1.02,0,...shape.body);
   torso.name=id+'-smooth-body';
   ell(root,belly,0,.97,shape.body[2]-.08,...shape.belly);
   if(id==='dog'){

@@ -247,18 +247,40 @@ export function createWorldLandmarks(scene,id='meadow'){
   }
   orb(0xfff0c3,gx,5.2,gz,.43,.36,.43);
  }else if(id==='arctic'){
-  // A translucent-like crystal arch sits above the running corridor.
-  for(const x of [-7.4,7.4]){
+  // Glacial spires, snow-pines and a tall portal with genuine 3D depth.
+  // The central runner passage stays clear underneath the portal.
+  for(const x of [-8.1,8.1]){
    crystal(x,-47,11,0x7ad7f6);
    for(let i=0;i<8;i++){
-    const z=-12-i*14;
-    p('cylinder',0xe9f4f4,x*1.4,1.6,z,.32,3.2,.32);
-    for(let k=0;k<3;k++)p('cone',[0x9fd9db,0xcaf5f7,0xb1e7e9][k],x*1.4,2.2+k*.88,z,1.9-k*.36,3.2-k*.5,1.9-k*.36);
+    const z=-12-i*13.5;
+    const side=Math.sign(x);
+    p('cylinder',0xe6f5f8,x*1.35,1.6,z,.31,3.2,.31);
+    for(let k=0;k<3;k++)
+     p('cone',[0x79bfd5,0xa9e6ef,0xc9f8fd][k],
+      x*1.35,2.1+k*.87,z,2-k*.32,3.0-k*.48,2-k*.32);
+    // Rounded powdery snowbanks give the lane a soft frozen edge.
+    orb(0xf3fdff,side*6.5,.25,z+.7,1.45,.55,1.12);
    }
   }
-  const arch=p('torus',0x78e9ff,0,6.8,-47,7.4,6.8,1,true);
+  const arch=p('torus',0x86eaff,0,7.0,-47,7.4,7.4,1,true);
+  arch.name='glacier-crystal-arch';
   arch.rotation.z=0;
-  for(const [x,z] of [[-12,-25],[11,-42],[-14,-79],[12,-92]])crystal(x,z,5.5,0x9dd9ff);
+  for(let i=0;i<9;i++){
+   const a=Math.PI*i/8;
+   const x=Math.cos(a)*7.2,y=7.0+Math.sin(a)*7.2;
+   const shard=p('cone',i%2?0xbef6ff:0x8edcf9,x,y,-47,
+      .38,1.2,.38,true);
+   shard.rotation.z=-a;
+  }
+  // Igloo and ice shelves: landmark objects remain outside the play lane.
+  const ix=-15.7,iz=-72;
+  orb(0xe6f9ff,ix,2.8,iz,4.3,3.15,4.1);
+  orb(0xc1ecf5,ix+2.2,1.13,iz+3.5,1.5,1.4,.91);
+  orb(0x456b82,ix+2.15,1.09,iz+4.39,.95,1.0,.12);
+  for(const [x,z] of [[-13,-25],[13,-38],[-14,-87],[12,-99]]){
+   crystal(x,z,6,0x9cdffa);
+   orb(0xe9fbff,x,.14,z+.48,2.1,.46,1.9);
+  }
  }else if(id==='farm'){
   for(const x of [-6.5,6.5])fence(x,-6,0xf3d6a0);
   barn(13,-39);

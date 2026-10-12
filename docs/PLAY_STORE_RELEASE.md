@@ -1,6 +1,6 @@
 # Google Play release checklist
 
-Polar Dash currently builds as a web app and includes a Capacitor Android wrapper configuration. **An Android App Bundle has not yet been produced, signed, tested, uploaded, or approved.**
+Pawverse Dash currently builds as a web app and includes a Capacitor Android wrapper configuration. **An Android App Bundle has not yet been produced, signed, tested, uploaded, or approved.**
 
 ## Windows CMD
 

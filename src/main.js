@@ -13,6 +13,7 @@ import {createSkylandDetails} from './skylandArt.js';
 import {createPrairieDetails} from './prairieArt.js';
 import {createTownDetails} from './townArt.js';
 import {createParkDetails} from './parkArt.js';
+import {createGlacierDetails} from './glacierArt.js';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
@@ -140,6 +141,7 @@ let skylandDetails=null;
 let prairieDetails=null;
 let townDetails=null;
 let parkDetails=null;
+let glacierDetails=null;
 // Fast-moving lane markings make the ice, meadow and farm roads feel alive.
 // This is decorative only: stable base track remains solid beneath every runner.
 const laneDashes=[];
@@ -202,7 +204,7 @@ function applyBiome(){
  scene.background.setHex(biome.sky);scene.fog.color.setHex(biome.fog);
  backdrop.setBiome(picked.biome,biome.sky);
  cloudMaterial.color.setHex(picked.biome==='rainbow'?0xffe4ff:0xffffff);
- if(weatherParticles)weatherParticles.visible=['arctic','rainbow'].includes(picked.biome);
+ if(weatherParticles)weatherParticles.visible=picked.biome==='rainbow';
  for(const b of butterflies)b.g.visible=['meadow','grassland','park','farm'].includes(picked.biome);
  snowMat.color.setHex(biome.ground);iceMat.color.setHex(biome.track);
  roadArt.setBiome(picked.biome);
@@ -224,6 +226,9 @@ function applyBiome(){
  parkDetails?.dispose();
  parkDetails=picked.biome==='park'?createParkDetails(scene):null;
  parkDetails?.update(distance);
+ glacierDetails?.dispose();
+ glacierDetails=picked.biome==='arctic'?createGlacierDetails(scene):null;
+ glacierDetails?.update(distance,clockTime);
  deepIce.color.setHex(biome.edge);rockMat.color.setHex(biome.hazards.includes('spike')?0x6a8ea4:0x917e75);
  clearScenery();
  for(let i=0;i<60;i++){
@@ -376,7 +381,7 @@ for(let i=0;i<350;i++){snowPos[i*3]=(Math.random()-.5)*36;snowPos[i*3+1]=Math.ra
 const flakesGeo=new THREE.BufferGeometry();flakesGeo.setAttribute('position',new THREE.BufferAttribute(snowPos,3));
 const flakes=new THREE.Points(flakesGeo,new THREE.PointsMaterial({color:0xffffff,size:.075,transparent:true,opacity:.77,depthWrite:false}));scene.add(flakes);
 weatherParticles=flakes;
-flakes.visible=['arctic','rainbow'].includes(profile.selected==='penguin'?'arctic':CHARS.find(c=>c.id===profile.selected)?.biome);
+flakes.visible=CHARS.find(c=>c.id===profile.selected)?.biome==='rainbow';
 let last=performance.now(),lastMilestone=0,noticeUntil=0,combo=0,lastCoinDistance=-100;
 function showSpeedNotice(message){const banner=$('speedNotice');if(banner){banner.textContent=message;banner.classList.remove('hidden');noticeUntil=clockTime+1.4;}}
 function tick(now){
@@ -458,6 +463,7 @@ function tick(now){
   prairieDetails?.update(distance);
   townDetails?.update(distance,clockTime);
   parkDetails?.update(distance);
+  glacierDetails?.update(distance,clockTime);
   landmarks?.update(clockTime);
   for(let i=0;i<laneDashes.length;i++){
    const period=24*8;
@@ -515,6 +521,7 @@ if(new URLSearchParams(location.search).has('qa')){
   prairieWheatStrips:prairieDetails?.strips.length??0,
   catTownStrips:townDetails?.strips.length??0,
   puppyParkStrips:parkDetails?.strips.length??0,
+  penguinGlacierStrips:glacierDetails?.strips.length??0,
   visibleObstacles:entities.filter(e=>!e.taken&&!['coin','energy','shield','magnet'].includes(e.kind)).length
  });
 }

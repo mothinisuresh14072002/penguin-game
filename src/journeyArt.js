@@ -79,7 +79,10 @@ export function createJourneyArt(scene,biome='meadow'){
   }
  }
  function update(distance=0){
-  const travel=layerTravel(distance,'mid');
+  // Grounded trees, buildings and flowers stay in the SAME physical
+  // world coordinate system as the road; depth/perspective supplies the
+  // apparent parallax instead of arbitrarily slowing anchored objects.
+  const travel=layerTravel(distance,'track');
   for(let i=0;i<groups.length;i++)
    groups[i].position.z=loopZ(i,JOURNEY_SPACING,travel,JOURNEY_CHUNKS,-18);
  }

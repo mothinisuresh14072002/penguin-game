@@ -278,7 +278,7 @@ layers**, equivalent to the animal moving through a stationary world:
 - Ground and flower/crystal/town/park/glacier/farm scenery reuse seamless
   chunks so the road doesn't pop out of existence when the run progresses.
 - Four lightweight, character-specific **3D landmark sections** approach and
-  pass at a mid-distance speed: orchards, village buildings, ice formations,
+  pass at the same physical distance rate as the path: orchards, village buildings, ice formations,
   flower gardens or fantasy crystals depending on the biome. These recycle
   ahead of the animal without moving the distant sky or mountains.
 - Each biome has three themed **journey chapter labels** that rotate

@@ -12,3 +12,36 @@
 .char-card small{font-size:10px;text-align:center;line-height:1.3}
 .char-card.selected .char-thumb{box-shadow:0 0 0 2px #b2fcff,0 8px 20px #022f5050}
 @media(max-width:520px){.char-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.char-card{min-height:160px}.char-thumb{max-width:130px}.shop-panel{max-height:90vh}}
+
+/* Farm-to-shop loop: compact, keyboard-accessible on mobile and desktop. */
+[hidden]{display:none!important}
+.shop-panel{max-height:min(92dvh,900px);overflow-y:auto;overscroll-behavior:contain}
+.shop-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0;padding:5px;
+ background:rgba(10,41,70,.36);border:1px solid #ffffff55;border-radius:16px}
+.shop-tabs .shop-tab{flex:1 1 110px;font:800 12px 'Outfit',sans-serif;color:#e9f9ff;
+ padding:10px 8px;border:1px solid #ffffff48;border-radius:12px;background:#ffffff1d;
+ cursor:pointer;white-space:nowrap}
+.shop-tabs .shop-tab.active,.shop-tabs .shop-tab[aria-pressed=true]{
+ background:#dcfce9;color:#224c3d;border-color:#dcfce9}
+.economy-panel{margin:10px auto 15px;max-width:740px;text-align:left}
+.economy-panel h2{margin:14px 0 4px;font-size:23px}
+.economy-panel h3{margin:18px 0 8px;font-size:16px;color:#caffdf}
+.economy-panel>p{font-size:13px;line-height:1.55;color:#e9f7ff;margin:4px 0 14px}
+.economy-item{display:flex;align-items:center;justify-content:space-between;gap:12px;
+ margin:7px 0;padding:11px 13px;border-radius:15px;border:1px solid #ffffff42;
+ background:rgba(13,49,76,.44)}
+.economy-info{min-width:0;display:flex;flex-direction:column;gap:3px}
+.economy-info strong{font-size:14px}.economy-info small{font-size:12px;color:#e2f5ffb8}
+.economy-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.economy-actions button{font:800 11px 'Outfit',sans-serif;padding:9px;
+ border-radius:10px;white-space:nowrap}
+.economy-actions button:disabled{opacity:.48;cursor:not-allowed}
+.shop-tab:focus-visible,.economy-actions button:focus-visible{outline:3px solid #fff39a;outline-offset:3px}
+@media(max-width:560px){
+ .shop-panel{max-height:93dvh}
+ .shop-tabs .shop-tab{flex-basis:42%;font-size:11px}
+ .economy-item{align-items:flex-start;flex-direction:column}
+ .economy-actions{justify-content:flex-start}
+ .hud-stats{gap:3px}
+ #foodHud{font-size:11px;padding:8px 7px}
+}

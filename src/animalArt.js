@@ -19,10 +19,10 @@ export function createAnimal(id, palette = {}) {
   const mats = new Map();
   function m(hex, shiny=false) {
     const key = String(hex) + (shiny?'s':'m');
-    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn'||id==='horse'||id==='cat'||id==='dog'||id==='penguin')&&!shiny
+    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn'||id==='horse'||id==='cat'||id==='dog'||id==='penguin'||id==='cow')&&!shiny
       ? new THREE.MeshPhysicalMaterial({
          color:hex,roughness:.88,metalness:0,
-         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:id==='horse'?0xffdcaa:id==='cat'?0xffd9b2:id==='dog'?0xffedc9:id==='penguin'?0xaac9ea:0xffe9e2),
+         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:id==='horse'?0xffdcaa:id==='cat'?0xffd9b2:id==='dog'?0xffedc9:id==='penguin'?0xaac9ea:id==='cow'?0xffecf6:0xffe9e2),
          clearcoat:.02
         })
       : new THREE.MeshStandardMaterial({
@@ -142,10 +142,14 @@ export function createAnimal(id, palette = {}) {
       ears.push(ear);
     }else if(id==='cow'){
       const ear=groupAt(face,side*.61,.27,-.08);
-      ell(ear,coat,side*.14,.05,0,.29,.16,.19,side*.18);
-      ell(ear,m(0xf5b1c0),side*.16,.05,.17,.18,.09,.04);
+      ear.name=side<0?'cow-left-ear':'cow-right-ear';
+      ell(ear,coat,side*.14,.05,0,.30,.18,.19,side*.18);
+      ell(ear,m(0xf5b1c0),side*.16,.05,.17,.18,.10,.045);
+      // Inner ears are also visible from the runner's rear view.
+      ell(ear,m(0xf9c1d0),side*.16,.05,-.18,.18,.10,.048);
       ears.push(ear);
-      triangle(face,ivory,side*.28,.62,-.05,.14,.33);
+      const horn=triangle(face,ivory,side*.28,.62,-.05,.14,.33);
+      horn.name='cow-small-horn';
     }else if(id==='penguin'){
       // The forehead's little feather crest is readable in shop previews.
       if(side===1)for(let i=0;i<3;i++){
@@ -223,8 +227,14 @@ export function createAnimal(id, palette = {}) {
     for(let i=0;i<3;i++)ell(face,tuft,(i-1)*.16,.51,.10,.15,.13,.15,(i-1)*.22);
   }
   if(id==='cow'){
-    const fringe=m(0xece5d9);
-    for(let i=0;i<3;i++)ell(face,fringe,(i-1)*.16,.52,.15,.15,.20,.16);
+    const fringe=m(0xfff8ee);
+    for(let i=0;i<3;i++)ell(face,fringe,(i-1)*.16,.52,.15,.16,.21,.16);
+    // Rounded cheeks and a broader blushing muzzle make the calf read as
+    // a baby animal in the front-facing character shop.
+    for(const side of [-1,1]){
+      ell(face,m(0xffd9de),side*.50,-.25,.34,.19,.18,.13);
+      ell(face,m(0xf9aebe),side*.45,-.27,.48,.12,.08,.04);
+    }
   }
   if(id==='dog'){
     ell(face,m(0xc7926d),.34,.3,.4,.18,.22,.12);
@@ -446,12 +456,39 @@ export function createAnimal(id, palette = {}) {
       ell(badge,m(0xb6ecff),Math.cos(a)*.17,Math.sin(a)*.17,-.015,.068,.067,.04);
     }
   }else if(id==='cow'){
-    const spot=m(0x323138);
-    ell(rear,spot,-.25,1.24,-.43,.31,.31,.11,.28);
-    ell(rear,spot,.29,.75,-.42,.25,.20,.12,-.23);
-    ell(rear,spot,.05,2.21,-.48,.28,.26,.10);
-    for(const side of [-1,1])ell(face,m(0xf2b7c1),side*.77,.30,-.11,.21,.11,.08,side*.2);
-    ell(rear,m(0xf4d0d1),0,.55,-.50,.20,.18,.08);
+    // Rounded black/charcoal markings arranged asymmetrically across a
+    // plush white calf silhouette, all legible from behind.
+    const spot=m(0x34343b);
+    const fur=m(0xfffdf7);
+    for(const side of [-1,1]){
+      ell(rear,fur,side*.37,.72,-.37,.27,.38,.18,side*.20);
+      ell(rear,m(0xffe5e7),side*.36,.42,-.47,.18,.13,.13);
+    }
+    const patches=[
+      [-.24,1.25,-.51,.34,.36,.10,.25],
+      [.32,.78,-.48,.28,.23,.10,-.28],
+      [.08,2.21,-.49,.29,.26,.09,.12],
+      [-.41,.72,-.37,.15,.16,.11,-.33]
+    ];
+    for(let i=0;i<patches.length;i++){
+      const [x,y,z,w,h,d,tilt]=patches[i];
+      const patch=ell(rear,spot,x,y,z,w,h,d,tilt);
+      patch.name='cow-spot-'+i;
+    }
+    for(const side of [-1,1]){
+      ell(face,m(0xf2b7c1),side*.77,.30,-.11,.21,.11,.08,side*.2);
+    }
+    const bow=groupAt(rear,0,1.29,-.54);
+    bow.name='cow-pink-bow';
+    ell(bow,m(0xf5b4cc),0,0,0,.13,.15,.12);
+    for(const side of [-1,1]){
+      ell(bow,m(0xffcbdf),side*.19,.02,.018,.22,.16,.10,side*.34);
+      ell(bow,m(0xf8abc9),side*.12,-.18,.018,.11,.19,.07,-side*.24);
+    }
+    const tailTip=ell(tail,m(0x39363e),.16,-.42,-.10,.11,.19,.12,-.34);
+    tailTip.name='cow-tail-tuft';
+    const tag=ell(rear,m(0xffdf85),0,.54,-.53,.12,.12,.075);
+    tag.name='cow-gold-bell';
   }
   const mane=id==='unicorn'?root.getObjectByName('unicorn-rainbow-mane')
     :id==='horse'?root.getObjectByName('horse-pony-mane'):null;
@@ -461,7 +498,9 @@ export function createAnimal(id, palette = {}) {
   const catTail=id==='cat'?tail:null;
   const dogEars=id==='dog'?ears:null;
   const dogTail=id==='dog'?tail:null;
-  return {group:root,pivotL,pivotR,feet,ears,tail,face,mane,wings,catTail,dogEars,dogTail};
+  const cowTail=id==='cow'?tail:null;
+  const cowEars=id==='cow'?ears:null;
+  return {group:root,pivotL,pivotR,feet,ears,tail,face,mane,wings,catTail,dogEars,dogTail,cowTail,cowEars};
 }
 
 // Character animation uses bones/groups, not just translating a static drawing.
@@ -474,6 +513,14 @@ export function animateAnimal(actor, t, moving=true, airborne=false) {
   if(actor.ears)for(let i=0;i<actor.ears.length;i++)actor.ears[i].rotation.z=Math.sin(t*7+i)*.075*pace;
   if(actor.tail)actor.tail.rotation.x=Math.sin(t*9)*.16*pace;
   if(actor.catTail)actor.catTail.rotation.z=Math.sin(t*5+.7)*.22*pace;
+  if(actor.cowTail){
+    actor.cowTail.rotation.y=Math.sin(t*7.6+.3)*.38*pace;
+    actor.cowTail.rotation.z=Math.sin(t*6.4)*.13*pace;
+  }
+  if(actor.cowEars)for(let i=0;i<actor.cowEars.length;i++){
+    const side=i===0?-1:1;
+    actor.cowEars[i].rotation.z=side*(.04+.065*Math.sin(t*6+i))*pace;
+  }
   if(actor.dogTail){
     actor.dogTail.rotation.y=Math.sin(t*12)*.41*pace;
     actor.dogTail.rotation.z=Math.sin(t*8+.9)*.19*pace;

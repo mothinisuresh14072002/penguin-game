@@ -5,6 +5,8 @@ import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
 import {renderCharacterPreviews, renderImportedPreview} from './characterPreviews.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 import {create3DBackdrop} from './visual3d.js';
+import {createRoadArtwork} from './roadArt.js';
+import {createWorldLandmarks} from './landmarkArt.js';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
@@ -52,10 +54,10 @@ const laneX=[-2.6,0,2.6],entities=[],decor=[],scrollItems=[],hue={ice:0x64c7ee,s
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x80caef);scene.fog=new THREE.FogExp2(0xb9e8ff,.014);
 const camera=new THREE.PerspectiveCamera(57,innerWidth/innerHeight,.1,300);
-camera.position.set(0,6.1,13.7);camera.lookAt(0,1,-18);
+camera.position.set(0,5.4,12.6);camera.lookAt(0,1.35,-19.0);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6));
-renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.42;
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 document.body.prepend(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xd5f4ff,0x3f8bae,2.7));
@@ -100,26 +102,33 @@ function swapCharacter(){
 }
 attemptImportedCharacter(profile.selected,characterLoadSequence);
 // Endless segments are recycled instead of spawning unlimited geometry.
+const glacialCliffs=[];
 for(let i=0;i<14;i++){
  const g=new THREE.Group();scene.add(g);scrollItems.push(g);g.position.z=10-i*18;
+ // Ground extends beyond the track, allowing trees, houses and props to
+ // belong to the same continuous landscape instead of floating in the sky.
+ part(g,cube,snowMat,0,-.34,0,85,.95,18.1);
  part(g,cube,deepIce,0,-.65,0,9,1.5,18);
  part(g,cube,iceMat,0,.06,0,9,.19,18);
  part(g,cube,snowMat,0,.16,0,9,.12,18.1);
- for(const x of [-1.3,1.3]) part(g,cube,deepIce,x,.245,0,.055,.024,18);
+ for(const x of [-4.59,4.59])part(g,cube,deepIce,x,.19,0,.23,.34,18.1);
+ const iceCliff=new THREE.Group();g.add(iceCliff);glacialCliffs.push(iceCliff);
  for(const x of [-5.3,5.3]){
-  const ridge=orb(g,snowMat,x,-.16,-1.5,1.2,.48,2);ridge.rotation.z=.05;
-  for(let j=0;j<3;j++)part(g,coneGeo,iceMat,x+(j-1)*.6,.7,-5, .36,.88+(j%2)*.45,.36);
+  const ridge=orb(iceCliff,snowMat,x,-.16,-1.5,1.2,.48,2);ridge.rotation.z=.05;
+  for(let j=0;j<3;j++)part(iceCliff,coneGeo,iceMat,x+(j-1)*.6,.7,-5, .36,.88+(j%2)*.45,.36);
   // Snow-covered glacier walls create depth cues along the playable runway.
   for(let j=0;j<3;j++){
     const z=-6.5+j*5.6,high=1.6+(i+j)%3*.45;
-    const cliff=part(g,cube,deepIce,x*1.55,high*.43,z,2.15,high,4.6);
+    const cliff=part(iceCliff,cube,deepIce,x*1.55,high*.43,z,2.15,high,4.6);
     cliff.rotation.y=(j%2?-.12:.10);
-    part(g,cube,snowMat,x*1.55,high+.04,z,2.3,.22,4.7);
-    part(g,coneGeo,iceMat,x*1.55+(j%2?.5:-.5),high+1.0,z,.48,.96,.48);
+    part(iceCliff,cube,snowMat,x*1.55,high+.04,z,2.3,.22,4.7);
+    part(iceCliff,coneGeo,iceMat,x*1.55+(j%2?.5:-.5),high+1.0,z,.48,.96,.48);
   }
  }
 }
 
+const roadArt=createRoadArtwork(scene,'arctic',{length:260,centerZ:-106,surfaceY:.29,width:8.95});
+let landmarks=null;
 // Fast-moving lane markings make the ice, meadow and farm roads feel alive.
 // This is decorative only: stable base track remains solid beneath every runner.
 const laneDashes=[];
@@ -183,10 +192,14 @@ function applyBiome(){
  cloudMaterial.color.setHex(picked.biome==='rainbow'?0xffe4ff:0xffffff);
  for(const b of butterflies)b.g.visible=['meadow','grassland','park','farm'].includes(picked.biome);
  snowMat.color.setHex(biome.ground);iceMat.color.setHex(biome.track);
+ roadArt.setBiome(picked.biome);
+ for(const cliff of glacialCliffs)cliff.visible=picked.biome==='arctic';
+ for(const marker of laneDashes)marker.visible=['arctic','rainbow'].includes(picked.biome);
+ landmarks?.dispose();landmarks=createWorldLandmarks(scene,picked.biome);
  deepIce.color.setHex(biome.edge);rockMat.color.setHex(biome.hazards.includes('spike')?0x6a8ea4:0x917e75);
  clearScenery();
  for(let i=0;i<60;i++){
-  const side=i%2===0?-1:1, x=side*(10.5+(i%3)*2.0), z=12-Math.floor(i/2)*11.5;
+  const side=i%2===0?-1:1, x=side*(7.8+(i%3)*1.3), z=12-Math.floor(i/2)*11.5;
   sceneryProp(biome.decor,x,z,i);
  }
  if($('worldName'))$('worldName').textContent=biome.name;
@@ -388,6 +401,7 @@ function tick(now){
    b.wings[0].rotation.y=Math.sin(clockTime*11+i)*.9;
    b.wings[1].rotation.y=-Math.sin(clockTime*11+i)*.9;
   }
+  roadArt.update(distance);
   for(let i=0;i<laneDashes.length;i++){
    const period=24*8;
    const offset=((Math.floor(i/2)*8-distance)%period+period)%period;
@@ -413,12 +427,12 @@ function tick(now){
  character.group.scale.y=sliding>0?.53:(playerY>.05?1.04:1);
  if(run&&playerY<=.02&&sliding<=0&&clockTime-lastStepSound>.25){lastStepSound=clockTime;sound(165+(Math.floor(clockTime*10)%3)*21,.047,'triangle',.014)}
  // Wider field of view at higher speeds makes acceleration more noticeable.
- const desiredFov=57+(Math.min(58,speed)-18)*.28;
+ const desiredFov=54+(Math.min(58,speed)-18)*.16;
  const newFov=THREE.MathUtils.damp(camera.fov,desiredFov,2.8,dt);
  if(Math.abs(newFov-camera.fov)>.02){camera.fov=newFov;camera.updateProjectionMatrix()}
  const desiredX=character.group.position.x*.28;
  camera.position.x=THREE.MathUtils.damp(camera.position.x,desiredX,2,dt);
- camera.lookAt(camera.position.x*.3,1.4,-17);
+ camera.lookAt(camera.position.x*.3,1.3,-19);
  // Keep the 3D sky infinite while road scenery and mountains retain parallax.
  backdrop.update(clockTime,camera);
  renderer.render(scene,camera);

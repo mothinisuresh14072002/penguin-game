@@ -15,6 +15,8 @@ import {createTownDetails} from './townArt.js';
 import {createParkDetails} from './parkArt.js';
 import {createGlacierDetails} from './glacierArt.js';
 import {createFarmDetails} from './farmArt.js';
+import {configureGameRenderer,browserQualityOptions} from './graphicsQuality.js';
+import {giveSurfaceDetail,surfaceKindForColor} from './hdSurface.js';
 import {createPickupArtwork} from './foodArt.js';
 import {FOODS,FOOD_BY_ANIMAL,DAILY_GOALS,WEEKLY_GOALS,createEconomy,synchronizeEconomy,collectFood,sellFood,openSurpriseBox,recordEvent,goalProgress,claimGoal,dailyKey} from './gameEconomy.js';
 import {createJourneyArt} from './journeyArt.js';
@@ -68,12 +70,11 @@ scene.background=new THREE.Color(0x80caef);scene.fog=new THREE.FogExp2(0xb9e8ff,
 const camera=new THREE.PerspectiveCamera(57,innerWidth/innerHeight,.1,300);
 camera.position.set(0,6.7,16.9);camera.lookAt(0,1.38,-21);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6));
-renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const graphicsQuality=configureGameRenderer(renderer,browserQualityOptions());
+renderer.setSize(innerWidth,innerHeight);
 document.body.prepend(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xd5f4ff,0x3f8bae,1.65));
-const sun=new THREE.DirectionalLight(0xfffaf1,2.5);sun.position.set(-7,16,7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-16;sun.shadow.camera.right=16;sun.shadow.camera.top=18;sun.shadow.camera.bottom=-22;sun.shadow.camera.near=1;sun.shadow.camera.far=70;scene.add(sun);
+const sun=new THREE.DirectionalLight(0xfffaf1,2.5);sun.position.set(-7,16,7);sun.castShadow=true;sun.shadow.mapSize.set(graphicsQuality.shadowSize,graphicsQuality.shadowSize);sun.shadow.bias=-.0005;sun.shadow.normalBias=.035;sun.shadow.camera.left=-16;sun.shadow.camera.right=16;sun.shadow.camera.top=18;sun.shadow.camera.bottom=-22;sun.shadow.camera.near=1;sun.shadow.camera.far=70;scene.add(sun);
 const glow=new THREE.DirectionalLight(0x379cf5,.72);glow.position.set(6,4,-13);scene.add(glow);
 const mat=(c,r=.85,metalness=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness});
 const snowMat=mat(0xf3fbff),iceMat=mat(0x8fddf1,.27,.12),deepIce=mat(0x309ac8,.38,.1),rockMat=mat(0x627589),dark=mat(0x1a222d),white=mat(0xfffcf3),pink=mat(0xdb8584),gold=mat(0xffd64f,.28,.65),energyMat=mat(0x41e6ad,.3,.18),powerMat=mat(0xbb81ff,.3,.3),wood=mat(0x7c5638);
@@ -169,6 +170,8 @@ const biomeDecor=[];
 const sceneryMaterials=new Set();
 function addScenery(parent,shape,color,x,y,z,sx,sy,sz){
  const material=mat(color,.83);
+ const kind=surfaceKindForColor(color);
+ if(kind)giveSurfaceDetail(material,kind);
  sceneryMaterials.add(material);
  return part(parent,shape,material,x,y,z,sx,sy,sz);
 }
@@ -621,7 +624,7 @@ function tick(now){
  backdrop.update(clockTime,camera);
  renderer.render(scene,camera);
 }
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6))});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();configureGameRenderer(renderer,browserQualityOptions());renderer.setSize(innerWidth,innerHeight)});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&!paused)$('pauseBtn').click()});
 window.addEventListener('blur',()=>{if(running&&!paused)$('pauseBtn').click();keys.clear()});
 try{audioEnabled=localStorage.getItem('polar-dash-sound')==='on'}catch{};
@@ -631,6 +634,7 @@ character.group.rotation.y=Math.PI;
 // Only enabled with ?qa=1; it cannot change progress or inject obstacles.
 if(new URLSearchParams(location.search).has('qa')){
  window.__pawverseQA=()=>Object.freeze({
+  graphicsQuality:graphicsQuality.name,
   selected:profile.selected,
   biome:CHARS.find(c=>c.id===profile.selected)?.biome,
   running,paused,ended,distance,energy,lane:playerLane,

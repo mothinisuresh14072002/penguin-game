@@ -4,6 +4,7 @@ import {createAnimal, animateAnimal} from './animalArt.js';
 import {populateHabitat} from './worldArt.js';
 import {renderCharacterPreviews, renderImportedPreview} from './characterPreviews.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
+import {create3DBackdrop} from './visual3d.js';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
@@ -130,13 +131,8 @@ for(let k=0;k<48;k++){
  scene.add(mesh);laneDashes.push(mesh);
 }
 
-// distant stationary mountain silhouettes and arctic backdrop.
-for(let i=0;i<22;i++){
- const x=(i-11)*10;
- const h=11+(Math.sin(i*4.11)+1)*5;
- part(scene,new THREE.ConeGeometry(5,h,5),rockMat,x,h*.5-3,-95-(i%3)*9);
- part(scene,new THREE.ConeGeometry(2.4,h*.37,5),snowMat,x,h*.79-3,-95-(i%3)*9);
-}
+// Camera-following shader sky and habitat-specific 3D horizon replace the old Arctic-only peaks.
+const backdrop=create3DBackdrop(scene,'arctic');
 // All biome decorations are generated in Three.js and reused across runs.
 let currentTheme=BIOMES.arctic;
 const biomeDecor=[];
@@ -183,6 +179,7 @@ function applyBiome(){
  const picked=CHARS.find(c=>c.id===profile.selected)||CHARS[0];
  const biome=BIOMES[picked.biome];currentTheme=biome;
  scene.background.setHex(biome.sky);scene.fog.color.setHex(biome.fog);
+ backdrop.setBiome(picked.biome,biome.sky);
  cloudMaterial.color.setHex(picked.biome==='rainbow'?0xffe4ff:0xffffff);
  for(const b of butterflies)b.g.visible=['meadow','grassland','park','farm'].includes(picked.biome);
  snowMat.color.setHex(biome.ground);iceMat.color.setHex(biome.track);
@@ -422,6 +419,8 @@ function tick(now){
  const desiredX=character.group.position.x*.28;
  camera.position.x=THREE.MathUtils.damp(camera.position.x,desiredX,2,dt);
  camera.lookAt(camera.position.x*.3,1.4,-17);
+ // Keep the 3D sky infinite while road scenery and mountains retain parallax.
+ backdrop.update(clockTime,camera);
  renderer.render(scene,camera);
 }
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6))});

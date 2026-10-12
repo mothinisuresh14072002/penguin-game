@@ -144,6 +144,7 @@ for(let k=0;k<48;k++){
 const backdrop=create3DBackdrop(scene,'arctic');
 // All biome decorations are generated in Three.js and reused across runs.
 let currentTheme=BIOMES.arctic;
+let weatherParticles=null;
 const biomeDecor=[];
 const sceneryMaterials=new Set();
 function addScenery(parent,shape,color,x,y,z,sx,sy,sz){
@@ -190,6 +191,7 @@ function applyBiome(){
  scene.background.setHex(biome.sky);scene.fog.color.setHex(biome.fog);
  backdrop.setBiome(picked.biome,biome.sky);
  cloudMaterial.color.setHex(picked.biome==='rainbow'?0xffe4ff:0xffffff);
+ if(weatherParticles)weatherParticles.visible=['arctic','rainbow'].includes(picked.biome);
  for(const b of butterflies)b.g.visible=['meadow','grassland','park','farm'].includes(picked.biome);
  snowMat.color.setHex(biome.ground);iceMat.color.setHex(biome.track);
  roadArt.setBiome(picked.biome);
@@ -340,6 +342,8 @@ const snowPos=new Float32Array(350*3);
 for(let i=0;i<350;i++){snowPos[i*3]=(Math.random()-.5)*36;snowPos[i*3+1]=Math.random()*19;snowPos[i*3+2]=-Math.random()*85;}
 const flakesGeo=new THREE.BufferGeometry();flakesGeo.setAttribute('position',new THREE.BufferAttribute(snowPos,3));
 const flakes=new THREE.Points(flakesGeo,new THREE.PointsMaterial({color:0xffffff,size:.075,transparent:true,opacity:.77,depthWrite:false}));scene.add(flakes);
+weatherParticles=flakes;
+flakes.visible=['arctic','rainbow'].includes(profile.selected==='penguin'?'arctic':CHARS.find(c=>c.id===profile.selected)?.biome);
 let last=performance.now(),lastMilestone=0,noticeUntil=0,combo=0,lastCoinDistance=-100;
 function showSpeedNotice(message){const banner=$('speedNotice');if(banner){banner.textContent=message;banner.classList.remove('hidden');noticeUntil=clockTime+1.4;}}
 function tick(now){
@@ -407,13 +411,13 @@ function tick(now){
    const offset=((Math.floor(i/2)*8-distance)%period+period)%period;
    laneDashes[i].position.z=11-offset;
   }
-  for(let i=0;i<350;i++){
+  if(flakes.visible)for(let i=0;i<350;i++){
    snowPos[i*3+1]-=dt*(.9+(i%5)*.2);
    snowPos[i*3+2]+=dt*speed*.4;
    if(snowPos[i*3+1]<0)snowPos[i*3+1]=19;
    if(snowPos[i*3+2]>14)snowPos[i*3+2]=-88;
   }
-  flakesGeo.attributes.position.needsUpdate=true;
+  if(flakes.visible)flakesGeo.attributes.position.needsUpdate=true;
   if(clockTime>noticeUntil)$('speedNotice')?.classList.add('hidden');
   updateHUD();
  }

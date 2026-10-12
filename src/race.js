@@ -384,7 +384,8 @@ if(new URLSearchParams(location.search).has('qa')){
   players:racers.map(p=>({
    id:p.ch.id,distance:p.distance,coins:p.coins,
    energy:p.energy,hit:p.hit,lane:p.lane,target:p.target,
-   y:p.y,slide:p.slide,biome:p.backdrop?.horizon?.name
+   y:p.y,slide:p.slide,meadowFlowerStrips:p.meadowDetails?.strips.length??0,
+   biome:p.backdrop?.horizon?.name
   }))
  });
 }

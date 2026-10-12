@@ -332,7 +332,11 @@ export function createAnimal(id, palette = {}) {
     for(const side of [-1,1])ell(face,m(0xf2b7c1),side*.77,.30,-.11,.21,.11,.08,side*.2);
     ell(rear,m(0xf4d0d1),0,.55,-.50,.20,.18,.08);
   }
-  return {group:root,pivotL,pivotR,feet,ears,tail,face};
+  const mane=id==='unicorn'?root.getObjectByName('unicorn-rainbow-mane'):null;
+  const wings=id==='unicorn'
+    ? [root.getObjectByName('unicorn-left-wing'),root.getObjectByName('unicorn-right-wing')]
+    : null;
+  return {group:root,pivotL,pivotR,feet,ears,tail,face,mane,wings};
 }
 
 // Character animation uses bones/groups, not just translating a static drawing.
@@ -345,6 +349,16 @@ export function animateAnimal(actor, t, moving=true, airborne=false) {
   if(actor.ears)for(let i=0;i<actor.ears.length;i++)actor.ears[i].rotation.z=Math.sin(t*7+i)*.075*pace;
   if(actor.tail)actor.tail.rotation.x=Math.sin(t*9)*.16*pace;
   if(actor.face)actor.face.rotation.z=Math.sin(t*7)*.026*pace;
+  // A little mane sway and wing flutter make the unicorn read as a living
+  // character even from the small rear-view runner camera.
+  if(actor.mane){
+    actor.mane.rotation.z=Math.sin(t*6)*.052*pace;
+    actor.mane.rotation.x=Math.sin(t*8+.7)*.045*pace;
+  }
+  if(actor.wings)for(let i=0;i<actor.wings.length;i++){
+    const wing=actor.wings[i];
+    if(wing)wing.rotation.z=(i===0?-1:1)*(.06+.095*Math.sin(t*9))*pace;
+  }
   actor.group.rotation.z=Math.sin(t*12)*.033*pace;
   actor.group.scale.y=airborne?1.04:1;
 }

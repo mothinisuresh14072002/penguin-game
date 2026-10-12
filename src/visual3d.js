@@ -33,6 +33,17 @@ export function create3DBackdrop(scene,biome='meadow'){
     varying vec3 vDirection;
     uniform vec3 uZenith,uHorizon,uGroundGlow,uSunColor;
     uniform float uTime;
+    // Soft painted cumulus above the distant hills. This is part of the
+    // infinite sky, not a flower/prop that scrolls along the road.
+    float hash21(vec2 p){
+      return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);
+    }
+    float noise2(vec2 p){
+      vec2 i=floor(p),f=fract(p);
+      vec2 u=f*f*(3.0-2.0*f);
+      return mix(mix(hash21(i),hash21(i+vec2(1.,0.)),u.x),
+                 mix(hash21(i+vec2(0.,1.)),hash21(i+vec2(1.,1.)),u.x),u.y);
+    }
     void main(){
       vec3 dir=normalize(vDirection);
       float h=clamp(dir.y*.5+.5,0.0,1.0);
@@ -42,6 +53,14 @@ export function create3DBackdrop(scene,biome='meadow'){
       float halo=pow(max(dot(dir,sunDir),0.0),12.0)*.13;
       float disc=pow(max(dot(dir,sunDir),0.0),380.0)*.70;
       col+=uSunColor*(halo+disc);
+      float horizonBand=smoothstep(.06,.17,dir.y)*
+                        (1.0-smoothstep(.73,.95,dir.y));
+      vec2 cloudUV=dir.xz*6.8/(.9+abs(dir.y))+
+                   vec2(uTime*.00045,uTime*.00018);
+      float clouds=.65*noise2(cloudUV)+
+                   .35*noise2(cloudUV*2.07+vec2(9.4,5.7));
+      float fluff=smoothstep(.45,.70,clouds)*horizonBand;
+      col=mix(col,vec3(.99,.99,1.0),fluff*.68);
       gl_FragColor=vec4(col,1.0);
       #include <tonemapping_fragment>
       #include <colorspace_fragment>

@@ -68,9 +68,8 @@ export function recordEvent(profile,event,quantity=1,now=new Date()){
 export function collectFood(profile,animal,count=1,now=new Date()){
  const food=FOOD_BY_ANIMAL[animal],n=whole(count);
  if(!food||!n)return null;
- const e=synchronizeEconomy(profile,now);
- e.inventory[food.id]+=n;
  recordEvent(profile,'food',n,now);
+ profile.economy.inventory[food.id]+=n;
  return food;
 }
 export function sellFood(profile,id,amount=1,now=new Date()){

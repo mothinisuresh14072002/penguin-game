@@ -33,6 +33,6 @@ test('grounded mid-distance landmarks travel at physical road speed',()=>{
  const old=world.groups[1].position.z;
  world.update(4);
  const delta=world.groups[1].position.z-old;
- assert.ok(delta>0&&delta<4,'buildings should pass slower than near track');
+ assert.equal(delta,4,'buildings and roadside flowers must stay anchored to ground');
  world.dispose();
 });

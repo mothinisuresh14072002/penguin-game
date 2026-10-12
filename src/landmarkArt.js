@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {loopZ} from './worldMotion.js';
+import {giveSurfaceDetail,surfaceKindForColor} from './hdSurface.js';
 
 // Landmark silhouettes and nearby set dressing inspired by the seven lanes in
 // the user's reference art. Each is actual 3D geometry with its own depth.
@@ -27,9 +28,12 @@ export function createWorldLandmarks(scene,id='meadow'){
  const mats=new Map();
  const mat=(color,gloss=false)=>{
   const key=color+':'+gloss;
-  if(!mats.has(key))mats.set(key,new THREE.MeshStandardMaterial({
-   color,roughness:gloss?.2:.79,metalness:gloss?.12:0
-  }));
+  if(!mats.has(key)){
+   const surface=new THREE.MeshStandardMaterial({color,roughness:gloss?.2:.83,metalness:gloss?.12:0});
+   const kind=!gloss?surfaceKindForColor(color):null;
+   if(kind)giveSurfaceDetail(surface,kind);
+   mats.set(key,surface);
+  }
   return mats.get(key);
  };
  let count=0;

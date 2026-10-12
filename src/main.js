@@ -5,6 +5,7 @@ import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
 import {renderCharacterPreviews, renderImportedPreview} from './characterPreviews.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 import {create3DBackdrop} from './visual3d.js';
+import {sweptHazardContact} from './collisionMath.js';
 import {createRoadArtwork} from './roadArt.js';
 import {createWorldLandmarks} from './landmarkArt.js';
 
@@ -353,6 +354,7 @@ function tick(now){
   clockTime+=dt;
   speed=Math.min(58,18+distance*.042);
   const previousDistance=distance;
+  const previousLane=playerLane,previousPlayerY=playerY,previousSlide=sliding;
   distance+=speed*dt;
   const milestone=Math.floor(distance/250);
   if(milestone>lastMilestone){lastMilestone=milestone;showSpeedNotice('⚡ SPEED UP!  '+Math.round(speed)+' RUN SPEED');sound(790,.15,'triangle',.04)}
@@ -373,16 +375,29 @@ function tick(now){
    // A pickup requires actual horizontal AND vertical contact; adjacent lanes never auto-collect.
    const dy=Math.abs((e.kind==='coin'?1.12:e.kind==='energy'?1.2:1.27)+e.root.position.y-(playerY+1.12));
    const sameLane=isPick?dx<.43&&dy<.75:dx<1.03;
-   if(running&&!ended&&!e.taken&&e.at>=previousDistance-.76&&e.at<=distance+.76&&sameLane){
+   // Check all positions swept between rendered frames (including lane
+   // changes and jumping). Endpoint-only collision misses fast hazards.
+   const hazardContact=!isPick&&!e.taken?sweptHazardContact({
+     kind:e.kind,obstacleDistance:e.at,obstacleX:e.root.position.x,
+     previousDistance,distance,
+     previousX:laneX[0]+(laneX[2]-laneX[0])*previousLane/2,
+     x:playerX,previousY:previousPlayerY,y:playerY,
+     slideStart:previousSlide,slideEnd:sliding
+   }):null;
+   if(running&&!ended&&!e.taken&&(
+     isPick?(e.at>=previousDistance-.76&&e.at<=distance+.76&&sameLane):Boolean(hazardContact)
+   )){
     if(isPick){
       if(e.kind==='coin'){combo=distance-lastCoinDistance<9?combo+1:1;lastCoinDistance=distance;runCoins++;sound(760+Math.min(combo,8)*35,.07,'sine',.04);if(combo===5||combo===10||combo===20)showSpeedNotice('✨ '+combo+' COIN STREAK!')}
       if(e.kind==='energy'){energy=Math.min(100,energy+29);sound(660,.18,'triangle')}
       if(e.kind==='shield'){shield=13;sound(540,.22,'triangle')}
       if(e.kind==='magnet'){magnet=11;sound(510,.22,'triangle')}
       e.taken=true;e.root.visible=false;
-    }else if(invincible<=0){
-      const above=playerY>1.15, duck=sliding>0&&e.kind==='log';
-      if(!above&&!duck){crash();break;}
+    }else{
+      // Consume the obstacle at first physical contact. While a shield's
+      // brief immunity is active, it must not appear to phase through props.
+      e.taken=true;e.root.visible=false;
+      if(invincible<=0){crash();if(ended)break;}
     }
    }
    if(e.at<distance-13){if(e.kind==='coin'&&!e.taken&&magnet<=0)combo=0;scene.remove(e.root);disposeGroup(e.root);entities.splice(entities.indexOf(e),1)}

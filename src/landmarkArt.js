@@ -13,6 +13,7 @@ export const LANDMARK_THEMES=Object.freeze({
 });
 export function createWorldLandmarks(scene,id='meadow'){
  const root=new THREE.Group();root.name='landmarks-'+id;scene.add(root);
+ const rotors=[];
  const geo={
   sphere:new THREE.SphereGeometry(1,14,10),
   box:new THREE.BoxGeometry(1,1,1),
@@ -144,20 +145,34 @@ export function createWorldLandmarks(scene,id='meadow'){
   }
   for(const x of [-6,6])for(let i=0;i<5;i++)crystal(x,-12-i*14,1.8+i%3*.6,0xf3b9ff);
  }else if(id==='grassland'){
-  for(const x of [-6,6])fence(x,-8,0xe9cf96);
-  for(const [x,z] of [[-12,-32],[12,-51],[14,-78]]){
-   p('cylinder',0xe7dbc1,x,4,z,1.6,8,1.6);
-   p('cone',0xa56e48,x,8.8,z,2.15,2.5,2.15);
-   const hub=orb(0x7e6348,x,6.4,z+1.81,.46,.46,.23);
+  // Windmills have actual blade rigs, rather than four frozen blocks.
+  // Keep rotating parts outside the central gameplay/obstacle corridor.
+  fence(-6.8,-8,0xf0d19b);fence(6.8,-8,0xf0d19b);
+  for(const [index,[x,z]] of [[-12,-32],[13.5,-55],[-15,-89]].entries()){
+   p('cylinder',0xe9dbc2,x,4.0,z,1.45,8,1.45);
+   p('cone',0xa66e4e,x,8.75,z,2.07,2.65,2.07);
+   const rotor=new THREE.Group();
+   rotor.name='prairie-windmill-rotor';
+   rotor.position.set(x,6.65,z+1.61);
+   root.add(rotor);
+   const hub=part(rotor,'sphere',0x926343,0,0,.2,.43,.43,.25);
+   hub.castShadow=false;
    for(let i=0;i<4;i++){
     const a=i*Math.PI*.5;
-    const blade=cube(0xffffff,x+Math.sin(a)*2.0,6.4+Math.cos(a)*2.0,z+1.86,.5,3.65,.14);
+    const blade=part(rotor,'box',0xfff0d2,
+      Math.sin(a)*1.62,Math.cos(a)*1.62,.10,.48,3.04,.14);
     blade.rotation.z=-a;
+    part(rotor,'box',0xc48c5e,
+      Math.sin(a)*2.32,Math.cos(a)*2.32,.24,.22,.65,.11).rotation.z=-a;
    }
+   rotors.push({rotor,phase:index*1.13,speed:.42+index*.10});
   }
-  for(let i=0;i<15;i++){
-   orb(0xdab05f,(i%2?8:-8)+(i%3)*.7,.7,-7-i*8,1.05,.73,.83);
-   if(i%3===0)tree(13,-9-i*5,1.0,0x77b36a);
+  house(-16,-108,0xffe1b7,0xa86d52);
+  for(let i=0;i<12;i++){
+   const x=(i%2?8.7:-8.7)+(i%3)*.59,z=-9-i*7.8;
+   orb(0xe5bc66,x,.68,z,.95,.76,.75);
+   orb(0xf4d57c,x+.35,.92,z-.22,.64,.38,.46);
+   if(i%3===0)tree(i%2?15:-14,-13-i*6,1.04,0x78b66a);
   }
  }else if(id==='city'){
   const walls=[0xffbfa5,0xfbd79b,0xb3d0e9,0xe8b1c7,0xcce1b8];
@@ -215,5 +230,8 @@ export function createWorldLandmarks(scene,id='meadow'){
   for(const geometry of Object.values(geo))geometry.dispose();
   for(const material of mats.values())material.dispose();
  }
- return {root,dispose,meshCount:count,theme:id};
+ function update(time=0){
+  for(const {rotor,phase,speed} of rotors)rotor.rotation.z=-time*speed+phase;
+ }
+ return {root,dispose,update,meshCount:count,theme:id};
 }

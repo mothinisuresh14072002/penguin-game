@@ -6,7 +6,15 @@ export function createAnimal(id, palette = {}) {
   const root = new THREE.Group();
   root.name = 'chibi-' + id;
   const geometries = {
-    sphere: new THREE.SphereGeometry(1, 22, 16),
+    sphere: new THREE.SphereGeometry(1, 28, 20),
+    // A gently pear-shaped sculpt, not a stack of round puffballs. Bunny
+    // shoulders narrow naturally into rounder hips, like the reference.
+    bunnyBody: new THREE.LatheGeometry([
+      new THREE.Vector2(0,-1),new THREE.Vector2(.48,-.98),
+      new THREE.Vector2(.86,-.78),new THREE.Vector2(1,-.45),
+      new THREE.Vector2(.96,-.1),new THREE.Vector2(.81,.47),
+      new THREE.Vector2(.63,.83),new THREE.Vector2(0,1)
+    ],28),
     box: new THREE.BoxGeometry(1, 1, 1),
     cone: new THREE.ConeGeometry(1, 1, 12),
     cylinder: new THREE.CylinderGeometry(1, 1, 10, 12),
@@ -47,16 +55,18 @@ export function createAnimal(id, palette = {}) {
   // Species-specific proportions prevent seven animals from looking like
   // identical stacks of balls. The camera sees their rear profiles.
   const shapes={
-    bunny:{body:[.48,.61,.38],head:[.56,.54,.49],belly:[.34,.45,.13]},
-    unicorn:{body:[.56,.70,.48],head:[.59,.56,.50],belly:[.42,.51,.15]},
-    horse:{body:[.55,.74,.44],head:[.56,.57,.48],belly:[.39,.51,.16]},
-    cat:{body:[.45,.65,.39],head:[.59,.57,.50],belly:[.34,.46,.14]},
-    dog:{body:[.55,.64,.47],head:[.64,.59,.53],belly:[.42,.48,.16]},
-    penguin:{body:[.53,.78,.46],head:[.59,.53,.50],belly:[.44,.58,.17]},
-    cow:{body:[.63,.66,.52],head:[.65,.57,.53],belly:[.48,.52,.16]}
+    bunny:{body:[.48,.59,.39],head:[.47,.47,.43],belly:[.33,.43,.11]},
+    unicorn:{body:[.50,.67,.44],head:[.53,.52,.46],belly:[.37,.49,.13]},
+    horse:{body:[.49,.69,.42],head:[.50,.52,.45],belly:[.35,.48,.14]},
+    cat:{body:[.40,.59,.35],head:[.53,.51,.46],belly:[.30,.43,.12]},
+    dog:{body:[.51,.61,.43],head:[.57,.55,.49],belly:[.39,.46,.14]},
+    penguin:{body:[.48,.75,.43],head:[.54,.50,.46],belly:[.41,.56,.14]},
+    cow:{body:[.56,.62,.48],head:[.59,.53,.49],belly:[.45,.49,.14]}
   };
   const shape=shapes[id]||shapes.bunny;
-  const torso=ell(root,coat,0,1.01,0,...shape.body);
+  const torso=id==='bunny'
+    ?part(root,geometries.bunnyBody,coat,0,1.02,0,...shape.body)
+    :ell(root,coat,0,1.01,0,...shape.body);
   torso.name=id+'-smooth-body';
   ell(root,belly,0,.97,shape.body[2]-.08,...shape.belly);
   if(id==='dog'){
@@ -73,7 +83,7 @@ export function createAnimal(id, palette = {}) {
     ell(root,m(0x33313a),.26,.72,.42,.20,.16,.09,-.35);
     ell(root,m(0xeeb7c0),0,.55,.43,.25,.15,.12);
   }
-  const face=groupAt(root,0,1.82,.035);
+  const face=groupAt(root,0,id==='bunny'?1.77:1.82,.035);
   const head=ell(face,coat,0,0,0,...shape.head);
   head.name=id+'-distinct-head';
   if(id==='penguin'){
@@ -128,12 +138,12 @@ export function createAnimal(id, palette = {}) {
   for(const side of [-1,1]){
     if(id==='bunny'){
       // Tall tapered rabbit ears attach to the skull, not a halo of fluff.
-      const ear=groupAt(face,side*.34,.43,-.055);
+      const ear=groupAt(face,side*.32,.37,-.055);
       ear.name=side<0?'bunny-left-ear':'bunny-right-ear';
-      ell(ear,coat,side*.035,.48,0,.165,.63,.12,-side*.075);
-      ell(ear,m(0xf4b5cc),side*.035,.49,.115,.083,.44,.028,-side*.075);
+      ell(ear,coat,side*.025,.48,0,.14,.57,.115,-side*.11);
+      ell(ear,m(0xf4b5cc),side*.025,.49,.107,.075,.40,.029,-side*.11);
       // Visible pink inset from the actual rear gameplay camera.
-      ell(ear,m(0xecafc4),side*.035,.49,-.115,.091,.45,.030,-side*.075);
+      ell(ear,m(0xecafc4),side*.025,.49,-.107,.080,.41,.032,-side*.11);
       ears.push(ear);
     }else if(id==='unicorn'||id==='horse'||id==='cat'){
       const ear=groupAt(face,side*.44,.47,-.04);
@@ -236,8 +246,12 @@ export function createAnimal(id, palette = {}) {
     ell(face,m(0xc7926d),.34,.3,.4,.18,.22,.12);
     ell(face,ink,0,-.43,.71,.1,.036,.016);
   }
-  const pivotL=groupAt(root,-.55,1.35,0);
-  const pivotR=groupAt(root,.55,1.35,0);
+  // Shoulders are inside the body's silhouette: no floating side pom-poms.
+  const shoulderWidth={
+    bunny:.39,unicorn:.46,horse:.45,cat:.37,dog:.45,penguin:.43,cow:.50
+  }[id]??.43;
+  const pivotL=groupAt(root,-shoulderWidth,1.32,0);
+  const pivotR=groupAt(root,shoulderWidth,1.32,0);
   for(const side of [-1,1]){
     const pivot=side===-1?pivotL:pivotR;
     if(id==='penguin'){
@@ -247,7 +261,8 @@ export function createAnimal(id, palette = {}) {
       ell(pivot,m(0x41516a),side*.27,-.56,-.08,.18,.21,.09,-side*.38);
     }else if(id==='bunny'){
       // Slim front arms sit beside, not in front of, the cotton tail.
-      ell(pivot,coat,side*.025,-.23,.08,.13,.27,.14,-side*.11);
+      const paw=ell(pivot,coat,side*.01,-.22,.03,.135,.28,.145,-side*.12);
+      paw.name='bunny-slim-front-leg';
     }else{
       const thickness=id==='cat'?.16:id==='horse'?.16:.20;
       ell(pivot,coat,side*.07,-.28,.04,thickness,.36,.18,-side*.12);
@@ -257,12 +272,12 @@ export function createAnimal(id, palette = {}) {
   const feet=[];
   for(const side of [-1,1]){
     const rearFacing=id==='bunny'||id==='horse'||id==='cow'||id==='dog';
-    const foot=groupAt(root,side*.31,.49,rearFacing?-.13:.04);
+    const foot=groupAt(root,side*(id==='bunny'?.25:.31),.46,rearFacing?-.15:.04);
     foot.name=id+'-'+(side<0?'left':'right')+'-hind-foot';
     if(id==='bunny'){
       // Exaggerated *long* bunny hind feet, two clearly separate shapes.
-      ell(foot,coat,0,-.20,-.04,.205,.27,.18);
-      const toe=ell(foot,m(0xfff6ec),0,-.37,-.33,.225,.115,.35);
+      ell(foot,coat,0,-.18,-.055,.19,.27,.17);
+      const toe=ell(foot,m(0xfff4ec),0,-.37,-.33,.22,.095,.30);
       toe.name='bunny-oval-toe';
       for(const dx of [-.11,.11])
         ell(foot,m(0xeebccc),dx,-.375,-.59,.06,.032,.03);
@@ -279,7 +294,7 @@ export function createAnimal(id, palette = {}) {
   }
   const tail=groupAt(root,id==='bunny'?0:.28,id==='bunny'?.91:1.04,id==='bunny'?-.51:-.49);
   if(id==='bunny'){
-    const cotton=ell(tail,cream,0,0,-.19,.19,.21,.19);
+    const cotton=ell(tail,m(0xfff3ec),0,.02,-.19,.16,.17,.15);
     cotton.name='bunny-cotton-tail';
   }
   else if(id==='unicorn'||id==='horse'){
@@ -307,15 +322,17 @@ export function createAnimal(id, palette = {}) {
   if(id==='bunny'){
     // One clean pear-shaped back with rounded hips. The user's rear-view
     // reference is a rabbit, not a cloud of overlapping cotton balls.
-    ell(rear,coat,0,1.01,-.34,.37,.48,.12);
+    // Only a very thin colour-free back contour, not a second bulging
+    // torso. The real pear mesh already defines the rabbit's whole back.
+    ell(rear,coat,0,.99,-.34,.29,.37,.045);
     for(const side of [-1,1]){
-      const thigh=ell(rear,coat,side*.29,.71,-.25,.245,.33,.205,side*.14);
+      const thigh=ell(rear,coat,side*.23,.67,-.20,.18,.23,.13,side*.09);
       thigh.name=side<0?'bunny-left-haunch':'bunny-right-haunch';
     }
     // Small, flat pastel waist ribbon, not a scalloped pom-pom dress.
     const dressBack=groupAt(rear,0,.99,-.44);
     dressBack.name='bunny-dress-back';
-    ell(dressBack,m(0xffe7ed),0,0,0,.37,.078,.085);
+    ell(dressBack,m(0xffe7ed),0,0,0,.29,.055,.06);
     const flower=groupAt(dressBack,.29,.015,-.095);
     flower.name='bunny-dress-flower';
     for(let j=0;j<5;j++){

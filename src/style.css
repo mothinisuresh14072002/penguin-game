@@ -45,3 +45,12 @@
  .hud-stats{gap:3px}
  #foodHud{font-size:11px;padding:8px 7px}
 }
+
+@media(max-width:560px){
+ .hud{padding:7px 10px 0;flex-direction:column;align-items:stretch;gap:5px}
+ .hud .logo{font-size:12px;text-align:center;letter-spacing:.10em}
+ .hud-stats{width:100%;gap:4px;justify-content:space-between}
+ .hud-stats span,.hud-stats button{font-size:11px;padding:8px 7px;border-radius:12px}
+ .energy-ui{top:92px;left:11px;width:164px}
+ .world-label{top:92px;right:11px;left:auto;font-size:10px}
+}

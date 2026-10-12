@@ -302,7 +302,8 @@ function showScreen(title,message,buttons){
  const actions=$('screenActions');actions.replaceChildren();
  for(const b of buttons){const btn=document.createElement('button');btn.textContent=b.text;btn.className=b.secondary?'secondary':'';btn.onclick=b.action;actions.appendChild(btn)}
 }
-let characterPreviews,importedBunnyPreview;
+let characterPreviews;
+const importedPreviewCache=new Map();
 function shop(tab='characters'){
  if(typeof tab!=='string')tab='characters';
  if(!characterPreviews)characterPreviews=renderCharacterPreviews(CHARS,BIOMES);
@@ -320,14 +321,13 @@ function shop(tab='characters'){
    else {$('shopMessage').textContent='Collect more gold coins to unlock '+c.name;}
   };
   grid.appendChild(button);
-  if(c.id==='bunny'){
-   importedBunnyPreview??=renderImportedPreview('bunny',BIOMES.meadow.sky);
-   importedBunnyPreview.then(source=>{
-    if(!source||!grid.contains(button))return;
-    const image=button.querySelector('.char-thumb');
-    if(image)image.src=source;
-   });
-  }
+  if(!importedPreviewCache.has(c.id))
+   importedPreviewCache.set(c.id,renderImportedPreview(c.id,BIOMES[c.biome].sky));
+  importedPreviewCache.get(c.id).then(source=>{
+   if(!source||!grid.contains(button))return;
+   const image=button.querySelector('.char-thumb');
+   if(image)image.src=source;
+  });
  }
  $('wallet').textContent=profile.coins;
  showShopTab(tab);

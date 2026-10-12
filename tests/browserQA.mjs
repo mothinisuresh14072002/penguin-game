@@ -187,10 +187,14 @@ try{
   assert.equal(before.players[0].id,'bunny');
   assert.equal(before.players[1].id,'penguin');
   await page.locator('#pauseRace').click();
+  // The renderer may advance while Playwright delivers a click under software
+  // WebGL. Measure *after* paused is true, not before initiating the click.
+  await page.waitForFunction(()=>window.__pawverseRaceQA().paused===true);
+  const pausedDistance=(await state(page)).players[0].distance;
   await wait(350);
   const after=await state(page);
   assert.equal(after.paused,true);
-  assert.ok(Math.abs(after.players[0].distance-before.players[0].distance)<1.5);
+  assert.ok(Math.abs(after.players[0].distance-pausedDistance)<.001);
   await snap(page,'06-duo-landscape');
   await close();
  });

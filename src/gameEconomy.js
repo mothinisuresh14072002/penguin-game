@@ -99,15 +99,15 @@ export function claimGoal(profile,period,id,now=new Date()){
  profile.coins=whole(profile.coins)+state.reward;
  return {coins:state.reward,id,period};
 }
-export function openSurpriseBox(profile,{free=false,animal='bunny',rng=Math.random,now=new Date()}={}){
+export function openSurpriseBox(profile,{free=false,found=false,animal='bunny',rng=Math.random,now=new Date()}={}){
  const e=synchronizeEconomy(profile,now),today=dailyKey(now);
- if(free){
+ if(free&&!found){
   if(e.freeBoxDay===today)return null;
- }else{
+ }else if(!found){
   if(whole(profile.coins)<55)return null;
   profile.coins-=55;
  }
- if(free)e.freeBoxDay=today;
+ if(free&&!found)e.freeBoxDay=today;
  // Weighted, bounded virtual-reward prize table; no cash or payment.
  const roll=Math.min(.99999,Math.max(0,Number(rng())||0));
  if(roll<.50){

@@ -64,12 +64,12 @@ function sound(frequency=440,duration=.08,type='sine',volume=.065){
 let running=false,paused=false,ended=false,playerLane=1,targetLane=1,playerY=0,velocityY=0,sliding=0,shield=0,magnet=0,boost=0,energy=100,runCoins=0,runFood=0,distance=0,speed=10,clockTime=0,spawnNext=25,invincible=0;
 const laneX=[-2.6,0,2.6],entities=[],decor=[],scrollItems=[],hue={ice:0x64c7ee,snow:0xecfaff,rock:0x50697c};
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x80caef);scene.fog=new THREE.FogExp2(0xb9e8ff,.014);
+scene.background=new THREE.Color(0x80caef);scene.fog=new THREE.FogExp2(0xb9e8ff,.0075);
 const camera=new THREE.PerspectiveCamera(57,innerWidth/innerHeight,.1,300);
 camera.position.set(0,6.7,16.9);camera.lookAt(0,1.38,-21);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6));
-renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.42;
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 document.body.prepend(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xd5f4ff,0x3f8bae,2.7));
@@ -584,7 +584,7 @@ function tick(now){
   parkDetails?.update(distance);
   glacierDetails?.update(distance,clockTime);
   farmDetails?.update(distance);
-  landmarks?.update(clockTime);
+  landmarks?.update(clockTime,distance);
   journeyArt?.update(distance);
   for(let i=0;i<laneDashes.length;i++){
    laneDashes[i].position.z=loopZ(Math.floor(i/2),8,distance,24,11);
@@ -607,8 +607,8 @@ function tick(now){
  animateAnimal(character,clockTime,run,playerY>.05);
  character.update?.(dt,clockTime,run,playerY>.05);
  // Characters occupy the lower part of the view like the reference art.
- character.group.scale.x=.90;character.group.scale.z=.90;
- character.group.scale.y=.90*(sliding>0?.53:(playerY>.05?1.04:1));
+ character.group.scale.x=1.03;character.group.scale.z=1.03;
+ character.group.scale.y=1.03*(sliding>0?.53:(playerY>.05?1.04:1));
  if(run&&playerY<=.02&&sliding<=0&&clockTime-lastStepSound>.25){lastStepSound=clockTime;sound(165+(Math.floor(clockTime*10)%3)*21,.047,'triangle',.014)}
  // Wider field of view at higher speeds makes acceleration more noticeable.
  const desiredFov=55+(Math.min(58,speed)-18)*.15;

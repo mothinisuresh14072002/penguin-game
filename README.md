@@ -294,6 +294,23 @@ lightweight milestones, not seven new downloadable maps.
 local two-player races still prioritize fair competition and independent
 world scenery. The shop remains available from the main game menu.
 
+## 🎨 HD visual foundation (October 2026)
+
+- New `src/graphicsQuality.js`: adaptive desktop HD / mobile balanced
+  raster resolution and soft-shadow settings. Forced `?quality=hd`
+  is available for visual comparisons.
+- New `src/hdSurface.js`: repeatable procedural bump maps shared across
+  painted foliage and wood/earth materials.
+- Sharper 1024×1024 canvas-painted biome road textures with subtle relief,
+  while preserving the original seven track styles.
+- Cumulus layering in the stationary sky shader, without making the
+  sky scroll at the road speed.
+- All seven names are enabled in `src/modelAssets.js` and the shop
+  preview renderer; binary 3D model authoring is still pending.
+- Automated tests cover graphics tier selection, material classification,
+  sky setup and asset mapping; real phone performance and visual art review
+  are still required.
+
 ## 🎮 Gameplay and features
 
 | Feature | How it works |
@@ -428,19 +445,37 @@ penguin-game/
 └── .github/workflows/build.yml   CI workflow
 ~~~
 
-## 🐰 Bringing in a custom bunny GLB
+## ✨ HD rendering and all seven 3D animal models
 
-The optional `public/models/bunny.glb` file can override Bella Bunny **only if it has usable painted materials or texture information**. Unpainted white Meshy exports are deliberately skipped: the colourful procedural bunny remains visible instead.
+The game now offers a higher-resolution **desktop HD rendering mode** with
+up to 2× device pixel ratio, 2048px soft shadows, more detailed 1024px
+road textures, subtle material bump relief on foliage/wood, and soft
+procedural cumulus in the 3D sky. Mobile and two-player mode automatically
+use lighter render settings to protect frame rate. On the game URL, use
+`?quality=hd` to request HD or `?quality=balanced` for a lighter mode.
 
-To add your own properly textured model, put `bunny.glb` in `public/models/`, then run:
+**These renderer changes do not magically turn simple procedural meshes
+into the professionally textured animals in the user's reference art.**
 
-~~~cmd
-git add public/models/bunny.glb
-git commit -m "Add textured Bella Bunny model"
-git push origin main
-~~~
+Every hero can now be replaced with an *authored, painted* `.glb` file
+by putting the correctly named model in `public/models/`:
+`bunny.glb`, `unicorn.glb`, `horse.glb`, `cat.glb`,
+`dog.glb`, `penguin.glb`, and `cow.glb`. The game loads these
+optional files in solo play and the two-player race and previews them
+in the character shop. Missing, invalid, or plain uncoloured meshes
+retain the current playable procedural fallback.
 
-The imported GLB is fitted to the game height and uses included animation clips when present; unrigged models only receive a basic bob animation. **This model binary is not currently committed to the repository.** See [GLB installation notes](public/models/README.md).
+**Recommended production asset workflow:** Sculpt and rig each chibi animal
+in Blender (or acquire legitimately licensed models), author 1K–2K PBR
+colour/normal/roughness textures, check the rear-view running silhouette,
+export as GLB with embedded animation, place the file in `public/models/`,
+and commit/push it. Use the same asset approach for more intricate biome
+props in future. See the [seven-model installation guide](public/models/README.md)
+for filenames and requirements.
+
+**Current status:** No seven finished, professionally textured and rigged
+animal GLB binaries were added by this graphics pass, and pixel-level
+fidelity to the promotional reference has not yet been demonstrated.
 
 ## 📱 Android prototype
 

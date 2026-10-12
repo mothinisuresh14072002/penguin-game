@@ -19,10 +19,10 @@ export function createAnimal(id, palette = {}) {
   const mats = new Map();
   function m(hex, shiny=false) {
     const key = String(hex) + (shiny?'s':'m');
-    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn'||id==='horse'||id==='cat')&&!shiny
+    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn'||id==='horse'||id==='cat'||id==='dog')&&!shiny
       ? new THREE.MeshPhysicalMaterial({
          color:hex,roughness:.88,metalness:0,
-         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:id==='horse'?0xffdcaa:id==='cat'?0xffd9b2:0xffe9e2),
+         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:id==='horse'?0xffdcaa:id==='cat'?0xffd9b2:id==='dog'?0xffedc9:0xffe9e2),
          clearcoat:.02
         })
       : new THREE.MeshStandardMaterial({
@@ -53,9 +53,13 @@ export function createAnimal(id, palette = {}) {
     ell(root,m(0xd8f5bd),0,.77,.44,.35,.10,.08);
   }
   if(id==='dog'){
-    ell(root,m(0xffffff),0,.9,.43,.45,.48,.17);
-    ell(root,m(0xd65b66),0,1.28,.24,.55,.085,.49);
-    ell(root,gold,0,1.19,.64,.13,.13,.07);
+    // Fluffy bib and actual red collar with a visible gold name tag.
+    ell(root,m(0xfff8e6),0,.91,.44,.45,.48,.17);
+    const collar=ell(root,m(0xd95c71),0,1.28,.20,.55,.085,.49);
+    collar.name='dog-red-collar';
+    const tag=ell(root,gold,0,1.17,.63,.13,.13,.07);
+    tag.name='dog-collar-tag';
+    ell(root,m(0xfff8e8),0,.87,-.44,.41,.45,.19);
   }
   if(id==='cow'){
     ell(root,m(0x33313a),-.28,1.10,.41,.17,.24,.12,.23);
@@ -122,8 +126,12 @@ export function createAnimal(id, palette = {}) {
       ell(ear,m(0xf6b4c8),0,.26,.13,.095,.17,.05);
       ears.push(ear);
     }else if(id==='dog'){
-      const ear=groupAt(face,side*.53,.28,-.02);
-      ell(ear,m(0xb6815c),side*.16,-.14,.02,.25,.43,.15,side*.55);
+      // Long ears are hinged so they flop and trail during running.
+      const ear=groupAt(face,side*.53,.30,-.02);
+      ear.name=side<0?'dog-left-floppy-ear':'dog-right-floppy-ear';
+      ell(ear,m(0xb78156),side*.20,-.20,-.02,.24,.45,.19,side*.49);
+      ell(ear,m(0xe6b18b),side*.28,-.31,-.19,.15,.23,.075,side*.42);
+      ell(ear,m(0xf6cfad),side*.33,-.47,-.17,.12,.13,.09);
       ears.push(ear);
     }else if(id==='cow'){
       const ear=groupAt(face,side*.61,.27,-.08);
@@ -373,11 +381,27 @@ export function createAnimal(id, palette = {}) {
       ell(face,m(0xf2a2b4),side*.45,.72,-.18,.11,.15,.065);
     }
   }else if(id==='dog'){
-    ell(rear,m(0xfff2cf),0,1.03,-.48,.43,.50,.16);
-    ell(rear,m(0xb88555),0,2.17,-.49,.42,.22,.095);
-    for(const side of [-1,1])ell(face,m(0xba835a),side*.65,.18,-.12,.23,.36,.15,side*.47);
-    ell(rear,m(0xe85b5d),0,1.3,-.49,.51,.09,.12);
-    ell(rear,m(0xffd478),0,1.20,-.57,.13,.12,.10);
+    // Rounded cream haunches and plush shoulder tufts read well
+    // from the small rear-view camera.
+    const creamFur=m(0xfff5df);
+    ell(rear,creamFur,0,1.03,-.48,.43,.50,.16);
+    ell(rear,m(0xb98258),0,2.18,-.48,.39,.23,.10);
+    for(const side of [-1,1]){
+      ell(rear,creamFur,side*.37,.76,-.36,.26,.34,.21,side*.17);
+      ell(rear,m(0xf8dbbd),side*.39,.45,-.44,.20,.15,.17);
+      ell(rear,creamFur,side*.37,1.20,-.37,.23,.22,.18,side*.32);
+      ell(face,m(0xb98661),side*.63,.12,-.17,.20,.33,.16,side*.39);
+    }
+    const rearCollar=ell(rear,m(0xd95c71),0,1.31,-.48,.53,.11,.17);
+    rearCollar.name='dog-collar-back';
+    const tag=ell(rear,m(0xffd478),0,1.20,-.64,.12,.13,.065);
+    tag.name='dog-gold-tag';
+    // Small harness patch and heart make Dodo distinct from other pups.
+    const badge=groupAt(rear,0,.92,-.65);
+    badge.name='dog-park-heart';
+    for(const side of [-1,1])ell(badge,m(0xf3a2b2),side*.09,.035,0,.10,.11,.06);
+    const heart=ell(badge,m(0xeb7795),0,-.09,-.025,.15,.13,.06);
+    heart.rotation.z=Math.PI/4;
   }else if(id==='penguin'){
     ell(rear,m(0x172333),0,1.06,-.43,.50,.59,.15);
     ell(rear,m(0x182536),0,1.94,-.46,.52,.51,.12);
@@ -399,7 +423,9 @@ export function createAnimal(id, palette = {}) {
     ? [root.getObjectByName('unicorn-left-wing'),root.getObjectByName('unicorn-right-wing')]
     : null;
   const catTail=id==='cat'?tail:null;
-  return {group:root,pivotL,pivotR,feet,ears,tail,face,mane,wings,catTail};
+  const dogEars=id==='dog'?ears:null;
+  const dogTail=id==='dog'?tail:null;
+  return {group:root,pivotL,pivotR,feet,ears,tail,face,mane,wings,catTail,dogEars,dogTail};
 }
 
 // Character animation uses bones/groups, not just translating a static drawing.
@@ -412,6 +438,15 @@ export function animateAnimal(actor, t, moving=true, airborne=false) {
   if(actor.ears)for(let i=0;i<actor.ears.length;i++)actor.ears[i].rotation.z=Math.sin(t*7+i)*.075*pace;
   if(actor.tail)actor.tail.rotation.x=Math.sin(t*9)*.16*pace;
   if(actor.catTail)actor.catTail.rotation.z=Math.sin(t*5+.7)*.22*pace;
+  if(actor.dogTail){
+    actor.dogTail.rotation.y=Math.sin(t*12)*.41*pace;
+    actor.dogTail.rotation.z=Math.sin(t*8+.9)*.19*pace;
+  }
+  if(actor.dogEars)for(let i=0;i<actor.dogEars.length;i++){
+    const side=i===0?-1:1;
+    actor.dogEars[i].rotation.z=side*(.13+Math.sin(t*11+i*.9)*.20*pace);
+    actor.dogEars[i].rotation.x=Math.sin(t*10+i*.8)*.11*pace;
+  }
   if(actor.face)actor.face.rotation.z=Math.sin(t*7)*.026*pace;
   // A little mane sway and wing flutter make the unicorn read as a living
   // character even from the small rear-view runner camera.

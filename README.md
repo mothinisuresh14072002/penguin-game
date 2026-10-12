@@ -1,386 +1,224 @@
 <div align="center">
 
-<img src="assets/readme-banner.svg" alt="Polar Dash — animated Arctic game artwork" width="100%" />
+<img src="assets/readme-banner.svg" alt="Pawverse Dash — illustrative animated Arctic banner" width="100%" />
 
-# ❄️ POLAR DASH
-### Seven Cute Heroes · Seven Living Worlds · Two-Friend Races
+# 🐾 PAWVERSE DASH
 
-**Fast 3D animal endless runner with a solo adventure and same-screen, two-player split-screen races. Built using Three.js and Vite.**
+### Seven cute heroes. Seven magical worlds. One endless adventure.
 
-[![Three.js](https://img.shields.io/badge/Three.js-3D%20WebGL-0b192c?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-f7df1e?style=for-the-badge&logo=javascript&logoColor=111)](https://developer.mozilla.org/docs/Web/JavaScript)
-[![Vite](https://img.shields.io/badge/Vite-Build%20Tool-646cff?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
-[![Android](https://img.shields.io/badge/Android-Capacitor-3ddc84?style=for-the-badge&logo=android&logoColor=111)](https://capacitorjs.com/)
+**Colourful Three.js 3D endless runner · Solo adventure · Two-player split-screen race**
 
 [![Build](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml/badge.svg)](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml)
-[![GitHub stars](https://img.shields.io/github/stars/mothinisuresh14072002/penguin-game?style=social)](https://github.com/mothinisuresh14072002/penguin-game/stargazers)
+[![Three.js](https://img.shields.io/badge/Three.js-WebGL-222222?logo=threedotjs&logoColor=white)](https://threejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)](https://vite.dev/)
+[![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Android%20prototype-74c69d)](#-android-prototype)
 
-**[🎮 Play](#-quick-start) · [🏁 Two Friends](#-two-friend-split-screen-race) · [🐾 Characters](#-meet-the-runners-and-their-worlds) · [✨ Three.js](#-threejs-visual-experience) · [📱 Android](#-android-build-prototype)**
+[Play locally](#-quick-start) · [Animal worlds](#-meet-the-seven-heroes) · [Controls](#-controls) · [Two-player race](#-two-player-duo-race) · [Contribute](#-contributing)
 
 </div>
 
 ---
 
-## 🌈 Welcome to the Animal Worlds
+## ✨ About the game
 
-*Pick your animal. Explore its world. Keep running!* 
+**Pawverse Dash** (formerly Polar Dash) is a cheerful 3D runner where each animal explores a world of its own. Run down a three-lane path, avoid obstacles, jump, slide, grab coins and energy, and unlock more friends. The active character controls the **entire world**: the sky, colour palette, painted roadway, scenery, landmarks and obstacle selection.
 
-**Polar Dash** is a playful 3D endless runner featuring seven cute animals and seven character-linked environments. The upgraded characters are playable Three.js models with expressive eyes, ears, tails, and real animated limbs—not still images pasted into the scene. Choose Bella Bunny for a flower meadow, Ula Unicorn for pastel magic, Pip Penguin for a frozen glacier, or one of the other animal friends. Switch lanes, jump, slide, gather coins and energy, and chase your personal best.
+The game runs in the browser with **Three.js + Vite**. It uses lightweight procedural 3D art, runtime-generated road textures and sky shaders. The same codebase includes a **local two-player race** with independently themed views.
 
-The world and characters are generated with **procedural Three.js geometry**, not prebuilt downloadable character models. This is an **open-source, playable prototype** with a mobile-oriented interface—not yet a fully tested or published Play Store release.
+> **Visual fidelity:** The concept illustration is a design target, **not** an actual in-game screenshot. Current models and props are stylized procedural meshes; achieving film-quality fur, perfectly sculpted animals and detailed environments requires additional textured/rigged assets. The header SVG is illustrative artwork, not a live render.
 
-<div align="center">
+## 🌎 Meet the seven heroes
 
-| 🌈 Seven themed worlds | 🏁 Two-player races | ⚡ Speed & energy | 🪙 Collect & unlock |
-|:---:|:---:|:---:|:---:|
-| Character-linked nature | Same-screen split view | Faster progression | Earn coins in solo |
+| Hero | World | Road and main landmarks | Solo unlock |
+|:---|:---|:---|---:|
+| 🐰 **Bella Bunny** | Bunny Meadow 🌼 | Soft dirt, daisies, fences, leafy trees and a burrow | Free |
+| 🦄 **Ula Unicorn** | Unicorn Skyland 🌈 | Glowing pastel bridge, rainbow arch, floating islands and crystals | 150 coins |
+| 🐴 **Hugo Horse** | Horse Prairie 🌾 | Golden earth, windmills, hay and rustic fences | 250 coins |
+| 🐱 **Coco Cat** | Cat Town 🏘️ | Warm cobblestones, pastel houses and a clock tower | 350 coins |
+| 🐶 **Dodo Dog** | Puppy Park 🌳 | Stepping-stone path, pond, flowers and gazebo | 450 coins |
+| 🐧 **Pip Penguin** | Penguin Glacier ❄️ | Blue ice road, snow trees, crystals and glacial arch | Free |
+| 🐮 **Mimi Cow** | Mimi Farm 🚜 | Countryside trail, crops, red barn, silo and fences | 700 coins |
 
-</div>
+**Change the character → change the world.** World transitions happen when choosing a hero in the Character Shop. The two-player mode creates each runner's biome separately.
 
-## 🎮 Gameplay
+## 🎮 Gameplay and features
 
-| Feature | Current implementation |
-|---|---|
-| **Solo endless run** | Progressive acceleration (18 → 58 world units/s), safe obstacle paths and faster pacing |
-| **Movement** | Switch between three lanes, jump and slide |
-| **Hazards** | World-dependent rocks, spikes, wooden obstacles and an Arctic lion |
-| **Energy** | Energy decreases during a run; green pickups refill it |
-| **Rewards** | Collect coins and spend them in the character shop |
-| **Power-ups** | Shield and temporary coin magnet |
-| **Progress** | Best distance, coins and unlocked characters stored locally |
-| **Controls** | Keyboard and mobile swipe gestures; two-player controls are independent |
-| **Audio** | Optional, lightweight synthesized gameplay effects |
+| Feature | How it works |
+|:---|:---|
+| **Solo endless run** | Accelerate from 18 up to 58 world units/second, with increasingly challenging obstacle rows |
+| **Movement** | Three lanes, jumping, sliding and smooth lane transitions |
+| **Obstacles** | World-specific rocks, spikes, raised log gates, and an Arctic lion |
+| **Collision reliability** | Swept collision detection checks the full travelled distance, side movement and jump height **between frames**, preventing common high-speed tunnelling |
+| **Log gates** | Slide underneath the raised wooden beam; jumping and dodging remain options according to clearance |
+| **Energy and rewards** | Collect coins; energy pickups replenish stamina |
+| **Solo power-ups** | Shield blocks a hit; magnet helps collect coins |
+| **Shop** | Spend earned coins to unlock heroes; selected hero and world are remembered |
+| **Visuals** | Animated animal limbs, custom third-person cameras, parallax nature, bright sky shaders, clouds, seven textured track styles and distinct 3D landmarks |
+| **Progress** | Best distance, coin balance and unlocks saved in browser local storage |
+| **Sound** | Optional synthesized effects with an on/off toggle |
 
-## 🏁 Two-Friend Split-Screen Race
+### 🛡️ Collision fix
 
-**NEW: Two people can play on the same desktop or mobile screen.** Choose any two of the seven animal heroes, each with their own nature world. Both runners face the **same generated obstacle-lane pattern**, so the race is fair even when the worlds look different.
+Obstacles are no longer checked solely at the character's end-of-frame position. Both modes now use `src/collisionMath.js` to find overlapping **time intervals** along the runner's forward path, lane transition and jump.
 
-- **Desktop:** two side-by-side Three.js views, with one shared renderer and two cameras.
-- **Portrait phone:** two views stacked vertically. Each player swipes within their own half of the screen.
-- **Goal:** first runner to **1,000m** wins. Obstacles temporarily slow a runner and reduce energy; pickups recharge it.
-- **Scoring:** separate distance, coins, energy, hits and a winner/results screen. The race is local multiplayer, not online networking.
-- **Fair play:** all seven heroes are available to select in the race lobby, regardless of solo shop unlocks. Race coins are session scores and do not change the solo wallet.
+- Fast animals cannot skip a rock or spike between two frames.
+- Moving across lanes checks the path taken, not just the lane where the animal ends the frame.
+- High jumps can clear obstacles only when the character is above the obstacle at the time of crossing.
+- Sliding can clear overhead wooden log gates, not rocks and spikes.
+- After a shielded hit or during brief post-impact immunity, a contacted obstacle disappears rather than visibly passing through the animal.
 
-| Action | Player 1 (🔷) | Player 2 (🔶) |
+Automated tests cover these cases in `tests/collisionMath.test.js`. Runtime appearance and game feel still need manual desktop/mobile playtesting.
+
+## 🏁 Two-player Duo Race
+
+Two friends race on **one screen**. Desktop uses side-by-side views; portrait mobile stacks the views. Each player chooses from all seven animals and has their own camera, themed scenery, distance, energy, coins, and obstacle-contact feedback. The obstacle-lane pattern is deterministic for fairness.
+
+**Objective:** Be the first to reach **1,000 metres**. Obstacles slow and drain energy; energy pickups help recovery. The mode is local multiplayer, **not** online networking.
+
+| Action | Player 1 | Player 2 |
 |:---|:---|:---|
-| Change lane | `A` / `D` | `J` / `L` |
+| Left / right | `A` / `D` | `J` / `L` |
 | Jump | `W` or Space | `I` |
 | Slide | `S` | `K` |
-| Mobile control | Swipe inside first viewport | Swipe inside second viewport |
-| Pause | `P` or Escape, or on-screen button | Shared pause |
+| Mobile | Swipe inside first viewport | Swipe inside second viewport |
+| Pause | `P`, Escape or on-screen button | Shared pause |
 
-**[Open race mode in your local browser](race.html)** after running the dev server, or visit **http://localhost:5173/race.html**.
+Race entry point: **http://localhost:5173/race.html** when the dev server is running.
 
-### Speed, game feel & animated nature
+## 🚀 Quick start
 
-Both modes accelerate over time. Solo runs progress toward 58 world units/second; the **two-player race reaches 70 world units/second**. Camera field of view widens with speed, and lane markings, roadside nature and clouds stream past the camera. Race obstacle spacing scales with speed so an increasing pace does not automatically create impossible lane changes. The road surface itself remains continuous.
+**Requirements:** Node.js, npm, a modern browser with WebGL. Use **Windows CMD**, VS Code terminal or Antigravity terminal.
 
-## 🐰 Import your own Bella Bunny 3D model
+### First installation
 
-The game supports a **real GLB character replacement** for Bella Bunny,
-using the local file `public/models/bunny.glb` rather than a remote service.
-
-- **Solo game:** replaces the procedural Bella Bunny when the GLB is present.
-- **Two-friend race:** either player may select the same imported bunny.
-- **Character shop:** generates a portrait from the imported model.
-- **Safe behavior:** missing or broken files fall back to the existing playable bunny.
-- **Automatic fitting:** model scaling, centering and foot placement are adjusted to match the game.
-- **Animation:** imported clips play when provided. Unrigged meshes get a subtle running bounce as a temporary fallback.
-
-**Asset status:** The source-code integration is complete. The uploaded
-`white_mesh.glb` is a 5.7 MB untextured, unrigged mesh. To activate it in
-your GitHub checkout, download it from the conversation, rename it to
-`bunny.glb`, and add it under `public/models/`. See
-[model installation instructions](public/models/README.md).
-The binary is not included in the repository yet.
-
-```cmd
-git add public/models/bunny.glb
-git commit -m "Add Bella Bunny GLB asset"
-git push origin main
-```
-
-## 🐾 Meet the Runners and Their Worlds
-
-Pick your favourite chibi-style animal. Each character changes the **sky, track colours, scenery and available obstacles**.
-
-| Character | Home world | Unlock |
-|:---|:---|---:|
-| 🐰 Bella Bunny | 🌷 Bunny Meadow — flowers and soft grass | Free |
-| 🦄 Ula Unicorn | 🌈 Unicorn Skyland — pastel palette and star-shaped crystal scenery | 150 coins |
-| 🐴 Hugo Horse | 🌾 Horse Prairie — grass-themed track and hay bales | 250 coins |
-| 🐱 Coco Cat | 🏘️ Cat Town — little houses and warm-toned paths | 350 coins |
-| 🐶 Dodo Dog | 🌳 Puppy Park — trees and green paths | 450 coins |
-| 🐧 Pip Penguin | ❄️ Penguin Glacier — ice formations and snow | Free |
-| 🐮 Mimi Cow | 🚜 Mimi Farm — mini barns and farm-coloured track | 700 coins |
-
-Progress from earlier versions is retained where possible. The penguin remains freely available.
-
-
-### 🎨 World-switching implementation
-
-Selecting a character applies its environment configuration using the `CHARS` and `BIOMES` definitions in `src/main.js`. The game updates the sky and fog, road materials, scenery props, world label and generated obstacle types. Worlds are **linked to the selected character**, not separate level downloads.
-
-| Environment | Decorative objects | Obstacle pool |
-| --- | --- | --- |
-| 🌷 Bunny Meadow | Flowers | Rocks, wooden barriers |
-| 🌈 Unicorn Skyland | Sparkling crystal shapes | Spikes, rocks |
-| 🌾 Horse Prairie | Hay bales | Wooden barriers, rocks |
-| 🏘️ Cat Town | Little houses | Wooden barriers, rocks |
-| 🌳 Puppy Park | Trees | Wooden barriers, rocks |
-| ❄️ Penguin Glacier | Ice crystals | Spikes, rocks, lion |
-| 🚜 Mimi Farm | Barns | Wooden barriers, rocks |
-
-The earlier v2 saved profile is read if a v3 profile does not yet exist. Bella Bunny and Pip Penguin are both free; legacy unlocks for removed characters are not carried over as equivalents.
-
-## 🎨 Seven Character Worlds — reference-inspired visual update
-
-Polar Dash now gives every animal its **own full 3D landscape**, not just a
-different colour on the same snow track. Selecting a playable animal through
-the Character Shop switches the character, road surface, decorations, sky,
-distant horizon and unique physical landmarks together. In split-screen
-races, both player worlds are built independently from their selected animals.
-
-| Character | Painted running track | New signature landmarks |
-|---|---|---|
-| Bella Bunny 🐰 | Warm earthy path with grassy edges | Daisy fences, trees, rabbit burrow |
-| Ula Unicorn 🦄 | Glossy lavender/pink crystal bridge | Rainbow, crystal spires, floating islands |
-| Hugo Horse 🐴 | Golden prairie dirt with wheel tracks | Windmills, hay bales, rustic fences |
-| Coco Cat 🐱 | Staggered warm cobblestones | Pastel houses, flower boxes, clock tower |
-| Dodo Dog 🐶 | Cream park stepping-stones | Pond, gazebo, flower gardens |
-| Pip Penguin 🐧 | Shimmering blue frozen lane | Glacial arch, snowy pines and ice peaks |
-| Mimi Cow 🐮 | Sunlit farmland earth | Red barn, silo, crops and farm fences |
-
-The road is an actual Three.js plane with procedurally painted,
-repeatable texture maps, lighting and simulated track motion. Additional
-models are built from real 3D geometry, with a smaller, more cinematic
-rear-facing avatar/camera layout. Animal geometry now includes distinctive
-**back-of-head, coat and tail markings** as well as the face seen in shop
-previews. Snow particles are restricted to the icy/magical worlds.
-
-**Quality note:** This is a substantial visual improvement using procedural
-3D art; it is **not a pixel-exact recreation** of the supplied cinematic
-reference illustration. Film-quality textures, fur, detailed sculpting, and
-skeletal animation require properly authored or commercially licensed
-character/environment assets. A plain white, untextured Meshy model now
-automatically falls back to the more colourful game character instead of
-hiding it. The source model file `public/models/bunny.glb` is still not
-included in this repository.
-
-New files: `src/roadArt.js`, `src/landmarkArt.js`, and
-`tests/referenceWorlds.test.js`. The test suite verifies the seven
-road styles, landmark systems and identifiable animal back designs.
-
-## 🌄 Upgraded Three.js 3D Environments
-
-The game already had real Three.js characters, collision handling and third-person
-cameras. Its latest visual upgrade replaces the old shared Arctic background
-mountains with biome-specific **three-dimensional horizons** and a lightweight
-**camera-following spherical sky shader**.
-
-| World | Distant 3D scenery |
-|---|---|
-| 🌷 Bunny Meadow | Layered green rolling hills |
-| 🌈 Unicorn Skyland | Floating magical islands |
-| 🌾 Horse Prairie | Soft grassy ridges |
-| 🏘️ Cat Town | Distant town skyline |
-| 🌳 Puppy Park | Leaf-green hills |
-| ❄️ Penguin Glacier | Layered icy mountain peaks |
-| 🚜 Mimi Farm | Countryside hills |
-
-- Animated clouds, butterflies, detailed habitat props, and scrolling road
-  markers provide depth cues in both solo and two-player modes.
-- All seven habitats reuse five common environment geometry buffers, reducing
-  repeated GPU allocations and simplifying cleanup between races.
-- The skyline shader and biome configurations have automated geometry tests.
-- The imported high-quality bunny GLB remains **optional and not checked into
-  this repository**. The current procedural fallback characters are genuine
-  animated 3D meshes, but their appearance is not equivalent to high-end
-  textured, rigged models from cinematic concept art.
-
-**Performance note:** Production build and unit tests are automated. FPS,
-lighting and asset appearance still require testing on physical phones and in
-desktop browsers.
-
-## ✨ Three.js Visual Experience
-
-<table>
-<tr>
-<td width="50%">
-
-### 🌍 Procedural Animal Worlds
-
-- Seven configurable sky, track and fog palettes
-- New character-specific 3D biomes with richer scenery: floral meadows and shrubs, rainbow crystal arches, hay and fences, colourful town cottages, park trees and ponds, icy formations, and red farm barns
-- Animated parallax clouds and scene-specific nature details
-- Butterflies in meadow, farm, prairie and park
-- World-specific decorations: flowers, crystals, hay, houses, trees, ice and barns
-- Biome-dependent obstacle pools
-- Procedural mountains and track scenery
-- Animated snowfall, lighting, shadows and tone mapping
-
-</td>
-<td width="50%">
-
-### 🐾 Cute Animated 3D Characters
-
-- Bunny, unicorn, small horse, cat, dog, penguin and cow
-- Shared detailed procedural 3D model system with oversized sparkling eyes, cheeks, hair, tails, ears and character-specific outfits or markings
-- 3D character thumbnails rendered directly from the playable models inside the shop
-- Articulated arms, feet, ears and tails with running/bouncing animations
-- Jump and slide motion
-- Smooth-follow camera
-- Runtime mesh generation
-
-</td>
-</tr>
-</table>
-
-**About the visuals:** the animated Arctic banner above is illustrative of the penguin's glacier world, not every biome or an in-game screenshot. The illustrated banner at the top is an SVG animation. The **real-time 3D gameplay** runs through Three.js when the project is launched. GitHub does not execute interactive WebGL/Three.js inside a README. The models are currently stylized procedural 3D art with more detailed rounded features, not the exact high-end cinematic characters depicted in concept images. Exact reference fidelity would require custom sculpted and rigged 3D assets, textures and further performance work.
-
-> 📸 **Gameplay preview:** An actual recorded gameplay GIF or screenshot will be added after a successful browser/device capture. This README intentionally does not present concept art as a real in-game screenshot.
-
-## 🚀 Quick Start
-
-**Requirements:** Node.js and npm. Use CMD or the integrated terminal in VS Code / Antigravity.
-
-```cmd
+~~~cmd
 git clone https://github.com/mothinisuresh14072002/penguin-game.git
 cd penguin-game
 npm install
 npm run dev
-```
+~~~
 
-Then open **http://localhost:5173/** (or the address displayed by Vite).
+Open **http://localhost:5173/** or the Vite address displayed in your terminal.
 
-### 🎮 Controls
+### Already cloned? Update your game
 
-| Action | Windows / Keyboard | Phone / Tablet |
-|---|---|---|
-| Switch left or right | `A` / `D` or `←` / `→` | Swipe left / right |
-| Jump | `W`, `Space`, `↑` | Swipe up / tap |
-| Slide | `S`, `↓` | Swipe down |
-| Pause | `P` | Pause button |
-| Sound effects | Sound toggle | Sound toggle |
+Run inside your local `penguin-game` folder:
 
-### Build for Web
+~~~cmd
+git pull origin main
+npm install
+npm run dev
+~~~
 
-```cmd
+### 🕹️ Controls
+
+| Action | Keyboard | Mobile |
+|:---|:---|:---|
+| Move lanes | `A` / `D` or `←` / `→` | Swipe left/right |
+| Jump | `W`, `↑` or Space | Swipe up/tap |
+| Slide | `S` or `↓` | Swipe down |
+| Pause | `P` or pause button | Pause button |
+| Sound | Sound button | Sound button |
+
+### Build and test
+
+~~~cmd
 npm run build
 npm run preview
-```
+~~~
 
-The optimized web output is generated in `dist/` and includes both `index.html` and `race.html`.
+Run the complete unit test suite:
 
-### Run Race Tests
+~~~cmd
+node --test tests/*.test.js
+~~~
 
-```cmd
-node --test tests/raceMath.test.js
-```
+`dist/` contains both solo and race HTML entry points. GitHub Actions runs syntax checks, unit tests and a Vite production build after pushes to `main` and on pull requests.
 
-## 🏗️ Project Architecture
+## 🗂️ Project structure
 
-```text
+~~~text
 penguin-game/
-├── .github/
-│   └── workflows/build.yml     # GitHub Actions build checks
-├── assets/
-│   └── readme-banner.svg       # Animated README banner
-├── docs/
-│   └── PLAY_STORE_RELEASE.md   # Android release checklist
+├── index.html                    Solo runner entry point
+├── race.html                     Two-player race
 ├── src/
-│   ├── main.js                 # Solo 3D runner + immersive animal biomes
-│   ├── animalArt.js            # Seven detailed animated character meshes
-│   ├── worldArt.js             # Seven themed 3D nature / environment prop sets
-│   ├── visual3d.js             # GPU sky dome and biome-specific 3D horizons
-│   ├── characterPreviews.js    # Renders shop thumbnails from actual game models
-│   ├── style.css               # Solo UI
-│   ├── race.js                 # Local two-player split-screen game
-│   ├── race.css                # Desktop and mobile race interface
-│   └── raceMath.js             # Testable deterministic race mechanics
-├── tests/
-│   ├── raceMath.test.js        # Fairness, coin, speed, road tests
-│   └── artAssets.test.js       # Seven characters and seven environment smoke tests
-├── race.html                   # Two-friend race entry point
-├── vite.config.js              # Bundles both HTML entry points
-├── index.html                  # Game interface
-├── package.json                # Dependencies and scripts
-├── capacitor.config.json      # Android app wrapper configuration
-├── PRIVACY.md                  # Prototype privacy notes
-└── README.md
-```
+│   ├── main.js                   Solo gameplay, world selection, rendering
+│   ├── race.js                   Split-screen multiplayer logic
+│   ├── collisionMath.js          Swept hazard contact detection
+│   ├── raceMath.js               Race physics and fair obstacle generation
+│   ├── animalArt.js              Seven procedural animated chibi animals
+│   ├── modelAssets.js            Optional GLB character loading and fallback
+│   ├── characterPreviews.js      3D portraits in the character shop
+│   ├── roadArt.js                Seven repeated illustrated road textures
+│   ├── landmarkArt.js            Biome-specific 3D landmark collections
+│   ├── worldArt.js               Reusable roadside scenery geometry
+│   ├── visual3d.js               Sky dome and distant horizon
+│   ├── style.css                 Solo game interface
+│   └── race.css                  Split-screen interface
+├── tests/                        Collision, race, worlds and art tests
+├── public/models/               Optional downloaded GLB assets
+├── assets/readme-banner.svg      Illustrative animated README header
+├── capacitor.config.json         Android wrapper configuration
+├── docs/PLAY_STORE_RELEASE.md    Android release checklist
+├── PRIVACY.md                    Prototype privacy notes
+└── .github/workflows/build.yml   CI workflow
+~~~
 
-### How It Works
+## 🐰 Bringing in a custom bunny GLB
 
-```mermaid
-flowchart TD
-    A[Start Game] --> B[Choose Character]
-    B --> C[Three.js Game Loop]
-    C --> D[Switch Lanes / Jump / Slide]
-    D --> E{Obstacle or Pickup?}
-    E -->|Obstacle| F[Collision / Shield Check]
-    E -->|Coin / Energy| G[Update Rewards]
-    F --> H{Run Over?}
-    H -->|No| C
-    H -->|Yes| I[Save Best Score & Coins]
-    G --> C
-    I --> B
-```
+The optional `public/models/bunny.glb` file can override Bella Bunny **only if it has usable painted materials or texture information**. Unpainted white Meshy exports are deliberately skipped: the colourful procedural bunny remains visible instead.
 
-## 📱 Android Build (Prototype)
+To add your own properly textured model, put `bunny.glb` in `public/models/`, then run:
 
-This repository includes **Capacitor** configuration for building an Android wrapper around the web game. Install **Android Studio**, an Android SDK and a compatible JDK.
+~~~cmd
+git add public/models/bunny.glb
+git commit -m "Add textured Bella Bunny model"
+git push origin main
+~~~
 
-```cmd
+The imported GLB is fitted to the game height and uses included animation clips when present; unrigged models only receive a basic bob animation. **This model binary is not currently committed to the repository.** See [GLB installation notes](public/models/README.md).
+
+## 📱 Android prototype
+
+The project includes **Capacitor** support for packaging the web game in Android Studio.
+
+~~~cmd
 npm install
 npm run build
 npm run android:add
 npm run android:sync
 npm run android:open
-```
+~~~
 
-**Note:** Run `npm run android:add` only for the first Android project creation. For later updates, use `npm run android:sync`.
+Run `npm run android:add` only if no Android project already exists. For subsequent changes, just use `npm run android:sync`.
 
-The game **has not yet been signed, published or confirmed through a complete Android device-test cycle**. For release requirements, see **[Google Play release guide](docs/PLAY_STORE_RELEASE.md)** and **[Privacy notes](PRIVACY.md)**.
+**Release status:** The game has **not** been signed, confirmed on physical Android devices, submitted or published to Google Play. See [release checklist](docs/PLAY_STORE_RELEASE.md) and [privacy policy](PRIVACY.md).
 
-## 🗺️ Roadmap
+## 🛣️ Roadmap
 
-- [x] Procedural 3D environments for seven animal worlds
-- [x] Three-lane running, jumping and sliding
-- [x] Seven articulated chibi-style animal characters with richer home worlds and in-game 3D shop portraits
-- [x] Coins, energy, shields and magnets
-- [x] Local progress saving and basic audio cues
-- [x] Capacitor Android configuration
-- [x] GitHub Actions build workflow with deterministic race-physics unit tests
-- [x] Two friends racing on the same screen (desktop split view, portrait stacked view)
-- [x] Faster acceleration, animated lane markers, moving nature and sky clouds
-- [x] Spherical 3D shader sky and custom distant terrain for seven habitats
-- [x] Reusable environment geometry buffers and horizon tests
-- [x] GitHub Actions production build verified
-- [ ] Add automated gameplay/browser tests
-- [ ] Higher-fidelity character meshes, textures and skeletal animation
-- [ ] Device-tested 60 FPS performance targets and graphical quality presets
-- [ ] Browser and physical-device playtesting of both-player controls and framerate
-- [ ] Additional levels, biomes, missions and onboarding
-- [ ] Capture authentic gameplay footage, screenshots and trailer
-- [ ] Sign, test and submit the Android App Bundle to Google Play
+- [x] Seven selectable characters with matching 3D environments
+- [x] Distinct road textures, landscape colours, props and landmarks
+- [x] Solo gameplay with coins, energy, shields and magnets
+- [x] Local, fair, same-screen two-player race
+- [x] Reliable high-speed swept collision logic and automated regression tests
+- [x] Custom sky shader, animated weather and world scenery
+- [x] CI checks for JavaScript, world art, race physics and builds
+- [ ] Browser-based gameplay automation and physical-device collision testing
+- [ ] Fully textured and rigged cinematic-quality character assets
+- [ ] Mobile FPS tuning, accessibility review and quality presets
+- [ ] Original real gameplay screenshots, trailer and complete onboarding
+- [ ] Signed and tested Android release
 
-## 🤝 Contributing
+## 🤝 Contributing and feedback
 
-Contributions, bug reports and improvements are welcome. Feel free to [open an issue](https://github.com/mothinisuresh14072002/penguin-game/issues) or submit a pull request.
+Bug reports and contributions are welcome through [GitHub Issues](https://github.com/mothinisuresh14072002/penguin-game/issues). Please include the affected character/world, mode (solo/race), browser or device, and reproduction steps.
 
-## 👩‍💻 Project Author
-
-Developed and maintained by **[Mothini S.](https://github.com/mothinisuresh14072002)**.
+**Created and maintained by [Mothini S.](https://github.com/mothinisuresh14072002).**
 
 <div align="center">
 
----
+**🐾 PAWVERSE DASH — every animal has a world.**
 
-### 🐾 Every Animal Has a World
-
-**Made with Three.js · Explore seven magical animal worlds**
-
-[⬆ Back to Top](#️-polar-dash)
+Built with Three.js · Vite · JavaScript · Capacitor
 
 </div>

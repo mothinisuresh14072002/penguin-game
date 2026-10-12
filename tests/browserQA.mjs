@@ -9,7 +9,7 @@ import path from 'node:path';
 const ORIGIN=process.env.PAWVERSE_QA_ORIGIN || 'http://127.0.0.1:5173';
 const OUT=path.resolve('qa-artifacts');
 await fs.mkdir(OUT,{recursive:true});
-const errors=[],results=[];
+const errors=[],results=[],contexts=new Set();
 let browser;
 const test=async (name,fn)=>{
  const start=Date.now();
@@ -20,6 +20,9 @@ const test=async (name,fn)=>{
  }catch(error){
   results.push({name,status:'FAIL',error:String(error.stack||error),elapsedMs:Date.now()-start});
   console.error('FAIL',name,error.stack||error);
+ }finally{
+  // A failed assertion should not keep a WebGL context alive for later tests.
+  for(const context of [...contexts]){await context.close().catch(()=>{});contexts.delete(context);}
  }
 };
 async function openGame(url,opts={}){
@@ -33,6 +36,7 @@ async function openGame(url,opts={}){
    localStorage.setItem('penguin-ice-runner-v3',JSON.stringify(profile));
   },opts.profile);
  }
+ contexts.add(context);
  const page=await context.newPage();
  page.setDefaultTimeout(18000);
  const pageErrors=[];
@@ -46,7 +50,7 @@ async function openGame(url,opts={}){
   window.__pawverseQA || window.__pawverseRaceQA
  ),{timeout:45000});
  const check=()=>assert.deepEqual(pageErrors,[],'No uncaught browser errors');
- const close=async()=>{check();await context.close()};
+ const close=async()=>{check();await context.close();contexts.delete(context)};
  return {context,page,check,close};
 }
 const state=page=>page.evaluate(()=>window.__pawverseQA?.()||window.__pawverseRaceQA?.());
@@ -123,7 +127,7 @@ try{
   const b=await state(page);
   assert.ok(Math.abs(a.distance-b.distance)<.001);
   await page.locator('#pauseBtn').click();
-  await page.waitForFunction(d=>window.__pawverseQA().distance>d,{arg:b.distance+.5,timeout:10000});
+  await page.waitForFunction(d=>window.__pawverseQA().distance>d,b.distance+.5,{timeout:10000});
   await snap(page,'05-solo-running');
   await close();
  });

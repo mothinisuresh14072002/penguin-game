@@ -3,8 +3,17 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Put exported GLB files in public/models/. Missing or invalid models fall back
 // to the existing procedural animal rather than breaking either game mode.
+// All seven heroes support authored, painted / rigged 3D model overrides.
+// Filenames are intentionally fixed: only assets the project owner installs
+// under public/models/ will load; no unlicensed third-party URLs.
 export const CHARACTER_ASSETS = Object.freeze({
-  bunny: 'models/bunny.glb'
+  bunny: 'models/bunny.glb',
+  unicorn: 'models/unicorn.glb',
+  horse: 'models/horse.glb',
+  cat: 'models/cat.glb',
+  dog: 'models/dog.glb',
+  penguin: 'models/penguin.glb',
+  cow: 'models/cow.glb'
 });
 
 const loader = new GLTFLoader();

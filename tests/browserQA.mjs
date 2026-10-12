@@ -129,6 +129,8 @@ try{
     assert.equal(selected.selected,id);
     assert.equal(selected.biome,biome);
     assert.equal(selected.meadowFlowerStrips,biome==='meadow'?5:0);
+    assert.equal(selected.rainbowCrystalStrips,biome==='rainbow'?4:0,
+      'Unicorn crystals should only exist in Rainbow Skyland');
     assert.equal(await page.locator('#worldName').textContent(),label);
     // Remove only the modal's visibility for a frame so the artifact is a
     // truthful screenshot of the currently rendered 3D world, unobstructed.
@@ -222,6 +224,21 @@ try{
   await page.keyboard.press('KeyW');
   await page.keyboard.press('KeyI');
   await page.waitForFunction(()=>window.__pawverseRaceQA().players.every(p=>p.y>0),{timeout:10000});
+  await close();
+ });
+ await test('Unicorn racer gets Skyland while other player keeps separate world',async()=>{
+  const {page,close}=await openGame('/race.html?qa=1');
+  await page.locator('#p1Pick').selectOption('unicorn');
+  await page.locator('#p2Pick').selectOption('cat');
+  await page.locator('#raceStart').click();
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2);
+  const a=await state(page);
+  assert.equal(a.players[0].id,'unicorn');
+  assert.equal(a.players[1].id,'cat');
+  assert.equal(a.players[0].rainbowCrystalStrips,4);
+  assert.equal(a.players[1].rainbowCrystalStrips,0);
+  assert.equal(a.players[0].meadowFlowerStrips,0);
+  await snap(page,'09-unicorn-vs-cat');
   await close();
  });
  await test('Mobile portrait race renders a vertical pair with touch controls',async()=>{

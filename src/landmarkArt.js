@@ -283,15 +283,43 @@ export function createWorldLandmarks(scene,id='meadow'){
   }
  }else if(id==='farm'){
   for(const x of [-6.5,6.5])fence(x,-6,0xf3d6a0);
-  barn(13,-39);
-  p('cylinder',0xcfc5b1,20,5,-46,2.5,10,2.5);
-  p('cone',0xa16a62,20,10.7,-46,2.8,2.4,2.8);
-  for(let i=0;i<36;i++){
-   const x=(i%2?-9:-14)+(i%3)*.65,z=-8-Math.floor(i/2)*5.1;
-   p('cylinder',0x55a74f,x,.85,z,.13,1.7,.13);
-   orb(0xf5d36c,x,1.6,z,.27,.38,.23);
+  barn(14,-39);
+  // Timber frame, glowing loft window and white X-shaped barn doors.
+  for(const side of [-1,1]){
+   cube(0xffe5c8,14+side*2.55,2.8,-36.25,.24,5.0,.15);
+   const brace=cube(0xffe5c8,14+side*.55,1.52,-36.10,.13,2.40,.15);
+   brace.rotation.z=side*.58;
   }
-  for(const [x,z] of [[-18,-66],[18,-78]])tree(x,z,1.2,0x74b874);
+  cube(0xf7f1d9,14,5.0,-36.08,.89,.80,.12);
+  orb(0xffd883,14,5.0,-36.00,.32,.32,.09);
+  p('cylinder',0xcfc5b1,21,5,-46,2.5,10,2.5);
+  p('cone',0xa16a62,21,10.7,-46,2.8,2.4,2.8);
+  // Turn an old-fashioned little windmill beside the fields.
+  const wx=-18,wz=-74;
+  p('cylinder',0xf2dfb7,wx,4.8,wz,1.20,9.60,1.20);
+  p('cone',0xc38861,wx,10.1,wz,1.65,2.2,1.65);
+  const mill=new THREE.Group();
+  mill.name='mimi-farm-windmill-rotor';
+  mill.position.set(wx,8.0,wz+1.30);root.add(mill);
+  part(mill,'sphere',0x9a7254,0,0,.17,.34,.34,.18);
+  for(let k=0;k<4;k++){
+   const angle=k*Math.PI/2;
+   const blade=part(mill,'box',0xffe7c2,
+     Math.sin(angle)*1.35,Math.cos(angle)*1.35,.08,.34,2.55,.12);
+   blade.rotation.z=-angle;
+  }
+  rotors.push({rotor:mill,phase:.23,speed:.34});
+  // Farm gate and planted countryside stay outside the runner's 3 lanes.
+  for(let i=0;i<32;i++){
+   const x=(i%2?-11:-15)+(i%3)*.76,z=-8-Math.floor(i/2)*5.1;
+   p('cylinder',0x59a254,x,.85,z,.13,1.7,.13);
+   orb(0xf7d36b,x,1.58,z,.27,.35,.23);
+  }
+  for(const [x,z] of [[-18,-45],[19,-78],[-20,-111]])tree(x,z,1.2,0x78bb6f);
+  for(let i=0;i<8;i++){
+   const side=i%2?-1:1;
+   daisies(side*(7.0+(i%3)*.45),-9-i*12,6);
+  }
  }
  function dispose(){
   scene.remove(root);

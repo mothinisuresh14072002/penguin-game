@@ -95,15 +95,15 @@ export function createRoadArtwork(scene,id,{length=260,centerZ=-107,surfaceY=.29
  // Refill texture in setBiome; the material and GPU texture are reused when
  // changing animal, avoiding new WebGL buffers during character selection.
  const canvas=texture.image;
- canvas.width=512;canvas.height=512;
+ canvas.width=1024;canvas.height=1024;
  const ctx=canvas.getContext('2d');
  if(!ctx)throw new Error('Road canvas unavailable');
  texture.colorSpace=THREE.SRGBColorSpace;
  texture.wrapS=texture.wrapT=THREE.RepeatWrapping;
  texture.repeat.set(1,length/6);
- texture.anisotropy=4;
+ texture.anisotropy=8;
  const material=new THREE.MeshStandardMaterial({
-  map:texture,roughness:.81,metalness:.02,side:THREE.DoubleSide
+  map:texture,bumpMap:texture,bumpScale:.045,roughness:.81,metalness:.02,side:THREE.DoubleSide
  });
  const mesh=new THREE.Mesh(geometry,material);
  mesh.name='painted-3d-runway';
@@ -115,10 +115,11 @@ export function createRoadArtwork(scene,id,{length=260,centerZ=-107,surfaceY=.29
  let style=id;
  function setBiome(next){
   style=ROAD_STYLES[next]?next:'meadow';
-  draw(ctx,style,512);
+  draw(ctx,style,1024);
   texture.needsUpdate=true;
   material.roughness=style==='arctic'||style==='rainbow'?.28:.88;
   material.metalness=style==='arctic'?.19:.02;
+  material.bumpScale=style==='arctic'||style==='rainbow'?.013:.055;
   material.emissive.setHex(style==='rainbow'?0x582866:0x000000);
   material.emissiveIntensity=style==='rainbow'?.12:0;
   material.needsUpdate=true;

@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {createAnimal, animateAnimal} from '../src/animalArt.js';
-import {populateHabitat} from '../src/worldArt.js';
+import {populateHabitat,WORLD_GEOMETRIES} from '../src/worldArt.js';
 
 const ids=['bunny','unicorn','horse','cat','dog','penguin','cow'];
 const habitats=['flower','star','hay','house','tree','ice','barn'];
@@ -40,7 +40,8 @@ test('all seven natural habitats create actual Three.js meshes',()=>{
    if(o.isMesh){count++;geometry.add(o.geometry);materials.add(o.material)}
   });
   assert.ok(count>=5,type+' should contain 3D scenery objects');
-  for(const g of geometry)g.dispose();
+  for(const g of geometry)assert.ok(WORLD_GEOMETRIES.has(g),'Biome should reuse prebuilt geometry');
   for(const m of materials)m.dispose();
  }
+ assert.equal(WORLD_GEOMETRIES.size,5);
 });

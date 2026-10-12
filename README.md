@@ -196,6 +196,39 @@ Real Chromium tests verify Penguin-versus-Dog world separation.
 A pixel-exact recreation of the cinematic reference still requires
 professional textured, rigged 3D assets and device-specific visual testing.
 
+## 🚜 Phase 7: Mimi Cow and Mimi Farm
+
+**Mimi Cow** completes the first reference-inspired visual pass across all
+seven heroes. Her soft white PBR coat has asymmetric charcoal patches,
+rounded baby-calf haunches, pink inner ears, little ivory horns and a
+pastel-pink bow visible from the rear gameplay camera. Her tail swishes
+and her ears respond subtly to running; the front-facing character-shop
+model has a broader, blushing muzzle.
+
+**Mimi Farm** now features:
+
+- Four endlessly scrolling countryside scenery strips with **232 corn
+  stalks** and **120 sunflower plants**, including thousands of individual
+  yellow petals and green leaf meshes instanced into just 36 scenery draw
+  calls.
+- Two-sided rustic fences, stacked hay rolls, corn cobs and golden flowers
+  kept safely outside the three running lanes.
+- A brighter red barn with white timber details, a silo, a small rotating
+  farm windmill, leafy trees and roadside flower beds.
+- Independent farm scenery in the local two-player race, so Cow can run
+  beside a different animal without sharing or changing their world.
+
+Automated unit tests verify Mimi's visible patches, bow and tail animation,
+crop-field draw-call budget, looping scenery, and windmill rotation.
+Real Chromium gameplay tests exercise all seven world switches plus a
+**Cow versus Penguin** split-screen race.
+
+**Visual status — 7/7 upgraded:** Every animal now has dedicated rear-view
+details and custom biome scenery. These remain procedural Three.js models,
+not professionally authored textured and rigged models. The game is still
+not visually identical to the cinematic concept art; real-phone FPS tests
+and manual art-direction acceptance remain outstanding.
+
 ## 🎮 Gameplay and features
 
 | Feature | How it works |
@@ -308,6 +341,7 @@ penguin-game/
 │   ├── townArt.js                Instanced pastel Cat Town buildings and lanterns
 │   ├── parkArt.js                Instanced Puppy Park flowers, bushes and stone path
 │   ├── glacierArt.js             Instanced ice spires, snow drifts and particles
+│   ├── farmArt.js                Instanced sunflower rows, corn stalks and fences
 │   ├── modelAssets.js            Optional GLB character loading and fallback
 │   ├── characterPreviews.js      3D portraits in the character shop
 │   ├── roadArt.js                Seven repeated illustrated road textures
@@ -363,6 +397,7 @@ Run `npm run android:add` only if no Android project already exists. For subsequ
 - [x] Coco Cat Phase 4: green-eyed tabby, moving tail, pastel village and clock tower
 - [x] Dodo Dog Phase 5: floppy-ear puppy, garden scenery, lily pond and off-road gazebo
 - [x] Pip Penguin Phase 6: scarf, flippers, falling snow and crystalline glacier portal
+- [x] Mimi Cow Phase 7: pink bow, spots, animated tail and living sunflower farm
 - [x] Seven selectable characters with matching 3D environments
 - [x] Distinct road textures, landscape colours, props and landmarks
 - [x] Solo gameplay with coins, energy, shields and magnets

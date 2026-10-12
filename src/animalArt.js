@@ -193,9 +193,9 @@ export function createAnimal(id, palette = {}) {
     for(const side of [-1,1]){
       const wing=groupAt(root,side*.49,1.11,-.25);
       wing.name=side<0?'unicorn-left-wing':'unicorn-right-wing';
-      ell(wing,m(0xfbe8ff),side*.18,.08,-.08,.25,.42,.21,side*.52);
-      ell(wing,cream,side*.39,.16,-.13,.22,.34,.16,side*.74);
-      ell(wing,m(0xe7d5ff),side*.53,.04,-.14,.16,.21,.11,side*.9);
+      // A single leaf-shaped wing with a narrow coloured inner vane.
+      ell(wing,m(0xfbe8ff),side*.23,.10,-.08,.17,.34,.12,side*.52);
+      ell(wing,m(0xe7d5ff),side*.34,.13,-.15,.08,.23,.06,side*.63);
     }
   }
   if(id==='horse'){
@@ -350,32 +350,27 @@ export function createAnimal(id, palette = {}) {
       const stripe=i%5,layer=Math.floor(i/5);
       const x=-.30+stripe*.15+(layer%2)*.042;
       const y=.58-layer*.23-(i%3)*.023;
-      const tuft=ell(mane,m(rainbow[stripe]),x,y,-.09,.12,.27+layer*.03,.17,(stripe-2)*-.11);
+      const tuft=ell(mane,m(rainbow[stripe]),x,y,-.09,.079,.25+layer*.022,.102,(stripe-2)*-.11);
       tuft.name='unicorn-mane-strand';
     }
-    for(let i=0;i<8;i++){
-      const stripe=i%5;
-      const x=-.25+(i%4)*.17;
-      ell(mane,m(rainbow[stripe]),x,-.17-Math.floor(i/4)*.26,-.10,.12,.24,.16,(i%2?-.18:.18));
-    }
-    // Tiny iridescent ribbons and an amethyst clasp stay visible from afar.
-    ell(rear,m(0xfefaff),0,1.08,-.51,.33,.37,.15);
+    // Five longer hair tips flow rather than stacking another eight blobs.
+    for(let i=0;i<5;i++)
+      ell(mane,m(rainbow[i]),(i-2)*.14,-.32-(i%2)*.08,-.12,.075,.30,.094,(i-2)*-.10);
+    // Tiny iridescent clasp; no extra marshmallow shape under the hair.
     ell(rear,m(0xa587e3,true),0,1.36,-.64,.15,.16,.075);
     ell(rear,m(0xffe0aa,true),0,1.37,-.70,.08,.08,.055);
     // Rear-facing ear insets complement the shop-facing detail.
     for(const side of [-1,1]){
       ell(face,m(0xf0b7df),side*.45,.72,-.18,.10,.18,.06);
-      ell(rear,m(0xfdf4ff),side*.58,1.08,-.30,.23,.30,.17,side*.42);
-      ell(rear,m(0xdac8fd),side*.74,1.19,-.40,.20,.26,.12,side*.59);
+      ell(rear,m(0xfdf4ff),side*.59,1.09,-.25,.13,.23,.11,side*.42);
     }
   }else if(id==='horse'){
     // A recognisable baby pony from behind: cream rump, rounded haunches,
     // long dark mane and soft fetlocks all read at small runner scale.
     const creamCoat=m(0xffedd5);
-    ell(rear,creamCoat,0,.99,-.47,.46,.51,.19);
+    ell(rear,creamCoat,0,.99,-.40,.38,.42,.075);
     for(const side of [-1,1]){
-      ell(rear,m(0xd7a073),side*.37,.74,-.35,.26,.38,.19,-side*.14);
-      ell(rear,creamCoat,side*.37,.47,-.37,.20,.16,.16);
+      ell(rear,m(0xd7a073),side*.30,.72,-.29,.15,.24,.095,-side*.12);
       ell(face,m(0xf6c8a9),side*.45,.72,-.19,.105,.20,.048);
     }
     const mane=groupAt(rear,0,1.81,-.48);
@@ -385,7 +380,7 @@ export function createAnimal(id, palette = {}) {
       const x=-.29+(i%5)*.145;
       const y=.35-Math.floor(i/5)*.23;
       const strand=ell(mane,m(shades[i%shades.length]),
-        x,y,-.08,.135,.24+Math.floor(i/5)*.035,.16,(i%5-2)*-.11);
+        x,y,-.08,.085,.24+Math.floor(i/5)*.025,.095,(i%5-2)*-.11);
       strand.name='horse-mane-lock';
     }
     // Decorative saddlecloth in muted pastoral cream and dusty rose.
@@ -405,7 +400,7 @@ export function createAnimal(id, palette = {}) {
       mark.name='cat-fur-stripe';
     }
     for(let i=0;i<3;i++)ell(tabby,stripes,0,.65-i*.20,-.07,.22,.07,.065);
-    ell(rear,m(0xffdeb5),0,.79,-.47,.29,.33,.16);
+    ell(rear,m(0xffdeb5),0,.78,-.39,.24,.28,.06);
     // A little lavender scarf with a clear bow on the back.
     const scarf=groupAt(rear,0,1.26,-.49);
     scarf.name='cat-lavender-scarf';
@@ -414,8 +409,7 @@ export function createAnimal(id, palette = {}) {
       .20,.13,.11,side*.35);
     ell(scarf,m(0xffdcb4),0,-.1,-.27,.09,.09,.07);
     for(const side of [-1,1]){
-      ell(rear,m(0xffcb90),side*.35,.62,-.36,.25,.30,.17,side*.19);
-      ell(rear,m(0xffead7),side*.34,.38,-.48,.18,.12,.12);
+      ell(rear,m(0xffcb90),side*.28,.64,-.31,.145,.23,.09,side*.14);
       // Triangular ears remain recognisable from behind.
       ell(face,m(0xf2a2b4),side*.45,.72,-.18,.11,.15,.065);
     }
@@ -423,12 +417,10 @@ export function createAnimal(id, palette = {}) {
     // Rounded cream haunches and plush shoulder tufts read well
     // from the small rear-view camera.
     const creamFur=m(0xfff5df);
-    ell(rear,creamFur,0,1.03,-.48,.43,.50,.16);
-    ell(rear,m(0xb98258),0,2.18,-.48,.39,.23,.10);
+    ell(rear,creamFur,0,1.03,-.42,.35,.42,.075);
+    ell(rear,m(0xb98258),0,2.14,-.43,.30,.18,.065);
     for(const side of [-1,1]){
-      ell(rear,creamFur,side*.37,.76,-.36,.26,.34,.21,side*.17);
-      ell(rear,m(0xf8dbbd),side*.39,.45,-.44,.20,.15,.17);
-      ell(rear,creamFur,side*.37,1.20,-.37,.23,.22,.18,side*.32);
+      ell(rear,creamFur,side*.30,.76,-.30,.16,.24,.10,side*.14);
       ell(face,m(0xb98661),side*.63,.12,-.17,.20,.33,.16,side*.39);
     }
     const rearCollar=ell(rear,m(0xd95c71),0,1.31,-.48,.53,.11,.17);
@@ -447,11 +439,10 @@ export function createAnimal(id, palette = {}) {
     const black=m(0x202c40);
     const feather=m(0x34475f);
     const trim=m(0xd6f5ff);
-    ell(rear,black,0,1.12,-.43,.52,.62,.16);
-    ell(rear,black,0,2.02,-.44,.56,.54,.16);
+    ell(rear,black,0,1.12,-.40,.42,.52,.06);
+    ell(rear,black,0,2.02,-.42,.44,.45,.06);
     for(const side of [-1,1]){
-      ell(rear,feather,side*.43,1.2,-.26,.21,.45,.17,side*.16);
-      ell(rear,trim,side*.43,.78,-.32,.13,.22,.10,side*.22);
+      ell(rear,feather,side*.39,1.17,-.22,.13,.32,.10,side*.16);
       ell(rear,m(0xffd38c),side*.26,.36,-.34,.24,.12,.25);
     }
     const scarf=groupAt(rear,0,1.36,-.48);
@@ -473,8 +464,7 @@ export function createAnimal(id, palette = {}) {
     const spot=m(0x34343b);
     const fur=m(0xfffdf7);
     for(const side of [-1,1]){
-      ell(rear,fur,side*.37,.72,-.37,.27,.38,.18,side*.20);
-      ell(rear,m(0xffe5e7),side*.36,.42,-.47,.18,.13,.13);
+      ell(rear,fur,side*.33,.71,-.32,.15,.23,.08,side*.16);
     }
     const patches=[
       [-.24,1.25,-.51,.34,.36,.10,.25],

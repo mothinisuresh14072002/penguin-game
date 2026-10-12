@@ -5,8 +5,11 @@ import {loopZ,layerTravel,WORLD_LAYERS,JOURNEY_CHAPTERS,journeyChapter} from '..
 test('scene chunks start contiguous across an animal runner track',()=>{
  const positions=Array.from({length:14},(_,i)=>loopZ(i,18,0,14,10));
  assert.equal(positions[0],10);
- for(let i=1;i<positions.length;i++)
-  assert.equal(positions[i-1]-positions[i],18);
+ // A recycled strip can already be one segment *ahead* of the camera,
+ // so check sorted coverage rather than assuming array-index order.
+ const sorted=positions.slice().sort((a,b)=>b-a);
+ for(let i=1;i<sorted.length;i++)
+  assert.equal(sorted[i-1]-sorted[i],18);
 });
 test('ground and near props move smoothly with running, never vanish after first step',()=>{
  const a=loopZ(0,18,0,14,10);

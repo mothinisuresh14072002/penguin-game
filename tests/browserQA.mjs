@@ -31,14 +31,6 @@ async function openGame(url,opts={}){
   deviceScaleFactor:1,
   hasTouch:Boolean(opts.touch),isMobile:Boolean(opts.mobile)
  });
- if(opts.profile){
-  // addInitScript() does not accept an evaluate-style argument; embed the
-  // test fixture literally so it exists before the game's first module runs.
-  const serialized=JSON.stringify(JSON.stringify(opts.profile));
-  await context.addInitScript({content:
-   "localStorage.setItem('penguin-ice-runner-v3',"+serialized+");"
-  });
- }
  contexts.add(context);
  const page=await context.newPage();
  page.setDefaultTimeout(18000);
@@ -49,6 +41,17 @@ async function openGame(url,opts={}){
    pageErrors.push(m.text());
  });
  await page.goto(ORIGIN+url,{waitUntil:'domcontentloaded',timeout:60000});
+ if(opts.profile){
+   // Explicitly seed on the correct origin and reload: this avoids
+   // race/permission differences in browser init scripts and guarantees
+   // the profile is present before the game reads localStorage.
+   await page.evaluate(profile=>{
+    localStorage.setItem('penguin-ice-runner-v3',JSON.stringify(profile));
+   },opts.profile);
+   const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('penguin-ice-runner-v3')));
+   assert.equal(saved.coins,opts.profile.coins,'Browser profile fixture seeded');
+   await page.reload({waitUntil:'domcontentloaded',timeout:60000});
+ }
  await page.waitForFunction(()=>Boolean(
   window.__pawverseQA || window.__pawverseRaceQA
  ),{timeout:45000});
@@ -140,6 +143,12 @@ try{
   await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();
   await page.locator('.char-card').filter({hasText:'Coco Cat'}).click();
   const s=await state(page);
+  const debug=await page.evaluate(()=>({
+    storage:JSON.parse(localStorage.getItem('penguin-ice-runner-v3')),
+    message:document.getElementById('shopMessage').textContent,
+    catCard:[...document.querySelectorAll('.char-card')].find(b=>b.textContent.includes('Coco Cat'))?.textContent
+  }));
+  console.log('Shop purchase diagnostic:',JSON.stringify(debug));
   assert.equal(s.selected,'cat');assert.equal(s.biome,'city');
   assert.match(await page.locator('#worldName').textContent(),/Cat Town/);
   const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('penguin-ice-runner-v3')));

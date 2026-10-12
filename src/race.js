@@ -3,6 +3,7 @@ import './race.css';
 import {createAnimal, animateAnimal} from './animalArt.js';
 import {populateHabitat} from './worldArt.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
+import {create3DBackdrop} from './visual3d.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
 const $ = id => document.getElementById(id);
@@ -62,6 +63,9 @@ function newRacePlayer(ch,index){
  const sun=new THREE.DirectionalLight(0xfff5e5,2.4);sun.position.set(-8,15,6);scene.add(sun);
  const camera=new THREE.PerspectiveCamera(63,1,.1,290);
  camera.position.set(0,6.1,13.6);camera.lookAt(0,1.1,-17);
+ const biomeId={bunny:'meadow',unicorn:'rainbow',horse:'grassland',cat:'city',dog:'park',penguin:'arctic',cow:'farm'}[ch.id]||'meadow';
+ const backdrop=create3DBackdrop(scene,biomeId);
+ backdrop.setBiome(biomeId,ch.sky);
  const turf=material(ch.ground),road=material(ch.road),border=material(ch.accent);
  piece(scene,geom.box,turf,0,-.74,-105,30,1.25,255);
  piece(scene,geom.box,road,0,-.04,-105,9.1,.17,255);
@@ -72,12 +76,7 @@ function newRacePlayer(ch,index){
   const o=piece(scene,geom.box,markMaterial,i%2===0?-1.3:1.3,.06,0,.085,.026,1.9);
   laneMarks.push(o);
  }
- // Layered distant mountains give the runner a natural horizon.
- for(let i=0;i<14;i++){
-  const x=(i-7)*10, h=10+rowRandom(i,4)*13;
-  piece(scene,geom.cone,material(index===0?0xa0c2c4:0xa7bddc),x,h*.48-3,-100-i%3*11,5,h,5);
-  piece(scene,geom.cone,material(0xe7f7fa),x,h*.81-3,-100-i%3*11,2.1,h*.32,2.1);
- }
+ // Character-specific 3D horizon is supplied by visual3d.js.
  const skyClouds=[],cloudMat=material(0xffffff);
  for(let i=0;i<14;i++){
   const cloud=new THREE.Group();
@@ -90,7 +89,7 @@ function newRacePlayer(ch,index){
   scenery.push(prop(scene,ch.scenery,ch,x,z,i));
  }
  const hero=createHero(ch.id,scene);
- return {scene,camera,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
+ return {scene,camera,backdrop,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
 }
 function obstacle(player,kind,lane,at){
  const root=new THREE.Group();root.position.set(LANE_POSITIONS[lane],0,2-(at-player.distance));player.scene.add(root);
@@ -127,6 +126,7 @@ function spawnRow(player){
  player.nextSpawn+=spawnSpacing(raceSpeed(at));
 }
 function clearPlayer(player){
+ player.backdrop?.dispose();
  if(player.hero?.imported&&player.hero.mixer)player.hero.mixer.stopAllAction();
  const geometries=new Set(),materials=new Set();
  player.scene.traverse(object=>{
@@ -231,6 +231,7 @@ function updatePlayer(p,dt){
 }
 function renderView(p,rect){
  const width=rect.w,height=rect.h;
+ p.backdrop.update(p.time,p.camera);
  p.camera.aspect=width/height;
  p.camera.updateProjectionMatrix();
  renderer.setViewport(rect.x,rect.y,width,height);

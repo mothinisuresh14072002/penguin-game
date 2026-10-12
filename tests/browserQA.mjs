@@ -32,9 +32,12 @@ async function openGame(url,opts={}){
   hasTouch:Boolean(opts.touch),isMobile:Boolean(opts.mobile)
  });
  if(opts.profile){
-  await context.addInitScript(profile=>{
-   localStorage.setItem('penguin-ice-runner-v3',JSON.stringify(profile));
-  },opts.profile);
+  // addInitScript() does not accept an evaluate-style argument; embed the
+  // test fixture literally so it exists before the game's first module runs.
+  const serialized=JSON.stringify(JSON.stringify(opts.profile));
+  await context.addInitScript({content:
+   "localStorage.setItem('penguin-ice-runner-v3',"+serialized+");"
+  });
  }
  contexts.add(context);
  const page=await context.newPage();

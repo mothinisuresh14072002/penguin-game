@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {loopZ} from './worldMotion.js';
 
 // Coco Cat's moving pastel town: reusable 3D facades, flower boxes, glowing
 // lanterns and street details. No model downloads or per-frame mesh creation.
@@ -118,12 +119,8 @@ export function createTownDetails(scene){
   }
  }
  function update(distance=0,time=0){
-  const cycle=TOWN_STRIPS*TOWN_STRIP_LENGTH;
-  const forward=Math.max(0,distance)*.82;
-  for(let i=0;i<strips.length;i++){
-   const z=((i*TOWN_STRIP_LENGTH+forward)%cycle+cycle)%cycle;
-   strips[i].position.z=14-z;
-  }
+  for(let i=0;i<strips.length;i++)
+   strips[i].position.z=loopZ(i,TOWN_STRIP_LENGTH,Math.max(0,distance),TOWN_STRIPS,14);
   mats.lamp.emissiveIntensity=.30+Math.sin(time*1.8)*.055;
  }
  function dispose(){

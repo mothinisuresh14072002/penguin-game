@@ -89,6 +89,29 @@ tests verify the selected worlds, dynamic scenery, and character animation.
 image at film-quality detail needs professionally textured/rigged meshes,
 art-directed lighting, and manual visual approval on real devices.
 
+## 🌾 Phase 3: Hugo Horse and Horse Prairie
+
+Hugo Horse now has a softer **chestnut PBR coat**, a cream-coloured rump,
+expressive muzzle, darker flowing pony mane, soft hooves, and a tiny
+pastel saddlecloth. The mane sways while the animal runs.
+
+**Horse Prairie** now features:
+
+- Five reusable countryside strips with **550 individual wheat stalks**,
+  leafy grass, golden seed heads, and cylindrical hay rolls.
+- Three **spinning windmills** with real moving 3D blade groups.
+- A cottage, rustic fences, green trees and golden grassland colours.
+- A looping pathside wheatfield that leaves all gameplay lanes clear.
+- Real-time character-specific creation/disposal in solo and multiplayer,
+  so only the Horse player gets this extra scenery.
+
+The wheatfield uses **instanced meshes** to limit draw calls. Unit tests
+cover animation, strip recycling, windmill rotation, cleanup and the
+number of instanced objects. Browser tests verify Horse-vs-Dog race
+scenery stays independent. As in phases 1 and 2, this remains
+hand-crafted procedural 3D rather than a cinematic textured animal
+model; physical-device performance and visual review are still needed.
+
 ## 🎮 Gameplay and features
 
 | Feature | How it works |
@@ -197,6 +220,7 @@ penguin-game/
 │   ├── animalArt.js              Seven procedural animated chibi animals
 │   ├── meadowArt.js              Instanced flowers and gravel for Bella Bunny
 │   ├── skylandArt.js             Floating islands and instanced Unicorn crystals
+│   ├── prairieArt.js             Instanced golden wheat, hay and countryside
 │   ├── modelAssets.js            Optional GLB character loading and fallback
 │   ├── characterPreviews.js      3D portraits in the character shop
 │   ├── roadArt.js                Seven repeated illustrated road textures
@@ -248,6 +272,7 @@ Run `npm run android:add` only if no Android project already exists. For subsequ
 
 - [x] Bella Bunny Phase 1: plush rear-view details and flowing flower meadow
 - [x] Ula Unicorn Phase 2: animated mane, pearlescent coat and sparkling Rainbow Skyland
+- [x] Hugo Horse Phase 3: chestnut baby pony, golden wheatfields and animated windmills
 - [x] Seven selectable characters with matching 3D environments
 - [x] Distinct road textures, landscape colours, props and landmarks
 - [x] Solo gameplay with coins, energy, shields and magnets

@@ -71,8 +71,8 @@ function prop(scene,type,ch,x,z,index){
 function newRacePlayer(ch,index){
  const scene=new THREE.Scene();
  scene.background=new THREE.Color(ch.sky);scene.fog=new THREE.FogExp2(ch.sky,.0075);
- scene.add(new THREE.HemisphereLight(0xecfbff,0x728da1,2.8));
- const sun=new THREE.DirectionalLight(0xfff5e5,2.4);sun.position.set(-8,15,6);scene.add(sun);
+ scene.add(new THREE.HemisphereLight(0xecfbff,0x728da1,1.65));
+ const sun=new THREE.DirectionalLight(0xfff5e5,2.25);sun.position.set(-8,15,6);scene.add(sun);
  const camera=new THREE.PerspectiveCamera(63,1,.1,290);
  camera.position.set(0,6.7,16.9);camera.lookAt(0,1.38,-21);
  const biomeId={bunny:'meadow',unicorn:'rainbow',horse:'grassland',cat:'city',dog:'park',penguin:'arctic',cow:'farm'}[ch.id]||'meadow';

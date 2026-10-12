@@ -14,6 +14,7 @@ export const LANDMARK_THEMES=Object.freeze({
 export function createWorldLandmarks(scene,id='meadow'){
  const root=new THREE.Group();root.name='landmarks-'+id;scene.add(root);
  const rotors=[];
+ const clockHands=[];
  const geo={
   sphere:new THREE.SphereGeometry(1,14,10),
   box:new THREE.BoxGeometry(1,1,1),
@@ -183,10 +184,15 @@ export function createWorldLandmarks(scene,id='meadow'){
   cube(0xf3d2a0,0,8,-100,4.5,16,4.5);
   p('cone',0xc37565,0,17.5,-100,3.8,4.2,3.8);
   orb(0xf7edda,0,11,-97.64,1.1,1.1,.12);
-  for(const a of [0,Math.PI/2]){
-   const hand=cube(0x6f6f74,Math.cos(a)*.22,11+Math.sin(a)*.22,-97.47,.12,.66,.10);
-   hand.rotation.z=a;
+  // Working village clock: both hands rotate about the proper clock pivot.
+  const clock=new THREE.Group();clock.name='cat-town-clock';
+  clock.position.set(0,11,-97.46);root.add(clock);
+  for(const [index,length] of [.73,.47].entries()){
+   const pivot=new THREE.Group();pivot.name=index?'clock-hour-hand':'clock-minute-hand';
+   clock.add(pivot);clockHands.push({pivot,speed:index?.11:1.32,phase:index?-.65:.28});
+   part(pivot,'box',0x64545a,0,length*.43,.10,.09,length,.08);
   }
+  orb(0xf7dda8,0,11,-97.34,.12,.12,.07);
  }else if(id==='park'){
   for(const [x,z] of [[-11,-19],[11,-28],[-12,-53],[12,-76]])tree(x,z,1.5,0x51b16f);
   orb(0x7ed3e9,-12,.02,-49,5,.07,7);
@@ -232,6 +238,7 @@ export function createWorldLandmarks(scene,id='meadow'){
  }
  function update(time=0){
   for(const {rotor,phase,speed} of rotors)rotor.rotation.z=-time*speed+phase;
+  for(const {pivot,phase,speed} of clockHands)pivot.rotation.z=phase-time*speed*.028;
  }
  return {root,dispose,update,meshCount:count,theme:id};
 }

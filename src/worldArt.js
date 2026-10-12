@@ -2,12 +2,17 @@ import * as THREE from 'three';
 
 // Stylized, fully 3D biome scenery. Artwork stays in the game world and
 // responds to motion and lighting; none of these props are flat image cards.
+// All decorations share just five meshes' source geometries. This prevents
+// hundreds of identical GPU buffers during long solo runs and 2-player races.
+// These are lifetime assets: character/scene cleanup must not dispose them.
+const ball=new THREE.SphereGeometry(1,12,9);
+const box=new THREE.BoxGeometry(1,1,1);
+const cone=new THREE.ConeGeometry(1,1,8);
+const cylinder=new THREE.CylinderGeometry(1,1,1,9);
+const torus=new THREE.TorusGeometry(1,.12,6,28,Math.PI);
+export const WORLD_GEOMETRIES = new Set([ball,box,cone,cylinder,torus]);
+
 export function populateHabitat(parent, type, index, addMesh) {
-  const ball=new THREE.SphereGeometry(1,12,9);
-  const box=new THREE.BoxGeometry(1,1,1);
-  const cone=new THREE.ConeGeometry(1,1,8);
-  const cylinder=new THREE.CylinderGeometry(1,1,1,9);
-  const torus=new THREE.TorusGeometry(1,.12,6,28,Math.PI);
   const add=(geometry,color,x,y,z,sx,sy,sz)=>addMesh(parent,geometry,color,x,y,z,sx,sy,sz);
   const orb=(c,x,y,z,sx,sy,sz)=>add(ball,c,x,y,z,sx,sy,sz);
   const brick=(c,x,y,z,sx,sy,sz)=>add(box,c,x,y,z,sx,sy,sz);

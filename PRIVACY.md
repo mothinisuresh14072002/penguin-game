@@ -1,8 +1,8 @@
-# Privacy policy — Polar Dash (prototype)
+# Privacy policy — Pawverse Dash (prototype)
 
 Last updated: 9 October 2026
 
-Polar Dash is an offline-first, single-player game. In its current source code, it stores game progress (coins, best score, characters unlocked, selected character) on the device using browser localStorage.
+Pawverse Dash is an offline-first game with solo and local same-screen multiplayer. In its current source code, it stores game progress (coins, best score, characters unlocked, selected character) on the device using browser localStorage.
 
 The current game code does **not** include analytics SDKs, advertising SDKs, user accounts, in-app purchase services, or a backend that receives player data. It does not request access to contacts, camera, microphone, or precise location.
 

@@ -12,6 +12,7 @@ import {createMeadowDetails} from './meadowArt.js';
 import {createSkylandDetails} from './skylandArt.js';
 import {createPrairieDetails} from './prairieArt.js';
 import {createTownDetails} from './townArt.js';
+import {createParkDetails} from './parkArt.js';
 
 const $ = id => document.getElementById(id);
 const CHARS=[
@@ -138,6 +139,7 @@ let meadowDetails=null;
 let skylandDetails=null;
 let prairieDetails=null;
 let townDetails=null;
+let parkDetails=null;
 // Fast-moving lane markings make the ice, meadow and farm roads feel alive.
 // This is decorative only: stable base track remains solid beneath every runner.
 const laneDashes=[];
@@ -219,6 +221,9 @@ function applyBiome(){
  townDetails?.dispose();
  townDetails=picked.biome==='city'?createTownDetails(scene):null;
  townDetails?.update(distance,clockTime);
+ parkDetails?.dispose();
+ parkDetails=picked.biome==='park'?createParkDetails(scene):null;
+ parkDetails?.update(distance);
  deepIce.color.setHex(biome.edge);rockMat.color.setHex(biome.hazards.includes('spike')?0x6a8ea4:0x917e75);
  clearScenery();
  for(let i=0;i<60;i++){
@@ -452,6 +457,7 @@ function tick(now){
   skylandDetails?.update(distance,clockTime);
   prairieDetails?.update(distance);
   townDetails?.update(distance,clockTime);
+  parkDetails?.update(distance);
   landmarks?.update(clockTime);
   for(let i=0;i<laneDashes.length;i++){
    const period=24*8;
@@ -508,6 +514,7 @@ if(new URLSearchParams(location.search).has('qa')){
   rainbowCrystalStrips:skylandDetails?.strips.length??0,
   prairieWheatStrips:prairieDetails?.strips.length??0,
   catTownStrips:townDetails?.strips.length??0,
+  puppyParkStrips:parkDetails?.strips.length??0,
   visibleObstacles:entities.filter(e=>!e.taken&&!['coin','energy','shield','magnet'].includes(e.kind)).length
  });
 }

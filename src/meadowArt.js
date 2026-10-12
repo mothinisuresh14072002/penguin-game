@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {loopZ} from './worldMotion.js';
 
 // Phase 1: a dense, lightweight Bella Bunny meadow, rendered using instancing.
 // Five reusable scenery strips create thousands of flower/grass details with a
@@ -103,12 +104,8 @@ export function createMeadowDetails(scene){
   }
  }
  function update(distance){
-  const travel=Math.max(0,distance)*.86;
-  const period=MEADOW_STRIPS*MEADOW_STRIP_LENGTH;
-  for(let i=0;i<strips.length;i++){
-   const d=((i*MEADOW_STRIP_LENGTH+travel)%period+period)%period;
-   strips[i].position.z=13-d;
-  }
+  for(let i=0;i<strips.length;i++)
+   strips[i].position.z=loopZ(i,MEADOW_STRIP_LENGTH,Math.max(0,distance),MEADOW_STRIPS,13);
  }
  function dispose(){
   scene.remove(root);

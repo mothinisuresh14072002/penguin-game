@@ -19,10 +19,10 @@ export function createAnimal(id, palette = {}) {
   const mats = new Map();
   function m(hex, shiny=false) {
     const key = String(hex) + (shiny?'s':'m');
-    if (!mats.has(key)) mats.set(key,id==='bunny'&&!shiny
+    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn')&&!shiny
       ? new THREE.MeshPhysicalMaterial({
          color:hex,roughness:.88,metalness:0,
-         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(0xffe9e2),
+         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:0xffe9e2),
          clearcoat:.02
         })
       : new THREE.MeshStandardMaterial({
@@ -137,16 +137,24 @@ export function createAnimal(id, palette = {}) {
     }
   }
   if(id==='unicorn'){
-    triangle(face,gold,0,.72,.36,.16,.69);
+    // Gold horn with subtle pearlescent winding bands visible in the shop
+    // and from above in gameplay.
+    const horn=triangle(face,gold,0,.84,-.035,.165,.73);
+    horn.name='unicorn-golden-horn';
+    const tip=triangle(face,m(0xfff3ad,true),0,1.10,-.05,.078,.27);
+    tip.rotation.z=.12;
     const pastel=[0xf79cc7,0xaedbff,0xffdc90,0xcba5f9,0x9bdfd2];
     for(let i=0;i<7;i++){
       const x=-.36+i*.12;
       ell(face,m(pastel[i%5]),x,.52-(i%3)*.06,.17,.15,.24,.21,(i-3)*.1);
     }
-    // Cloudlike wings.
+    // Layered cloudlike wings extend beyond the silhouette from the back.
     for(const side of [-1,1]){
-      ell(root,m(0xfdeafb),side*.54,1.10,-.24,.25,.40,.13,side*.60);
-      ell(root,cream,side*.7,1.18,-.30,.21,.26,.1,side*.8);
+      const wing=groupAt(root,side*.49,1.11,-.25);
+      wing.name=side<0?'unicorn-left-wing':'unicorn-right-wing';
+      ell(wing,m(0xfbe8ff),side*.18,.08,-.08,.25,.42,.21,side*.52);
+      ell(wing,cream,side*.39,.16,-.13,.22,.34,.16,side*.74);
+      ell(wing,m(0xe7d5ff),side*.53,.04,-.14,.16,.21,.11,side*.9);
     }
   }
   if(id==='horse'){
@@ -206,8 +214,9 @@ export function createAnimal(id, palette = {}) {
   const tail=groupAt(root,.28,1.04,-.49);
   if(id==='bunny')ell(tail,cream,0,0,0,.25,.25,.23);
   else if(id==='unicorn'||id==='horse'){
-    const shades=id==='unicorn'?[0xffaacc,0x9bd7ff,0xd2b8fc]:[0x805340,0x96664c,0xb98a6a];
-    for(let i=0;i<3;i++)ell(tail,m(shades[i]),i*.08,-.21-i*.09,-.16,.12,.35,.16,-.3);
+    const shades=id==='unicorn'?[0xffaacc,0x9bd7ff,0xffe39d,0xd2b8fc,0x9ae2d4]:[0x805340,0x96664c,0xb98a6a];
+    for(let i=0;i<shades.length;i++)
+      ell(tail,m(shades[i]),(i-2)*.057,-.18-i*.053,-.14,.10,.36,.13,-.26);
   }else if(id==='cat'||id==='dog'){
     ell(tail,coat,.20,.18,-.07,.19,.45,.17,-.45);
     ell(tail,id==='cat'?ivory:coat,.41,.47,-.06,.16,.19,.15);
@@ -263,16 +272,33 @@ export function createAnimal(id, palette = {}) {
     }
     ell(rear,m(0xffce65),0,.64,-.57,.075,.075,.05);
   }else if(id==='unicorn'){
-    // Rainbow mane flowing down the neck; horn and tiny wings stay visible.
-    const mane=[0xff9ecf,0xa3d8ff,0xf8d58e,0xd8b3f3,0x93dcba];
+    // The camera sees the BACK, so the mane must read like soft
+    // cascading pastel hair and not disappear behind the head.
+    const mane=groupAt(rear,0,1.68,-.44);
+    mane.name='unicorn-rainbow-mane';
+    const rainbow=[0xffa9d0,0xc4a8fa,0x9bd7fc,0xffe1a3,0xace3cc];
+    for(let i=0;i<13;i++){
+      const stripe=i%5,layer=Math.floor(i/5);
+      const x=-.30+stripe*.15+(layer%2)*.042;
+      const y=.58-layer*.23-(i%3)*.023;
+      const tuft=ell(mane,m(rainbow[stripe]),x,y,-.09,.12,.27+layer*.03,.17,(stripe-2)*-.11);
+      tuft.name='unicorn-mane-strand';
+    }
     for(let i=0;i<8;i++){
-      ell(rear,m(mane[i%5]),-.33+(i%4)*.2,2.22-Math.floor(i/4)*.30,-.45,.14,.22,.19,(i%2?-.3:.3));
+      const stripe=i%5;
+      const x=-.25+(i%4)*.17;
+      ell(mane,m(rainbow[stripe]),x,-.17-Math.floor(i/4)*.26,-.10,.12,.24,.16,(i%2?-.18:.18));
     }
-    for(let i=0;i<5;i++){
-      ell(rear,m(mane[i]),-.19+(i%3)*.18,1.56-i*.18,-.45,.12,.19,.16,(i%2?-.2:.2));
+    // Tiny iridescent ribbons and an amethyst clasp stay visible from afar.
+    ell(rear,m(0xfefaff),0,1.08,-.51,.33,.37,.15);
+    ell(rear,m(0xa587e3,true),0,1.36,-.64,.15,.16,.075);
+    ell(rear,m(0xffe0aa,true),0,1.37,-.70,.08,.08,.055);
+    // Rear-facing ear insets complement the shop-facing detail.
+    for(const side of [-1,1]){
+      ell(face,m(0xf0b7df),side*.45,.72,-.18,.10,.18,.06);
+      ell(rear,m(0xfdf4ff),side*.58,1.08,-.30,.23,.30,.17,side*.42);
+      ell(rear,m(0xdac8fd),side*.74,1.19,-.40,.20,.26,.12,side*.59);
     }
-    ell(rear,m(0xfdf3ff),0,.99,-.49,.36,.39,.14);
-    for(const side of [-1,1])ell(rear,cream,side*.69,1.25,-.37,.24,.37,.15,side*.65);
   }else if(id==='horse'){
     ell(rear,m(0xfff2d6),0,.92,-.45,.42,.46,.17);
     ell(rear,m(0x855239),0,2.13,-.45,.20,.49,.22);

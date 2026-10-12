@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { fitImportedCharacter,animalAssetUrl,CHARACTER_ASSETS,hasPaintedAppearance } from '../src/modelAssets.js';
+import { fitImportedCharacter,animalAssetUrl,CHARACTER_ASSETS,hasPaintedAppearance,selectAnimalClips } from '../src/modelAssets.js';
 
 test('all seven heroes accept optional textured GLB character assets',()=>{
  const animals=['bunny','unicorn','horse','cat','dog','penguin','cow'];
@@ -39,4 +39,14 @@ test('an untextured white Meshy shape never hides the coloured playable bunny',(
  group.add(nose,eye);
  assert.equal(hasPaintedAppearance(group),true);
  for(const item of [mesh,nose,eye]){item.geometry.dispose();item.material.dispose();}
+});
+
+test('rigged characters select named run, idle and jump clips',()=>{
+ const idle={name:'Idle_Breath'},walk={name:'Walk'},run={name:'Run_Cycle'},jump={name:'Jump'};
+ const found=selectAnimalClips([idle,walk,run,jump]);
+ assert.equal(found.run,run);
+ assert.equal(found.idle,idle);
+ assert.equal(found.jump,jump);
+ assert.equal(selectAnimalClips([idle]).run,idle);
+ assert.equal(selectAnimalClips([]).run,null);
 });

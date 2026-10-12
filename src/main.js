@@ -471,4 +471,15 @@ window.addEventListener('blur',()=>{if(running&&!paused)$('pauseBtn').click();ke
 try{audioEnabled=localStorage.getItem('polar-dash-sound')==='on'}catch{};
 $('soundBtn').textContent=audioEnabled?'SOUND: ON':'SOUND: OFF';
 character.group.rotation.y=Math.PI;
+// Read-only state snapshot used by automated browser gameplay tests.
+// Only enabled with ?qa=1; it cannot change progress or inject obstacles.
+if(new URLSearchParams(location.search).has('qa')){
+ window.__pawverseQA=()=>Object.freeze({
+  selected:profile.selected,
+  biome:CHARS.find(c=>c.id===profile.selected)?.biome,
+  running,paused,ended,distance,energy,lane:playerLane,
+  targetLane,playerY,sliding,coins:runCoins,
+  visibleObstacles:entities.filter(e=>!e.taken&&!['coin','energy','shield','magnet'].includes(e.kind)).length
+ });
+}
 menu();requestAnimationFrame(tick);

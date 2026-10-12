@@ -107,8 +107,10 @@ function obstacle(player,kind,lane,at){
  }else if(kind==='spike'){
   for(let i=-1;i<=1;i++)piece(root,geom.cone,material(0x8de7f5),i*.30,.62+Math.abs(i)*-.15,0,.31,.9,.31);
  }else if(kind==='log'){
-  piece(root,geom.box,wood,0,.79,0,1.68,1.02,.48);
-  piece(root,geom.box,snow,0,1.33,0,1.66,.13,.46);
+  // Arch with actual crouch clearance instead of a ground-level solid box.
+  piece(root,geom.box,wood,0,1.67,0,2.15,.54,.46);
+  for(const x of [-1.06,1.06])piece(root,geom.box,wood,x,.78,0,.16,1.55,.46);
+  piece(root,geom.box,snow,0,1.98,0,2.11,.12,.43);
  }else if(kind==='coin'){
   const c=piece(root,geom.torus,gold,0,1.14,0,1,1,1);
   c.rotation.x=.16;pickup=true;

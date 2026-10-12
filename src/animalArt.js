@@ -344,16 +344,27 @@ export function createAnimal(id, palette = {}) {
     const shades=id==='unicorn'?[0xffaacc,0x9bd7ff,0xffe39d,0xd2b8fc,0x9ae2d4]:[0x805340,0x96664c,0xb98a6a];
     for(let i=0;i<shades.length;i++)
       ell(tail,m(shades[i]),(i-2)*.057,-.18-i*.053,-.14,.10,.36,.13,-.26);
-  }else if(id==='cat'||id==='dog'){
-    ell(tail,coat,.20,.18,-.07,.19,.45,.17,-.45);
-    ell(tail,id==='cat'?ivory:coat,.41,.47,-.06,.16,.19,.15);
-    if(id==='cat'){
-      // A striped upright tail projects beyond the running silhouette.
-      const tip=ell(tail,m(0xbb783e),.43,.50,-.09,.17,.19,.18);
-      tip.name='cat-tail-tip';
-      for(let i=0;i<3;i++)ell(tail,m(0xb8773c),
-        .22+i*.075,.15+i*.14,-.236,.175,.062,.07,-.45);
-    }
+  }else if(id==='cat'){
+    // A slender, continuously curving cat tail with a clear hook at the
+    // tip. It reads as a cat silhouette rather than an extra rear leg.
+    const curve=new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0,-.12,-.02),
+      new THREE.Vector3(.25,.02,-.12),
+      new THREE.Vector3(.42,.36,-.15),
+      new THREE.Vector3(.45,.65,-.15),
+      new THREE.Vector3(.31,.80,-.15)
+    ]);
+    const stripeGeo=new THREE.TubeGeometry(curve,28,.107,10,false);
+    const catStem=new THREE.Mesh(stripeGeo,coat);
+    catStem.name='cat-curved-tail';
+    catStem.castShadow=true;tail.add(catStem);
+    const tip=ell(tail,m(0xbb783e),.31,.80,-.15,.13,.15,.13);
+    tip.name='cat-tail-tip';
+    for(let i=0;i<3;i++)
+      ell(tail,m(0xb8773c),.30+i*.045,.10+i*.18,-.237,.095,.045,.038,-.28);
+  }else if(id==='dog'){
+    ell(tail,coat,.20,.18,-.07,.15,.35,.12,-.45);
+    ell(tail,coat,.38,.44,-.06,.12,.16,.12);
   }else if(id==='cow')ell(tail,coat,.15,-.17,-.12,.10,.36,.10,-.30);
   else ell(tail,coat,0,-.12,0,.19,.24,.21);
 

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {loopZ} from './worldMotion.js';
 
 // Landmark silhouettes and nearby set dressing inspired by the seven lanes in
 // the user's reference art. Each is actual 3D geometry with its own depth.
@@ -321,14 +322,40 @@ export function createWorldLandmarks(scene,id='meadow'){
    daisies(side*(7.0+(i%3)*.45),-9-i*12,6);
   }
  }
+ // Assign every landmark mesh (including tiny flowers and fences) to the
+ // same travelling-world coordinate system as the ground. A flower cannot
+ // remain frozen while an adjacent flower bed scrolls beside the path.
+ const STRIP_LENGTH=35,STRIP_COUNT=5;
+ const strips=Array.from({length:STRIP_COUNT},(_,index)=>{
+  const strip=new THREE.Group();
+  strip.name='physical-landmark-strip-'+index;
+  root.add(strip);
+  return strip;
+ });
+ // Bucketing preserves the exact starting world position and also retains
+ // named objects (clock hands, windmill rotors, portal) for the old tests.
+ const children=root.children.filter(child=>!strips.includes(child));
+ for(const child of children){
+  const start=child.position.z;
+  const index=Math.max(0,Math.min(STRIP_COUNT-1,Math.floor(Math.max(0,-start)/STRIP_LENGTH)));
+  root.remove(child);
+  strips[index].add(child);
+  child.position.z=start+index*STRIP_LENGTH;
+ }
+ function moveLandmarks(distance){
+  for(let index=0;index<strips.length;index++)
+   strips[index].position.z=loopZ(index,STRIP_LENGTH,Math.max(0,distance),STRIP_COUNT,0);
+ }
+ moveLandmarks(0);
  function dispose(){
   scene.remove(root);
   for(const geometry of Object.values(geo))geometry.dispose();
   for(const material of mats.values())material.dispose();
  }
- function update(time=0){
+ function update(time=0,distance=0){
+  moveLandmarks(distance);
   for(const {rotor,phase,speed} of rotors)rotor.rotation.z=-time*speed+phase;
   for(const {pivot,phase,speed} of clockHands)pivot.rotation.z=phase-time*speed*.028;
  }
- return {root,dispose,update,meshCount:count,theme:id};
+ return {root,strips,dispose,update,meshCount:count,theme:id};
 }

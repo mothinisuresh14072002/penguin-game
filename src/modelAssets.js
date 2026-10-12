@@ -35,6 +35,24 @@ export function fitImportedCharacter(object, targetHeight = 2.55) {
   return object;
 }
 
+// A shape-only Meshy download can technically load but will render plain
+// white. Prefer our colourful articulated game character until the model
+// contains baked colours, multiple painted materials, or texture maps.
+export function hasPaintedAppearance(root) {
+ const colors=new Set();
+ let textured=false;
+ root.traverse(object=>{
+  if(!object.isMesh)return;
+  if(object.geometry?.getAttribute('color'))textured=true;
+  for(const material of Array.isArray(object.material)?object.material:[object.material]){
+   if(!material)continue;
+   if(material.map||material.vertexColors)textured=true;
+   if(material.color)colors.add(material.color.getHexString());
+  }
+ });
+ return textured||colors.size>=3;
+}
+
 export async function loadImportedAnimal(id) {
   const url=animalAssetUrl(id);
   if (!url) return null;
@@ -64,6 +82,18 @@ export async function loadImportedAnimal(id) {
       }
     });
     if (!meshCount) throw new Error('GLB contains no meshes');
+    if (!hasPaintedAppearance(gltf.scene)) {
+      console.info('Skipping uncoloured '+id+' GLB; using colourful procedural character.');
+      const geometries=new Set(),materials=new Set();
+      gltf.scene.traverse(o=>{
+        if(!o.isMesh)return;
+        if(o.geometry)geometries.add(o.geometry);
+        for(const m of Array.isArray(o.material)?o.material:[o.material])if(m)materials.add(m);
+      });
+      for(const g of geometries)g.dispose();
+      for(const m of materials)m.dispose();
+      return null;
+    }
     const mixer=gltf.animations?.length ? new THREE.AnimationMixer(gltf.scene) : null;
     if(mixer) mixer.clipAction(gltf.animations[0]).play();
     return {

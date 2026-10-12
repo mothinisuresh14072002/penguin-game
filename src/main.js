@@ -17,6 +17,7 @@ import {createGlacierDetails} from './glacierArt.js';
 import {createFarmDetails} from './farmArt.js';
 import {createPickupArtwork} from './foodArt.js';
 import {FOODS,FOOD_BY_ANIMAL,DAILY_GOALS,WEEKLY_GOALS,createEconomy,synchronizeEconomy,collectFood,sellFood,openSurpriseBox,recordEvent,goalProgress,claimGoal,dailyKey} from './gameEconomy.js';
+import {createJourneyArt} from './journeyArt.js';
 import {loopZ,layerTravel,journeyChapter} from './worldMotion.js';
 
 const $ = id => document.getElementById(id);
@@ -140,6 +141,7 @@ for(let i=0;i<14;i++){
 
 const roadArt=createRoadArtwork(scene,'arctic',{length:260,centerZ:-106,surfaceY:.29,width:8.95});
 let landmarks=null;
+let journeyArt=null;
 let meadowDetails=null;
 let skylandDetails=null;
 let prairieDetails=null;
@@ -216,6 +218,7 @@ function applyBiome(){
  for(const cliff of glacialCliffs)cliff.visible=picked.biome==='arctic';
  for(const marker of laneDashes)marker.visible=['arctic','rainbow'].includes(picked.biome);
  landmarks?.dispose();landmarks=createWorldLandmarks(scene,picked.biome);
+ journeyArt?.dispose();journeyArt=createJourneyArt(scene,picked.biome);
  meadowDetails?.dispose();
  meadowDetails=picked.biome==='meadow'?createMeadowDetails(scene):null;
  meadowDetails?.update(distance);
@@ -582,6 +585,7 @@ function tick(now){
   glacierDetails?.update(distance,clockTime);
   farmDetails?.update(distance);
   landmarks?.update(clockTime);
+  journeyArt?.update(distance);
   for(let i=0;i<laneDashes.length;i++){
    laneDashes[i].position.z=loopZ(Math.floor(i/2),8,distance,24,11);
   }
@@ -643,6 +647,7 @@ if(new URLSearchParams(location.search).has('qa')){
   nearSceneryZ:biomeDecor[2]?.position.z,
   farCloudZ:skyClouds[1].position.z,
   horizonZ:backdrop.horizon.position.z,
+  journeyChunks:journeyArt?.groups.length??0,
   inventory:{...profile.economy.inventory},
   dailyProgress:{food:profile.economy.daily.food,jumps:profile.economy.daily.jumps,runs:profile.economy.daily.runs},
   visibleFood:entities.filter(e=>!e.taken&&e.kind==='food').length,

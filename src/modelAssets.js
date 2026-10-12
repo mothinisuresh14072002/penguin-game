@@ -44,6 +44,19 @@ export function fitImportedCharacter(object, targetHeight = 2.55) {
   return object;
 }
 
+// Real production models often store more than one animation clip.
+// Prefer an actual run/trot, distinct jump and idle instead of blindly playing
+// the first clip (which is often 'Idle') throughout the entire run.
+export function selectAnimalClips(clips=[]){
+ const get=(pattern)=>clips.find(clip=>pattern.test(clip.name||''));
+ return {
+  run:get(/run|jog|sprint|trot|hop|gallop/i)||
+      get(/walk|locomotion|move/i)||clips[0]||null,
+  idle:get(/idle|stand|breath|rest/i)||null,
+  jump:get(/jump|leap|hop_up/i)||null
+ };
+}
+
 // A shape-only Meshy download can technically load but will render plain
 // white. Prefer our colourful articulated game character until the model
 // contains baked colours, multiple painted materials, or texture maps.
@@ -104,16 +117,33 @@ export async function loadImportedAnimal(id) {
       return null;
     }
     const mixer=gltf.animations?.length ? new THREE.AnimationMixer(gltf.scene) : null;
-    if(mixer) mixer.clipAction(gltf.animations[0]).play();
+    const selectedClips=selectAnimalClips(gltf.animations||[]);
+    const actions=mixer ? {
+      run:selectedClips.run?mixer.clipAction(selectedClips.run):null,
+      idle:selectedClips.idle?mixer.clipAction(selectedClips.idle):null,
+      jump:selectedClips.jump?mixer.clipAction(selectedClips.jump):null
+    } : null;
+    let activeAction=null;
+    function changeAction(next){
+      if(!next||next===activeAction)return;
+      if(activeAction)activeAction.fadeOut(.17);
+      next.reset().fadeIn(.17).play();
+      activeAction=next;
+    }
+    if(actions)changeAction(actions.idle||actions.run);
     return {
       group,visual,mixer,imported:true,
       pivotL:new THREE.Group(),pivotR:new THREE.Group(),
       feet:[],ears:[],face:null,tail:null,
       update(dt,clock,moving,airborne){
-        if(mixer) mixer.update(moving?dt:0);
-        else {
-          // The supplied GLB has no rig/animations. A gentle bouncing pose
-          // is a visual placeholder until a rigged version is exported.
+        if(mixer){
+          const desired=airborne?(actions.jump||actions.run):
+            moving?(actions.run||actions.idle):(actions.idle||actions.run);
+          changeAction(desired);
+          mixer.update(Math.max(0,dt));
+        }else{
+          // The GLB has no rig/animation clips; gently bob until a rigged
+          // version is exported instead of implying full running animation.
           visual.position.y=moving&&!airborne?Math.abs(Math.sin(clock*12))*.065:0;
           visual.rotation.z=moving?Math.sin(clock*12)*.028:0;
           visual.rotation.x=airborne?-.09:0;

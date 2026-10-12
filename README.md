@@ -133,6 +133,44 @@ Selecting a character applies its environment configuration using the `CHARS` an
 
 The earlier v2 saved profile is read if a v3 profile does not yet exist. Bella Bunny and Pip Penguin are both free; legacy unlocks for removed characters are not carried over as equivalents.
 
+## 🎨 Seven Character Worlds — reference-inspired visual update
+
+Polar Dash now gives every animal its **own full 3D landscape**, not just a
+different colour on the same snow track. Selecting a playable animal through
+the Character Shop switches the character, road surface, decorations, sky,
+distant horizon and unique physical landmarks together. In split-screen
+races, both player worlds are built independently from their selected animals.
+
+| Character | Painted running track | New signature landmarks |
+|---|---|---|
+| Bella Bunny 🐰 | Warm earthy path with grassy edges | Daisy fences, trees, rabbit burrow |
+| Ula Unicorn 🦄 | Glossy lavender/pink crystal bridge | Rainbow, crystal spires, floating islands |
+| Hugo Horse 🐴 | Golden prairie dirt with wheel tracks | Windmills, hay bales, rustic fences |
+| Coco Cat 🐱 | Staggered warm cobblestones | Pastel houses, flower boxes, clock tower |
+| Dodo Dog 🐶 | Cream park stepping-stones | Pond, gazebo, flower gardens |
+| Pip Penguin 🐧 | Shimmering blue frozen lane | Glacial arch, snowy pines and ice peaks |
+| Mimi Cow 🐮 | Sunlit farmland earth | Red barn, silo, crops and farm fences |
+
+The road is an actual Three.js plane with procedurally painted,
+repeatable texture maps, lighting and simulated track motion. Additional
+models are built from real 3D geometry, with a smaller, more cinematic
+rear-facing avatar/camera layout. Animal geometry now includes distinctive
+**back-of-head, coat and tail markings** as well as the face seen in shop
+previews. Snow particles are restricted to the icy/magical worlds.
+
+**Quality note:** This is a substantial visual improvement using procedural
+3D art; it is **not a pixel-exact recreation** of the supplied cinematic
+reference illustration. Film-quality textures, fur, detailed sculpting, and
+skeletal animation require properly authored or commercially licensed
+character/environment assets. A plain white, untextured Meshy model now
+automatically falls back to the more colourful game character instead of
+hiding it. The source model file `public/models/bunny.glb` is still not
+included in this repository.
+
+New files: `src/roadArt.js`, `src/landmarkArt.js`, and
+`tests/referenceWorlds.test.js`. The test suite verifies the seven
+road styles, landmark systems and identifiable animal back designs.
+
 ## 🌄 Upgraded Three.js 3D Environments
 
 The game already had real Three.js characters, collision handling and third-person

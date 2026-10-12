@@ -82,6 +82,20 @@ try{
   await snap(page,'01-solo-start');
   await close();
  });
+ await test('Desktop HD rendering mode shows the full 3D meadow without WebGL errors',async()=>{
+  const {page,close}=await openGame('/?qa=1&quality=hd');
+  const game=await state(page);
+  assert.equal(game.graphicsQuality,'hd');
+  assert.equal(game.biome,'meadow');
+  assert.equal(game.avatarFeet,2);
+  const canvas=page.locator('canvas');
+  const pixels=await canvas.evaluate(el=>({width:el.width,height:el.height}));
+  assert.ok(pixels.width>=1200&&pixels.height>=700,'HD mode needs sharp canvas resolution');
+  await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();
+  assert.equal(await page.locator('.char-card').count(),7);
+  await snap(page,'02-hd-meadow-and-all-heroes');
+  await close();
+ });
  await test('Shop offers seven heroes; locked character does not change world',async()=>{
   const {page,close}=await openGame('/?qa=1');
   await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();

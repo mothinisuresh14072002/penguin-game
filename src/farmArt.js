@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {loopZ} from './worldMotion.js';
 
 // Mimi Farm: sunlight-coloured crop rows, bright sunflowers, rustic fences,
 // and hay bales. All detail meshes are instanced and remain outside the
@@ -105,11 +106,8 @@ export function createFarmDetails(scene){
   }
  }
  function update(distance=0){
-  const period=FARM_STRIPS*FARM_STRIP_LENGTH,forward=Math.max(0,distance)*.84;
-  for(let i=0;i<strips.length;i++){
-   const z=((i*FARM_STRIP_LENGTH+forward)%period+period)%period;
-   strips[i].position.z=14-z;
-  }
+  for(let i=0;i<strips.length;i++)
+   strips[i].position.z=loopZ(i,FARM_STRIP_LENGTH,Math.max(0,distance),FARM_STRIPS,14);
  }
  function dispose(){
   scene.remove(root);

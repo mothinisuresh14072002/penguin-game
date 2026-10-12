@@ -19,10 +19,10 @@ export function createAnimal(id, palette = {}) {
   const mats = new Map();
   function m(hex, shiny=false) {
     const key = String(hex) + (shiny?'s':'m');
-    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn'||id==='horse')&&!shiny
+    if (!mats.has(key)) mats.set(key,(id==='bunny'||id==='unicorn'||id==='horse'||id==='cat')&&!shiny
       ? new THREE.MeshPhysicalMaterial({
          color:hex,roughness:.88,metalness:0,
-         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:id==='horse'?0xffdcaa:0xffe9e2),
+         sheen:.65,sheenRoughness:.85,sheenColor:new THREE.Color(id==='unicorn'?0xeddaff:id==='horse'?0xffdcaa:id==='cat'?0xffd9b2:0xffe9e2),
          clearcoat:.02
         })
       : new THREE.MeshStandardMaterial({
@@ -78,7 +78,7 @@ export function createAnimal(id, palette = {}) {
   for(const side of [-1,1]){
     ell(face,cream,side*.285,.10,.492,.183,.228,.09);
     ell(face,ink,side*.285,.095,.566,.134,.174,.061);
-    ell(face,m(id==='penguin'?0x328ebc:0x413645,true),side*.277,.105,.616,.077,.117,.025);
+    ell(face,m(id==='penguin'?0x328ebc:id==='cat'?0x54b88e:0x413645,true),side*.277,.105,.616,.077,.117,.025);
     ell(face,cream,side*.24,.169,.65,.044,.055,.024);
     ell(face,cream,side*.32,.046,.657,.019,.025,.013);
     ell(face,blush,side*.45,-.226,.38,.152,.089,.06);
@@ -169,12 +169,20 @@ export function createAnimal(id, palette = {}) {
     }
   }
   if(id==='cat'){
-    // Small stripy forehead and six visible whiskers.
+    // Wide kitten cheeks, soft orange tabby stripes and green-glass irises.
     const stripe=m(0xc77a36);
-    for(const side of [-1,0,1])ell(face,stripe,side*.15,.43,.45,.07,.17,.045,-side*.22);
+    for(const side of [-1,0,1]){
+      const mark=ell(face,stripe,side*.15,.43,.45,.075,.17,.045,-side*.22);
+      mark.name='cat-tabby-forehead';
+    }
+    for(const side of [-1,1]){
+      ell(face,m(0xffd69c),side*.50,-.27,.24,.22,.24,.19,-side*.25);
+      ell(face,m(0xfff1de),side*.31,-.38,.47,.21,.16,.12);
+      ell(face,m(0xe68d9f),side*.53,-.20,.40,.13,.07,.045);
+    }
     const whiskMat=m(0xf4e7d9);
     for(const side of [-1,1])for(let i=-1;i<=1;i++){
-      const whisker=part(face,geometries.cylinder,whiskMat,side*.55,-.32+i*.085,.52,.009,.48,.009);
+      const whisker=part(face,geometries.cylinder,whiskMat,side*.57,-.32+i*.085,.52,.009,.48,.009);
       whisker.rotation.z=Math.PI/2+side*i*.13;
     }
   }
@@ -227,6 +235,13 @@ export function createAnimal(id, palette = {}) {
   }else if(id==='cat'||id==='dog'){
     ell(tail,coat,.20,.18,-.07,.19,.45,.17,-.45);
     ell(tail,id==='cat'?ivory:coat,.41,.47,-.06,.16,.19,.15);
+    if(id==='cat'){
+      // A striped upright tail projects beyond the running silhouette.
+      const tip=ell(tail,m(0xbb783e),.43,.50,-.09,.17,.19,.18);
+      tip.name='cat-tail-tip';
+      for(let i=0;i<3;i++)ell(tail,m(0xb8773c),
+        .22+i*.075,.15+i*.14,-.236,.175,.062,.07,-.45);
+    }
   }else if(id==='cow')ell(tail,coat,.15,-.17,-.12,.10,.36,.10,-.30);
   else ell(tail,coat,0,-.12,0,.19,.24,.21);
 
@@ -335,11 +350,28 @@ export function createAnimal(id, palette = {}) {
     }
   }else if(id==='cat'){
     const stripes=m(0xba7033);
-    for(let i=0;i<4;i++){
-      ell(rear,stripes,(i%2?-.16:.16),1.23-i*.27,-.47,.23,.075,.056,(i%2?-.35:.35));
+    const tabby=groupAt(rear,0,1.65,-.45);
+    tabby.name='cat-tabby-back';
+    for(let i=0;i<6;i++){
+      const mark=ell(tabby,stripes,(i%2?-.14:.14),
+        -.03-i*.20,-.055,.23,.073,.08,(i%2?-.28:.28));
+      mark.name='cat-fur-stripe';
     }
-    for(let i=0;i<3;i++)ell(rear,stripes,0,2.22-i*.22,-.48,.24,.075,.07);
-    ell(rear,m(0xffcc8d),0,.80,-.46,.20,.23,.1);
+    for(let i=0;i<3;i++)ell(tabby,stripes,0,.65-i*.20,-.07,.22,.07,.065);
+    ell(rear,m(0xffdeb5),0,.79,-.47,.29,.33,.16);
+    // A little lavender scarf with a clear bow on the back.
+    const scarf=groupAt(rear,0,1.26,-.49);
+    scarf.name='cat-lavender-scarf';
+    ell(scarf,m(0xceaadf),0,0,0,.47,.14,.23);
+    for(const side of [-1,1])ell(scarf,m(0xe5c2ed),side*.18,-.13,-.19,
+      .20,.13,.11,side*.35);
+    ell(scarf,m(0xffdcb4),0,-.1,-.27,.09,.09,.07);
+    for(const side of [-1,1]){
+      ell(rear,m(0xffcb90),side*.35,.62,-.36,.25,.30,.17,side*.19);
+      ell(rear,m(0xffead7),side*.34,.38,-.48,.18,.12,.12);
+      // Triangular ears remain recognisable from behind.
+      ell(face,m(0xf2a2b4),side*.45,.72,-.18,.11,.15,.065);
+    }
   }else if(id==='dog'){
     ell(rear,m(0xfff2cf),0,1.03,-.48,.43,.50,.16);
     ell(rear,m(0xb88555),0,2.17,-.49,.42,.22,.095);
@@ -366,7 +398,8 @@ export function createAnimal(id, palette = {}) {
   const wings=id==='unicorn'
     ? [root.getObjectByName('unicorn-left-wing'),root.getObjectByName('unicorn-right-wing')]
     : null;
-  return {group:root,pivotL,pivotR,feet,ears,tail,face,mane,wings};
+  const catTail=id==='cat'?tail:null;
+  return {group:root,pivotL,pivotR,feet,ears,tail,face,mane,wings,catTail};
 }
 
 // Character animation uses bones/groups, not just translating a static drawing.
@@ -378,6 +411,7 @@ export function animateAnimal(actor, t, moving=true, airborne=false) {
   if(actor.feet)for(let i=0;i<actor.feet.length;i++)actor.feet[i].rotation.x=step*(i===0?-1:1)*.55*pace;
   if(actor.ears)for(let i=0;i<actor.ears.length;i++)actor.ears[i].rotation.z=Math.sin(t*7+i)*.075*pace;
   if(actor.tail)actor.tail.rotation.x=Math.sin(t*9)*.16*pace;
+  if(actor.catTail)actor.catTail.rotation.z=Math.sin(t*5+.7)*.22*pace;
   if(actor.face)actor.face.rotation.z=Math.sin(t*7)*.026*pace;
   // A little mane sway and wing flutter make the unicorn read as a living
   // character even from the small rear-view runner camera.

@@ -20,14 +20,16 @@ export function createMeadowDetails(scene){
   center:new THREE.SphereGeometry(1,9,7),
   stalk:new THREE.CylinderGeometry(.07,.10,1,5),
   grass:new THREE.ConeGeometry(1,1,5),
-  leaf:new THREE.SphereGeometry(1,6,4)
+  leaf:new THREE.SphereGeometry(1,6,4),
+  stone:new THREE.SphereGeometry(1,9,6)
  };
  const materials={
   petal:flowerColors.map(c=>new THREE.MeshLambertMaterial({color:c,side:THREE.DoubleSide})),
   center:new THREE.MeshStandardMaterial({color:0xffcb58,roughness:.68}),
   stalk:new THREE.MeshLambertMaterial({color:0x4b9f52}),
   grass:new THREE.MeshLambertMaterial({color:0x68bb60}),
-  leaf:new THREE.MeshLambertMaterial({color:0x5ea957})
+  leaf:new THREE.MeshLambertMaterial({color:0x5ea957}),
+  stone:new THREE.MeshLambertMaterial({color:0xfff7d7})
  };
  const dummy=new THREE.Object3D();
  function setMatrix(mesh,index,x,y,z,sx,sy,sz,rotation=0){
@@ -48,6 +50,16 @@ export function createMeadowDetails(scene){
   const stalks=new THREE.InstancedMesh(geometries.stalk,materials.stalk,FLOWERS_PER_STRIP);
   const blades=new THREE.InstancedMesh(geometries.grass,materials.grass,FLOWERS_PER_STRIP*3);
   const leaves=new THREE.InstancedMesh(geometries.leaf,materials.leaf,FLOWERS_PER_STRIP*2);
+  const stones=new THREE.InstancedMesh(geometries.stone,materials.stone,48);
+  for(let j=0;j<24;j++)for(let side=0;side<2;side++){
+   const k=j*2+side;
+   const x=(side?1:-1)*(4.97+hash(strip*19+j*13)*.12);
+   const z=-.45-j*MEADOW_STRIP_LENGTH/24;
+   setMatrix(stones,k,x,.22,z,.17+hash(j*3+strip)*.08,.10,.26);
+  }
+  stones.instanceMatrix.needsUpdate=true;
+  stones.frustumCulled=false;
+  tile.add(stones);
   const petalIndices=[0,0,0];
   for(let i=0;i<FLOWERS_PER_STRIP;i++){
    const seed=strip*1019+i*19.7;
@@ -101,7 +113,7 @@ export function createMeadowDetails(scene){
  function dispose(){
   scene.remove(root);
   for(const geo of Object.values(geometries))geo.dispose();
-  for(const material of [...materials.petal,materials.center,materials.stalk,materials.grass,materials.leaf])
+  for(const material of [...materials.petal,materials.center,materials.stalk,materials.grass,materials.leaf,materials.stone])
    material.dispose();
  }
  update(0);

@@ -194,18 +194,58 @@ export function createWorldLandmarks(scene,id='meadow'){
   }
   orb(0xf7dda8,0,11,-97.34,.12,.12,.07);
  }else if(id==='park'){
-  for(const [x,z] of [[-11,-19],[11,-28],[-12,-53],[12,-76]])tree(x,z,1.5,0x51b16f);
-  orb(0x7ed3e9,-12,.02,-49,5,.07,7);
-  for(let i=0;i<6;i++){daisies(i%2?6:-6,-10-i*13,3);}
-  for(const i of [-1,1]){
-   p('cylinder',0xffe2b8,i*14,2.5,-67,.15,5,.15);
-   cube(0xf6cda1,i*14,4.9,-67,2.2,.18,2.2);
+  // Layered park plantings frame the runner without blocking any lane.
+  for(const [i,[x,z]] of [[-12,-18],[13,-30],[-15,-58],[15,-77],[-15,-102]].entries()){
+   const scale=1.18+(i%3)*.17;
+   tree(x,z,scale,i%2?0x62b975:0x58aa75);
+   for(let n=0;n<6;n++){
+    const a=n*Math.PI/3;
+    orb(n%2?0xffc6d8:0xffecc7,
+      x+Math.sin(a)*1.3*scale,3.0*scale+Math.cos(a)*.35,
+      z+Math.cos(a)*.7,.28,.26,.27);
+   }
   }
-  p('cone',0xd67866,0,7.4,-88,5.0,2.7,5.0);
+  // Pond, shore stones and lily pads sit well to the LEFT of the track.
+  const pondX=-16,pondZ=-49;
+  orb(0x91cd9f,pondX,.08,pondZ,6.6,.20,8.2);
+  orb(0x75c7df,pondX,.19,pondZ,5.5,.11,7.1);
+  orb(0xa4e7f0,pondX,.225,pondZ,4.5,.055,5.7);
+  for(let i=0;i<10;i++){
+   const a=i*Math.PI*2/10;
+   orb(0xd7dfc8,pondX+Math.cos(a)*5.5,.26,
+      pondZ+Math.sin(a)*6.9,.73,.30,.67);
+  }
+  for(let i=0;i<6;i++){
+   const x=pondX-2.7+(i%3)*2.0,z=pondZ-3+Math.floor(i/3)*3.2;
+   orb(0x4ba878,x,.33,z,.53,.07,.45);
+   orb(i%2?0xffc6de:0xfff6e8,x+.10,.48,z,.18,.13,.15);
+   orb(0xffd873,x+.10,.58,z,.09,.07,.09);
+  }
+  for(let i=0;i<8;i++)daisies(i%2?6.7:-7.1,-7-i*12,6);
+  // 3D timber benches angled parallel to the scenic walking path.
+  for(const side of [-1,1]){
+   for(const z of [-25,-71]){
+    const x=side*7.9;
+    cube(0xa8785d,x,.88,z,2.30,.18,.78);
+    cube(0xb98768,x,1.44,z-.38,2.3,1.0,.19);
+    for(const dx of [-.87,.87]){
+     cube(0x74685e,x+dx,.43,z,.18,.9,.55);
+    }
+    cube(0xffe4a9,x,1.39,z-.26,1.9,.10,.13);
+   }
+  }
+  // The gazebo is off the roadway, not straddling the center running lane.
+  const gx=14,gz=-88;
+  orb(0xf4e0bc,gx,.30,gz,4.2,.45,4.2);
+  p('cone',0xd67866,gx,6.75,gz,5.0,2.7,5.0);
   for(let i=0;i<8;i++){
    const a=i*Math.PI/4;
-   p('cylinder',0xf9e4ca,Math.cos(a)*3.5,3,-88+Math.sin(a)*3.5,.17,6,.17);
+   p('cylinder',0xf9e4ca,gx+Math.cos(a)*3.5,3.2,
+      gz+Math.sin(a)*3.5,.18,5.8,.18);
+   orb(0xe0b28a,gx+Math.cos(a)*3.5,.42,gz+Math.sin(a)*3.5,
+    .40,.27,.40);
   }
+  orb(0xfff0c3,gx,5.2,gz,.43,.36,.43);
  }else if(id==='arctic'){
   // A translucent-like crystal arch sits above the running corridor.
   for(const x of [-7.4,7.4]){

@@ -65,7 +65,8 @@ test('Penguin world contains glacial portal while Puppy Park stays distinct',()=
  const portal=arctic.root.getObjectByName('glacier-crystal-arch');
  assert.ok(portal);
  assert.ok(arctic.meshCount>80);
- assert.equal(portal.position.z,-47);
+ scene.updateMatrixWorld(true);
+ assert.equal(portal.getWorldPosition(new THREE.Vector3()).z,-47);
  assert.ok(portal.position.y>=6,'portal should leave clear running space');
  arctic.dispose();
  const park=createWorldLandmarks(scene,'park');

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import './race.css';
 import {createAnimal, animateAnimal} from './animalArt.js';
-import {populateHabitat} from './worldArt.js';
+import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 import {create3DBackdrop} from './visual3d.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
@@ -131,7 +131,7 @@ function clearPlayer(player){
  const geometries=new Set(),materials=new Set();
  player.scene.traverse(object=>{
   if(!object.isMesh)return;
-  if(object.geometry&&!Object.values(geom).includes(object.geometry))geometries.add(object.geometry);
+  if(object.geometry&&!Object.values(geom).includes(object.geometry)&&!WORLD_GEOMETRIES.has(object.geometry))geometries.add(object.geometry);
   const list=Array.isArray(object.material)?object.material:[object.material];
   for(const m of list)if(m)materials.add(m);
  });

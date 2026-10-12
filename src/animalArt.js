@@ -44,14 +44,21 @@ export function createAnimal(id, palette = {}) {
   const triangle=(p,ma,x,y,z,r,h,d=1)=>part(p,geometries.cone,ma,x,y,z,r,h,r*d);
   const groupAt=(p,x,y,z)=>{const g=new THREE.Group();g.position.set(x,y,z);p.add(g);return g};
   const belly = id==='penguin'?m(0xfffcfb):id==='dog'?m(0xfffaf1):ivory;
-  // Oversized baby-animal head, pear-shaped body, little paws and rosy cheeks.
-  ell(root,coat,0,.96,0,.58,.66,.50);
-  ell(root,belly,0,.94,.405,.43,.53,.17);
-  if(id==='bunny'){
-    // A little pastel flower outfit / skirt like the character reference.
-    ell(root,m(0xffdce9),0,.54,0,.67,.25,.54);
-    ell(root,m(0xd8f5bd),0,.77,.44,.35,.10,.08);
-  }
+  // Species-specific proportions prevent seven animals from looking like
+  // identical stacks of balls. The camera sees their rear profiles.
+  const shapes={
+    bunny:{body:[.48,.61,.38],head:[.56,.54,.49],belly:[.34,.45,.13]},
+    unicorn:{body:[.56,.70,.48],head:[.59,.56,.50],belly:[.42,.51,.15]},
+    horse:{body:[.55,.74,.44],head:[.56,.57,.48],belly:[.39,.51,.16]},
+    cat:{body:[.45,.65,.39],head:[.59,.57,.50],belly:[.34,.46,.14]},
+    dog:{body:[.55,.64,.47],head:[.64,.59,.53],belly:[.42,.48,.16]},
+    penguin:{body:[.53,.78,.46],head:[.59,.53,.50],belly:[.44,.58,.17]},
+    cow:{body:[.63,.66,.52],head:[.65,.57,.53],belly:[.48,.52,.16]}
+  };
+  const shape=shapes[id]||shapes.bunny;
+  const torso=ell(root,coat,0,1.01,0,...shape.body);
+  torso.name=id+'-smooth-body';
+  ell(root,belly,0,.97,shape.body[2]-.08,...shape.belly);
   if(id==='dog'){
     // Fluffy bib and actual red collar with a visible gold name tag.
     ell(root,m(0xfff8e6),0,.91,.44,.45,.48,.17);
@@ -67,7 +74,8 @@ export function createAnimal(id, palette = {}) {
     ell(root,m(0xeeb7c0),0,.55,.43,.25,.15,.12);
   }
   const face=groupAt(root,0,1.82,.035);
-  ell(face,coat,0,0,0,.66,.60,.54);
+  const head=ell(face,coat,0,0,0,...shape.head);
+  head.name=id+'-distinct-head';
   if(id==='penguin'){
     // The little penguin has a prominent rounded white mask and gentle
     // powder-blue highlights instead of looking like a featureless dark ball.
@@ -119,12 +127,13 @@ export function createAnimal(id, palette = {}) {
   const ears=[];
   for(const side of [-1,1]){
     if(id==='bunny'){
-      const ear=groupAt(face,side*.43,.49,-.07);
-      ell(ear,coat,side*.10,.47,0,.22,.68,.17,-side*.12);
-      ell(ear,m(0xf4b5cc),side*.10,.49,.145,.116,.49,.035,-side*.12);
-      // A second inset faces the rear camera (original model turned toward -Z).
-      ell(ear,m(0xf2a8bf),side*.10,.49,-.154,.124,.50,.038,-side*.12);
-      ell(ear,m(0xffe2e9),side*.08,.69,-.179,.067,.19,.026);
+      // Tall tapered rabbit ears attach to the skull, not a halo of fluff.
+      const ear=groupAt(face,side*.34,.43,-.055);
+      ear.name=side<0?'bunny-left-ear':'bunny-right-ear';
+      ell(ear,coat,side*.035,.48,0,.165,.63,.12,-side*.075);
+      ell(ear,m(0xf4b5cc),side*.035,.49,.115,.083,.44,.028,-side*.075);
+      // Visible pink inset from the actual rear gameplay camera.
+      ell(ear,m(0xecafc4),side*.035,.49,-.115,.091,.45,.030,-side*.075);
       ears.push(ear);
     }else if(id==='unicorn'||id==='horse'||id==='cat'){
       const ear=groupAt(face,side*.44,.47,-.04);
@@ -209,22 +218,9 @@ export function createAnimal(id, palette = {}) {
     }
   }
   if(id==='bunny'){
-    // Small floral decoration on the dress.
-    for(const side of [-1,1]){
-      ell(root,m(0xffda84),side*.26,.77,.50,.09,.09,.04);
-      for(let i=0;i<5;i++){
-        const a=i*Math.PI*2/5;
-        ell(root,m(0xffffff),side*.26+Math.cos(a)*.1,.77+Math.sin(a)*.1,.52,.055,.055,.03);
-      }
-    }
-    ell(face,m(0xfae3ed),-.22,.52,.25,.18,.10,.06);
-    // Soft cheek fluff and a tiny forelock to reduce the toy-sphere profile.
-    const tuft= m(0xfffdf7);
-    for(const side of [-1,1]){
-      ell(face,tuft,side*.55,-.20,.23,.20,.27,.20,-side*.33);
-      ell(face,tuft,side*.50,-.35,.12,.18,.19,.16,-side*.22);
-    }
-    for(let i=0;i<3;i++)ell(face,tuft,(i-1)*.16,.51,.10,.15,.13,.15,(i-1)*.22);
+    // Two tiny cheek highlights on the face; no piled pom-pom cheeks.
+    for(const side of [-1,1])
+      ell(face,m(0xfff2e8),side*.38,-.28,.35,.13,.10,.10);
   }
   if(id==='cow'){
     const fringe=m(0xfff8ee);
@@ -249,20 +245,43 @@ export function createAnimal(id, palette = {}) {
       const flipper=ell(pivot,coat,side*.21,-.30,-.03,.24,.44,.15,-side*.36);
       flipper.name='penguin-flipper';
       ell(pivot,m(0x41516a),side*.27,-.56,-.08,.18,.21,.09,-side*.38);
+    }else if(id==='bunny'){
+      // Slim front arms sit beside, not in front of, the cotton tail.
+      ell(pivot,coat,side*.025,-.23,.08,.13,.27,.14,-side*.11);
     }else{
-      ell(pivot,coat,side*.07,-.28,.04,.21,.36,.21,-side*.12);
-      ell(pivot,ivory,side*.08,-.55,.16,.18,.11,.22);
+      const thickness=id==='cat'?.16:id==='horse'?.16:.20;
+      ell(pivot,coat,side*.07,-.28,.04,thickness,.36,.18,-side*.12);
+      ell(pivot,ivory,side*.08,-.55,.16,.14,.095,.18);
     }
   }
   const feet=[];
   for(const side of [-1,1]){
-    const foot=groupAt(root,side*.30,.47,.1);
-    ell(foot,coat,0,-.22,0,.23,.28,.22);
-    ell(foot,id==='penguin'?peach:id==='cow'?m(0x62505a):id==='horse'?brown:ivory,0,-.39,.20,.27,.12,.30);
+    const rearFacing=id==='bunny'||id==='horse'||id==='cow'||id==='dog';
+    const foot=groupAt(root,side*.31,.49,rearFacing?-.13:.04);
+    foot.name=id+'-'+(side<0?'left':'right')+'-hind-foot';
+    if(id==='bunny'){
+      // Exaggerated *long* bunny hind feet, two clearly separate shapes.
+      ell(foot,coat,0,-.20,-.04,.205,.27,.18);
+      const toe=ell(foot,m(0xfff6ec),0,-.37,-.33,.225,.115,.35);
+      toe.name='bunny-oval-toe';
+      for(const dx of [-.11,.11])
+        ell(foot,m(0xeebccc),dx,-.375,-.59,.06,.032,.03);
+    }else if(id==='penguin'){
+      ell(foot,coat,0,-.22,.02,.20,.26,.18);
+      const flipperFoot=ell(foot,peach,0,-.40,-.16,.26,.10,.36);
+      flipperFoot.name='penguin-orange-foot';
+    }else{
+      const hoof=id==='cow'?m(0x62505a):id==='horse'?brown:id==='cat'?m(0xffcf91):ivory;
+      ell(foot,coat,0,-.22,0,id==='cow'?.245:.21,.29,.20);
+      ell(foot,hoof,0,-.40,-.20,id==='cow'?.26:.23,.115,.31);
+    }
     feet.push(foot);
   }
-  const tail=groupAt(root,.28,1.04,-.49);
-  if(id==='bunny')ell(tail,cream,0,0,0,.25,.25,.23);
+  const tail=groupAt(root,id==='bunny'?0:.28,id==='bunny'?.91:1.04,id==='bunny'?-.51:-.49);
+  if(id==='bunny'){
+    const cotton=ell(tail,cream,0,0,-.19,.19,.21,.19);
+    cotton.name='bunny-cotton-tail';
+  }
   else if(id==='unicorn'||id==='horse'){
     const shades=id==='unicorn'?[0xffaacc,0x9bd7ff,0xffe39d,0xd2b8fc,0x9ae2d4]:[0x805340,0x96664c,0xb98a6a];
     for(let i=0;i<shades.length;i++)
@@ -286,48 +305,24 @@ export function createAnimal(id, palette = {}) {
   const rear=groupAt(root,0,0,0);
   rear.name='character-rear-design-'+id;
   if(id==='bunny'){
-    // Layered fluffy haunches, paws and an embroidered floral skirt, visible
-    // in the gameplay camera from behind; animations remain lightweight.
-    ell(rear,m(0xfffdf9),-.36,.73,-.34,.24,.37,.22,.19);
-    ell(rear,m(0xfffdf9),.36,.73,-.34,.24,.37,.22,-.19);
-    for(let side of [-1,1]){
-      ell(rear,m(0xf6d1df),side*.52,.48,-.33,.17,.16,.14);
-      ell(rear,m(0xffecf2),side*.36,.40,-.52,.22,.16,.17);
-      ell(rear,m(0xffe4ed),side*.32,1.24,-.42,.12,.35,.09,side*.17);
+    // One clean pear-shaped back with rounded hips. The user's rear-view
+    // reference is a rabbit, not a cloud of overlapping cotton balls.
+    ell(rear,coat,0,1.01,-.34,.37,.48,.12);
+    for(const side of [-1,1]){
+      const thigh=ell(rear,coat,side*.29,.71,-.25,.245,.33,.205,side*.14);
+      thigh.name=side<0?'bunny-left-haunch':'bunny-right-haunch';
     }
-    const petalMaterial=m(0xffc9dc);
-    const seamMaterial=m(0xfff3fb);
-    const dressBack=groupAt(rear,0,.57,-.44);
+    // Small, flat pastel waist ribbon, not a scalloped pom-pom dress.
+    const dressBack=groupAt(rear,0,.99,-.44);
     dressBack.name='bunny-dress-back';
-    ell(dressBack,m(0xffdce9),0,0,0,.59,.22,.23);
-    for(let i=0;i<9;i++){
-      const a=Math.PI*2*i/9;
-      ell(dressBack,petalMaterial,Math.cos(a)*.56,.045,Math.sin(a)*.43,.18,.14,.12);
-    }
-    // A five-petal daisy is legible even at the small third-person scale.
-    const flower=groupAt(rear,.22,.58,-.65);
+    ell(dressBack,m(0xffe7ed),0,0,0,.37,.078,.085);
+    const flower=groupAt(dressBack,.29,.015,-.095);
     flower.name='bunny-dress-flower';
     for(let j=0;j<5;j++){
-      const a=j*Math.PI*2/5;
-      ell(flower,seamMaterial,Math.cos(a)*.13,Math.sin(a)*.13,0,.082,.092,.055);
+      const angle=j*Math.PI*2/5;
+      ell(flower,m(0xfff7ff),Math.cos(angle)*.076,Math.sin(angle)*.076,0,.053,.059,.025);
     }
-    ell(flower,m(0xffd36d),0,0,-.04,.075,.075,.055);
-    // Cream fur, visible pink inner-ear folds and a flower-skirt hem.
-    for(const side of [-1,1]){
-      ell(face,m(0xf4a9c7),side*.50,.95,-.148,.095,.40,.035,-side*.13);
-      ell(rear,m(0xfff5fd),side*.31,.55,-.42,.21,.14,.12);
-    }
-    ell(rear,m(0xffffff),0,1.05,-.47,.40,.39,.15);
-    // Gentle shoulder fur ensures no hard edge between oversized head/body.
-    for(const side of [-1,1]){
-      ell(rear,m(0xfffdf9),side*.36,1.33,-.30,.26,.27,.23);
-    }
-    ell(rear,cream,0,.85,-.60,.10,.10,.08);
-    for(let i=0;i<5;i++){
-      const a=i*Math.PI*2/5;
-      ell(rear,m(0xffffff),Math.cos(a)*.15,.64+Math.sin(a)*.14,-.55,.08,.08,.045);
-    }
-    ell(rear,m(0xffce65),0,.64,-.57,.075,.075,.05);
+    ell(flower,m(0xffcd62),0,0,-.03,.043,.043,.026);
   }else if(id==='unicorn'){
     // The camera sees the BACK, so the mane must read like soft
     // cascading pastel hair and not disappear behind the head.

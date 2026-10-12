@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {loopZ} from './worldMotion.js';
 
 // Phase 6 — Pip Penguin. Real 3D faceted ice, powdery snowbanks and falling
 // snow, without GLB downloads. Crystals and snow mounds are instanced.
@@ -95,12 +96,8 @@ export function createGlacierDetails(scene){
  root.add(snowfall);
  let lastDistance=0,lastTime=0;
  function update(distance=0,time=0){
-  const progress=Math.max(0,distance)*.84;
-  const cycle=GLACIER_STRIPS*GLACIER_STRIP_LENGTH;
-  for(let i=0;i<strips.length;i++){
-   const n=((i*GLACIER_STRIP_LENGTH+progress)%cycle+cycle)%cycle;
-   strips[i].position.z=14-n;
-  }
+  for(let i=0;i<strips.length;i++)
+   strips[i].position.z=loopZ(i,GLACIER_STRIP_LENGTH,Math.max(0,distance),GLACIER_STRIPS,14);
   const deltaTime=Math.max(0,Math.min(.055,time-lastTime));
   const forward=Math.max(0,Math.min(3.6,(distance-lastDistance)*.28));
   for(let i=0;i<SNOWFLAKES;i++){

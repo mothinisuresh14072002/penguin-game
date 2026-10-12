@@ -208,9 +208,8 @@ model has a broader, blushing muzzle.
 **Mimi Farm** now features:
 
 - Four endlessly scrolling countryside scenery strips with **232 corn
-  stalks** and **120 sunflower plants**, including thousands of individual
-  yellow petals and green leaf meshes instanced into just 36 scenery draw
-  calls.
+  stalks** and **120 sunflower plants**, including 960 yellow petals and 464 corn-leaf details,
+  instanced into 36 scenery draw calls.
 - Two-sided rustic fences, stacked hay rolls, corn cobs and golden flowers
   kept safely outside the three running lanes.
 - A brighter red barn with white timber details, a silo, a small rotating

@@ -14,6 +14,8 @@ import {createTownDetails} from './townArt.js';
 import {createParkDetails} from './parkArt.js';
 import {createGlacierDetails} from './glacierArt.js';
 import {createFarmDetails} from './farmArt.js';
+import {configureGameRenderer,browserQualityOptions} from './graphicsQuality.js';
+import {giveSurfaceDetail,surfaceKindForColor} from './hdSurface.js';
 import {createJourneyArt} from './journeyArt.js';
 import {loopZ,layerTravel} from './worldMotion.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
@@ -37,17 +39,14 @@ const geom = {
 };
 const bodyMat = color => new THREE.MeshStandardMaterial({color,roughness:.76});
 const renderer = new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(1.35,window.devicePixelRatio || 1));
+const graphicsQuality=configureGameRenderer(renderer,browserQualityOptions(true));
 renderer.setSize(innerWidth,innerHeight);
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.18;
 renderer.autoClear=false;
 renderer.domElement.style.touchAction='none';
 document.body.prepend(renderer.domElement);
 
 const disposables = new Set();
-function material(color){const m=bodyMat(color);disposables.add(m);return m}
+function material(color){const m=bodyMat(color);const kind=surfaceKindForColor(color);if(kind)giveSurfaceDetail(m,kind);disposables.add(m);return m}
 function piece(parent,geo,mat,x,y,z,sx=1,sy=1,sz=1){
  const mesh=new THREE.Mesh(geo,mat);
  mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);parent.add(mesh);return mesh;
@@ -72,7 +71,7 @@ function newRacePlayer(ch,index){
  const scene=new THREE.Scene();
  scene.background=new THREE.Color(ch.sky);scene.fog=new THREE.FogExp2(ch.sky,.0075);
  scene.add(new THREE.HemisphereLight(0xecfbff,0x728da1,1.65));
- const sun=new THREE.DirectionalLight(0xfff5e5,2.25);sun.position.set(-8,15,6);scene.add(sun);
+ const sun=new THREE.DirectionalLight(0xfff5e5,2.25);sun.position.set(-8,15,6);sun.castShadow=graphicsQuality.name==='hd';sun.shadow.mapSize.set(1024,1024);sun.shadow.normalBias=.035;scene.add(sun);
  const camera=new THREE.PerspectiveCamera(63,1,.1,290);
  camera.position.set(0,6.7,16.9);camera.lookAt(0,1.38,-21);
  const biomeId={bunny:'meadow',unicorn:'rainbow',horse:'grassland',cat:'city',dog:'park',penguin:'arctic',cow:'farm'}[ch.id]||'meadow';
@@ -404,12 +403,13 @@ renderer.domElement.addEventListener('pointerup',event=>{
  else if(dy<0)jump(p);else slide(p);
 });
 renderer.domElement.addEventListener('pointercancel',()=>touchStart=null);
-addEventListener('resize',()=>renderer.setSize(innerWidth,innerHeight));
+addEventListener('resize',()=>{configureGameRenderer(renderer,browserQualityOptions(true));renderer.setSize(innerWidth,innerHeight)});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing&&!paused)pauseToggle()});
 addEventListener('blur',()=>{held.clear();if(playing&&!paused)pauseToggle()});
 // Opt-in read-only diagnostics for real-browser gameplay QA.
 if(new URLSearchParams(location.search).has('qa')){
  window.__pawverseRaceQA=()=>Object.freeze({
+  graphicsQuality:graphicsQuality.name,
   playing,paused,finished,elapsed,
   players:racers.map(p=>({
    id:p.ch.id,distance:p.distance,coins:p.coins,

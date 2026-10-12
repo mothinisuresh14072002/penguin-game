@@ -3,10 +3,14 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { fitImportedCharacter,animalAssetUrl,CHARACTER_ASSETS,hasPaintedAppearance } from '../src/modelAssets.js';
 
-test('only an exported bunny GLB is configured to override a procedural animal',()=>{
- assert.equal(CHARACTER_ASSETS.bunny,'models/bunny.glb');
- assert.equal(animalAssetUrl('unicorn'),null);
- assert.ok(animalAssetUrl('bunny').endsWith('models/bunny.glb'));
+test('all seven heroes accept optional textured GLB character assets',()=>{
+ const animals=['bunny','unicorn','horse','cat','dog','penguin','cow'];
+ assert.deepEqual(Object.keys(CHARACTER_ASSETS),animals);
+ for(const id of animals){
+  assert.equal(CHARACTER_ASSETS[id],`models/${id}.glb`);
+  assert.ok(animalAssetUrl(id).endsWith(`models/${id}.glb`));
+ }
+ assert.equal(animalAssetUrl('dragon'),null);
 });
 test('imported GLB geometry is centered on the lane and sits on the road',()=>{
  const object=new THREE.Group();

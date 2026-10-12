@@ -128,6 +128,7 @@ try{
     const selected=await state(page);
     assert.equal(selected.selected,id);
     assert.equal(selected.biome,biome);
+    assert.equal(selected.journeyChunks,4,'Each biome must stream recognizable new places');
     assert.equal(selected.meadowFlowerStrips,biome==='meadow'?5:0);
     assert.equal(selected.rainbowCrystalStrips,biome==='rainbow'?4:0,
       'Unicorn crystals should only exist in Rainbow Skyland');

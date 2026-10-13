@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {createSoftEarGeometry,createRoundedTriangleGeometry} from './chibiGeometry.js';
 import {createCuteFaceTexture,getCuteFaceStyle,FACE_EYE_STYLE} from './cuteFace.js';
+import {createCoatTexture,COAT_PATTERNS} from './cuteCoat.js';
 
 // Shared character design system for solo and split-screen play.
 // These are genuine animated Three.js meshes (not flat screenshots or image cards).
@@ -82,21 +83,14 @@ export function createAnimal(id, palette = {}) {
     id==='bunny'?geometries.bunnyBody:geometries.softBody,
     coat,0,1.02,0,...shape.body);
   torso.name=id+'-smooth-body';
-  ell(root,belly,0,.97,shape.body[2]-.08,...shape.belly);
-  if(id==='dog'){
-    // Fluffy bib and actual red collar with a visible gold name tag.
-    ell(root,m(0xfff8e6),0,.91,.44,.45,.48,.17);
-    const collar=ell(root,m(0xd95c71),0,1.28,.20,.55,.085,.49);
-    collar.name='dog-red-collar';
-    const tag=ell(root,gold,0,1.17,.63,.13,.13,.07);
-    tag.name='dog-collar-tag';
-    ell(root,m(0xfff8e8),0,.87,-.44,.41,.45,.19);
-  }
-  if(id==='cow'){
-    ell(root,m(0x33313a),-.28,1.10,.41,.17,.24,.12,.23);
-    ell(root,m(0x33313a),.26,.72,.42,.20,.16,.09,-.35);
-    ell(root,m(0xeeb7c0),0,.55,.43,.25,.15,.12);
-  }
+  const coatTexture=createCoatTexture(id,coat.color.getHex());
+  if(coatTexture)torso.material=new THREE.MeshPhysicalMaterial({
+    color:0xffffff,map:coatTexture,roughness:.9,metalness:0,
+    sheen:.55,sheenRoughness:.92
+  });
+  torso.userData.coatPattern=COAT_PATTERNS[id]||'clean-cream';
+  // Belly is visually part of the torso and no longer a raised plush disc.
+  // The coat map gives Cow, Cat, Horse, Dog etc their markings.
   const face=groupAt(root,0,id==='bunny'?1.77:1.82,.035);
   const head=ell(face,coat,0,0,0,...shape.head);
   head.name=id+'-distinct-head';
@@ -331,11 +325,7 @@ export function createAnimal(id, palette = {}) {
     // reference is a rabbit, not a cloud of overlapping cotton balls.
     // Only a very thin colour-free back contour, not a second bulging
     // torso. The real pear mesh already defines the rabbit's whole back.
-    ell(rear,coat,0,.99,-.34,.29,.37,.045);
-    for(const side of [-1,1]){
-      const thigh=ell(rear,coat,side*.23,.67,-.20,.18,.23,.13,side*.09);
-      thigh.name=side<0?'bunny-left-haunch':'bunny-right-haunch';
-    }
+    // Pear torso itself forms the rounded rabbit hips, without glued balls.
     // Small, flat pastel waist ribbon, not a scalloped pom-pom dress.
     const dressBack=groupAt(rear,0,.99,-.44);
     dressBack.name='bunny-dress-back';
@@ -368,19 +358,11 @@ export function createAnimal(id, palette = {}) {
     ell(rear,m(0xa587e3,true),0,1.36,-.64,.15,.16,.075);
     ell(rear,m(0xffe0aa,true),0,1.37,-.70,.08,.08,.055);
     // Rear-facing ear insets complement the shop-facing detail.
-    for(const side of [-1,1]){
-      ell(face,m(0xf0b7df),side*.45,.72,-.18,.10,.18,.06);
-      ell(rear,m(0xfdf4ff),side*.59,1.09,-.25,.13,.23,.11,side*.42);
-    }
+    // Rear-visible pink ear interiors are already sculpted into the ears.
   }else if(id==='horse'){
     // A recognisable baby pony from behind: cream rump, rounded haunches,
     // long dark mane and soft fetlocks all read at small runner scale.
-    const creamCoat=m(0xffedd5);
-    ell(rear,creamCoat,0,.99,-.40,.38,.42,.075);
-    for(const side of [-1,1]){
-      ell(rear,m(0xd7a073),side*.30,.72,-.29,.15,.24,.095,-side*.12);
-      ell(face,m(0xf6c8a9),side*.45,.72,-.19,.105,.20,.048);
-    }
+    // Cream rump and dorsal highlights are painted into the coat texture.
     const mane=groupAt(rear,0,1.81,-.48);
     mane.name='horse-pony-mane';
     const shades=[0x72452f,0x8d5a3c,0xa36b47,0x684230];
@@ -399,16 +381,9 @@ export function createAnimal(id, palette = {}) {
       ell(blanket,m(0xe0a790),side*.37,-.11,-.07,.10,.27,.12,side*.18);
     }
   }else if(id==='cat'){
-    const stripes=m(0xba7033);
     const tabby=groupAt(rear,0,1.65,-.45);
     tabby.name='cat-tabby-back';
-    for(let i=0;i<6;i++){
-      const mark=ell(tabby,stripes,(i%2?-.14:.14),
-        -.03-i*.20,-.055,.23,.073,.08,(i%2?-.28:.28));
-      mark.name='cat-fur-stripe';
-    }
-    for(let i=0;i<3;i++)ell(tabby,stripes,0,.65-i*.20,-.07,.22,.07,.065);
-    ell(rear,m(0xffdeb5),0,.78,-.39,.24,.28,.06);
+    // Orange tabby stripes are painted onto the seamless torso surface.
     // A little lavender scarf with a clear bow on the back.
     const scarf=groupAt(rear,0,1.26,-.49);
     scarf.name='cat-lavender-scarf';
@@ -417,21 +392,11 @@ export function createAnimal(id, palette = {}) {
     for(const side of [-1,1])ell(scarf,m(0xe5c2ed),side*.18,-.13,-.19,
       .20,.13,.11,side*.35);
     ell(scarf,m(0xffdcb4),0,-.1,-.27,.09,.09,.07);
-    for(const side of [-1,1]){
-      ell(rear,m(0xffcb90),side*.28,.64,-.31,.145,.23,.09,side*.14);
-      // Triangular ears remain recognisable from behind.
-      ell(face,m(0xf2a2b4),side*.45,.72,-.18,.11,.15,.065);
-    }
+    // Sculpted kitten ears already have rear pink inner surfaces.
   }else if(id==='dog'){
     // Rounded cream haunches and plush shoulder tufts read well
     // from the small rear-view camera.
-    const creamFur=m(0xfff5df);
-    ell(rear,creamFur,0,1.03,-.42,.35,.42,.075);
-    ell(rear,m(0xb98258),0,2.14,-.43,.30,.18,.065);
-    for(const side of [-1,1]){
-      ell(rear,creamFur,side*.30,.76,-.30,.16,.24,.10,side*.14);
-      ell(face,m(0xb98661),side*.63,.12,-.17,.20,.33,.16,side*.39);
-    }
+    // Cream shoulders and puppy markings are painted, not extra balls.
     const rearCollar=ell(rear,m(0xd95c71),0,1.31,-.48,.53,.11,.17);
     rearCollar.name='dog-collar-back';
     const tag=ell(rear,m(0xffd478),0,1.20,-.64,.12,.13,.065);
@@ -446,15 +411,9 @@ export function createAnimal(id, palette = {}) {
   }else if(id==='penguin'){
     // Oversized soft charcoal head, pale feather trim and adorable ice-blue
     // scarf are designed for the behind-the-runner camera.
-    const black=m(0x202c40);
-    const feather=m(0x34475f);
     const trim=m(0xd6f5ff);
-    ell(rear,black,0,1.12,-.40,.42,.52,.06);
-    ell(rear,black,0,2.02,-.42,.44,.45,.06);
-    for(const side of [-1,1]){
-      ell(rear,feather,side*.39,1.17,-.22,.13,.32,.10,side*.16);
-      ell(rear,m(0xffd38c),side*.26,.36,-.34,.24,.12,.25);
-    }
+    // Feather shading is baked into the coat; the scarf supplies the only
+    // meaningful layered rear accessory.
     const scarf=groupAt(rear,0,1.36,-.48);
     scarf.name='penguin-blue-scarf';
     scarf.scale.setScalar(.52); // Keep the clean black-white penguin silhouette
@@ -472,25 +431,8 @@ export function createAnimal(id, palette = {}) {
   }else if(id==='cow'){
     // Rounded black/charcoal markings arranged asymmetrically across a
     // plush white calf silhouette, all legible from behind.
-    const spot=m(0x34343b);
-    const fur=m(0xfffdf7);
-    for(const side of [-1,1]){
-      ell(rear,fur,side*.33,.71,-.32,.15,.23,.08,side*.16);
-    }
-    const patches=[
-      [-.24,1.25,-.51,.34,.36,.10,.25],
-      [.32,.78,-.48,.28,.23,.10,-.28],
-      [.08,2.21,-.49,.29,.26,.09,.12],
-      [-.41,.72,-.37,.15,.16,.11,-.33]
-    ];
-    for(let i=0;i<patches.length;i++){
-      const [x,y,z,w,h,d,tilt]=patches[i];
-      const patch=ell(rear,spot,x,y,z,w,h,d,tilt);
-      patch.name='cow-spot-'+i;
-    }
-    for(const side of [-1,1]){
-      ell(face,m(0xf2b7c1),side*.77,.30,-.11,.21,.11,.08,side*.2);
-    }
+    // Rounded charcoal calf spots now belong to the torso paint instead
+    // of separate dark spheres floating off the white fur.
     const bow=groupAt(rear,0,1.29,-.54);
     bow.name='cow-pink-bow';
     bow.scale.setScalar(.48); // Small charm, not a distracting floating bow

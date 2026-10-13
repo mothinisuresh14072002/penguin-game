@@ -311,6 +311,32 @@ world scenery. The shop remains available from the main game menu.
   sky setup and asset mapping; real phone performance and visual art review
   are still required.
 
+## 🧸 Unified soft-chibi character pass (October 2026)
+
+The seven **playable Three.js animals** now use a consistent soft, simple
+face design rather than dozens of raised eye and muzzle balls:
+
+- **Painted 512px face textures** in `src/cuteFace.js` place the same
+  oval eyes, shiny catchlights, soft blush and small smile directly on
+  the 3D head. Each animal keeps appropriate coat colouring, and the cat
+  retains mint-green irises.
+- **Painted 512px coat textures** in `src/cuteCoat.js` blend Bunny's
+  creamy fur, Cow's charcoal spots, Cat's tabby stripes, Horse's cream
+  rump, Dog's cream patches and Penguin's feather shading into the
+  body itself. Black spots and stripes no longer stick out as ellipsoids.
+- Rounded, sculpted ears, a distinguishable curved cat tail, clear feet,
+  a small bunny cotton tail, and smaller collars/bows remain 3D where
+  their silhouettes matter.
+- Bunny, Unicorn, Horse, Cat, Dog, Penguin and Cow still share working
+  animated body groups and their own recognizable run/hop/waddle styles.
+
+The body and head are still separate lightweight procedural meshes, so
+this reduces visible seams rather than guaranteeing a seamless
+professionally sculpted animal. Replacing them with textured, rigged
+GLBs remains the path to the exact cinematic-reference level. Browser
+QA checks that all seven animal faces and coats are actually painted
+in WebGL rather than only having data or mock artwork.
+
 ## 🎮 Gameplay and features
 
 | Feature | How it works |

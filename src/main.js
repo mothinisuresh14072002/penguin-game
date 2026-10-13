@@ -104,6 +104,7 @@ const SHARED_GEOMETRIES=new Set([sphere,cube,coneGeo]);
 const SHARED_MATERIALS=new Set([snowMat,iceMat,deepIce,rockMat,dark,white,pink,gold,energyMat,powerMat,wood]);
 function disposeGroup(root){root.traverse(obj=>{if(obj.isMesh){if(obj.geometry&&!SHARED_GEOMETRIES.has(obj.geometry))obj.geometry.dispose();const mats=Array.isArray(obj.material)?obj.material:[obj.material];for(const m of mats)if(m&&!SHARED_MATERIALS.has(m))m.dispose()}})}
 function swapCharacter(){
+ if(typeof testSelect!=='undefined')testSelect.value=profile.selected;
  ++characterLoadSequence;
  scene.remove(character.group);
  if(character.imported)releaseImportedAnimal(character);
@@ -454,6 +455,27 @@ function updateHUD(){
  $('walletHud').textContent=profile.coins;
  $('power').textContent=shield>0?'🛡 '+Math.ceil(shield)+'s':magnet>0?'🧲 '+Math.ceil(magnet)+'s':'';
 }
+// Temporary visual QA controls: test every animal without purchasing or restarting.
+const testSwitcher=document.createElement('div');
+testSwitcher.className='character-test-switcher';
+testSwitcher.setAttribute('aria-label','Character testing controls');
+testSwitcher.innerHTML='<span class="test-heading">🧪 CHARACTER TEST</span><button type="button" data-step="-1" aria-label="Previous animal">◀</button><select aria-label="Choose test animal"></select><button type="button" data-step="1" aria-label="Next animal">▶</button>';
+const testSelect=testSwitcher.querySelector('select');
+for(const ch of CHARS){const option=document.createElement('option');option.value=ch.id;option.textContent=ch.icon+' '+ch.name;testSelect.appendChild(option)}
+testSelect.value=profile.selected;
+function testSwitchTo(id){
+ if(!validIds.has(id)||profile.selected===id)return;
+ profile.selected=id;
+ // Testing is free and does not modify unlocks, wallet or saved selection.
+ swapCharacter();updateHUD();testSelect.value=id;
+}
+testSelect.addEventListener('change',()=>testSwitchTo(testSelect.value));
+for(const button of testSwitcher.querySelectorAll('button'))button.onclick=()=>{
+ const current=CHARS.findIndex(ch=>ch.id===profile.selected);
+ const next=(current+Number(button.dataset.step)+CHARS.length)%CHARS.length;
+ testSwitchTo(CHARS[next].id);
+};
+document.getElementById('app').appendChild(testSwitcher);
 $('pauseBtn').onclick=()=>{if(!running)return;paused=!paused;$('pauseBtn').textContent=paused?'▶':'Ⅱ';$('pauseBanner').classList.toggle('hidden',!paused)};
 $('shopBack').onclick=menu;
 $('startFromShop').onclick=start;

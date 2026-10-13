@@ -539,3 +539,20 @@ export function animateAnimal(actor, t, moving=true, airborne=false) {
     (actor.id==='penguin'?.057:.022)*pace;
   actor.group.scale.y=airborne?1.04:1;
 }
+
+// Correct the rendered feet against the actual road surface *after* pose and scale.
+// Jump height stays additive: ground contact is maintained only at jump offset zero.
+const contactBounds=new THREE.Box3();
+export function alignAnimalFeetToRoad(actor,roadY,jumpHeight=0){
+ if(!actor?.feet?.length||!Number.isFinite(roadY))return;
+ actor.group.updateMatrixWorld(true);
+ let lowest=Infinity;
+ for(const foot of actor.feet){
+  contactBounds.setFromObject(foot);
+  if(Number.isFinite(contactBounds.min.y))lowest=Math.min(lowest,contactBounds.min.y);
+ }
+ if(Number.isFinite(lowest)){
+  actor.group.position.y+=roadY+Math.max(0,jumpHeight)-lowest;
+  actor.group.updateMatrixWorld(true);
+ }
+}

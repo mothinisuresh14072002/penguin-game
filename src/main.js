@@ -652,6 +652,8 @@ if(new URLSearchParams(location.search).has('qa')){
   physicalLandmarkZ:landmarks?.strips[2]?.position.z,
   avatarFeet:character.feet?.length??0,
   avatarHeadWidth:character.group.getObjectByName(profile.selected+'-distinct-head')?.scale.x??null,
+  faceStyle:character.group.getObjectByName(profile.selected+'-distinct-head')?.userData?.cuteFace?.eyeStyle??null,
+  paintedFaceResolution:character.group.getObjectByName(profile.selected+'-distinct-head')?.material?.map?.image?.width??0,
   hasBunnyCottonTail:profile.selected==='bunny'&&Boolean(character.group.getObjectByName('bunny-cotton-tail')),
   farCloudZ:skyClouds[1].position.z,
   horizonZ:backdrop.horizon.position.z,

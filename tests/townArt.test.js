@@ -12,14 +12,14 @@ test('Coco Cat has plush orange tabby markings, green irises and an animated tai
  assert.ok(actor.group.getObjectByName('cat-tail-tip'));
  assert.ok(actor.catTail);
  const mats=new Set(),geos=new Set();
- let stripes=0;
+
  actor.group.traverse(o=>{
   if(!o.isMesh)return;
   mats.add(o.material);
   geos.add(o.geometry);
-  if(o.name==='cat-fur-stripe')stripes++;
+
  });
- assert.ok(stripes>=5,'Kitten must have clearly visible rear tabby markings');
+ assert.equal(actor.group.getObjectByName('cat-smooth-body').userData.coatPattern,'orange-tabby','Tabby stripes should be painted into the fur, not raised shapes');
  assert.ok([...mats].some(m=>m.isMeshPhysicalMaterial));
  assert.equal(actor.group.getObjectByName('cat-distinct-head').userData.cuteFace.iris,0x54b88e,'Kitten should have the unified green-eye face design');
  animateAnimal(actor,.27,true,false);

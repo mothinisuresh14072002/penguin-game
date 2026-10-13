@@ -30,6 +30,15 @@ export function createAnimal(id, palette = {}) {
       new THREE.Vector2(.45,.89),
       new THREE.Vector2(0,1)
     ],28),
+    // Single seamless tapered limb surface with a broad shoulder and
+    // rounded paw. Avoid adjoining sphere/sphere seams on each front leg.
+    softLimb: new THREE.LatheGeometry([
+      new THREE.Vector2(0,-1),new THREE.Vector2(.49,-.98),
+      new THREE.Vector2(.69,-.76),new THREE.Vector2(.77,-.46),
+      new THREE.Vector2(.66,-.12),new THREE.Vector2(.79,.31),
+      new THREE.Vector2(.91,.69),new THREE.Vector2(.70,.91),
+      new THREE.Vector2(0,1)
+    ],22),
     box: new THREE.BoxGeometry(1, 1, 1),
     cone: new THREE.ConeGeometry(1, 1, 12),
     cylinder: new THREE.CylinderGeometry(1, 1, 10, 12),
@@ -254,18 +263,21 @@ export function createAnimal(id, palette = {}) {
   for(const side of [-1,1]){
     const pivot=side===-1?pivotL:pivotR;
     if(id==='penguin'){
-      // Dark tapered flippers swing with the existing gait animation.
-      const flipper=ell(pivot,coat,side*.21,-.30,-.03,.24,.44,.15,-side*.36);
+      // One tapered flipper mesh: no second dark round piece at the tip.
+      const flipper=part(pivot,geometries.softLimb,coat,
+        side*.18,-.31,-.035,.19,.37,.13,-side*.40);
       flipper.name='penguin-flipper';
-      ell(pivot,m(0x41516a),side*.27,-.56,-.08,.18,.21,.09,-side*.38);
     }else if(id==='bunny'){
-      // Slim front arms sit beside, not in front of, the cotton tail.
-      const paw=ell(pivot,coat,side*.01,-.22,.03,.135,.28,.145,-side*.12);
+      // Shoulder broadens into one rounded paw with no visible segment
+      // joining two ball shapes.
+      const paw=part(pivot,geometries.softLimb,coat,
+        side*.008,-.24,.025,.135,.29,.135,-side*.13);
       paw.name='bunny-slim-front-leg';
     }else{
-      const thickness=id==='cat'?.16:id==='horse'?.16:.20;
-      ell(pivot,coat,side*.07,-.28,.04,thickness,.36,.18,-side*.12);
-      ell(pivot,ivory,side*.08,-.55,.16,.14,.095,.18);
+      const thickness=id==='cat'?.16:id==='horse'?.16:.18;
+      const arm=part(pivot,geometries.softLimb,coat,
+        side*.06,-.29,.035,thickness,.35,.17,-side*.12);
+      arm.name=id+'-soft-front-leg';
     }
   }
   const feet=[];

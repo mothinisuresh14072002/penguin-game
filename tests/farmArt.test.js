@@ -14,14 +14,14 @@ test('Mimi Cow has fluffy PBR coat, black spots, pink bow and animated tail',()=
  }
  assert.equal(cow.cowEars.length,2);
  assert.ok(cow.cowTail);
- const mats=new Set(),geos=new Set();let patches=0;
+ const mats=new Set(),geos=new Set();
  cow.group.traverse(o=>{
   if(!o.isMesh)return;
-  if(o.name.startsWith('cow-spot-'))patches++;
+
   geos.add(o.geometry);
   for(const m of Array.isArray(o.material)?o.material:[o.material])mats.add(m);
  });
- assert.ok(patches>=4,'The cow must have visible black and white markings');
+ assert.equal(cow.group.getObjectByName('cow-smooth-body').userData.coatPattern,'black-calf-spots','Spots should be part of the fur, not floating shapes');
  assert.ok([...mats].some(m=>m.isMeshPhysicalMaterial));
  animateAnimal(cow,.25,true,false);
  assert.ok(Math.abs(cow.cowTail.rotation.y)>.02);

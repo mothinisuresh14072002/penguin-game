@@ -89,6 +89,15 @@ export function createAnimal(id, palette = {}) {
     sheen:.55,sheenRoughness:.92
   });
   torso.userData.coatPattern=COAT_PATTERNS[id]||'clean-cream';
+  if(id==='dog'){
+    // A tiny collar is an intentional accessory, unlike raised fur patches.
+    const collar=part(root,geometries.torus,m(0xd95c71),
+      0,1.39,0,.45,.45,.34);
+    collar.name='dog-red-collar';
+    collar.rotation.x=Math.PI/2;
+    const tag=ell(root,gold,0,1.26,.46,.092,.10,.055);
+    tag.name='dog-collar-tag';
+  }
   // Belly is visually part of the torso and no longer a raised plush disc.
   // The coat map gives Cow, Cat, Horse, Dog etc their markings.
   const face=groupAt(root,0,id==='bunny'?1.77:1.82,.035);

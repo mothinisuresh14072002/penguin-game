@@ -21,7 +21,7 @@ test('Coco Cat has plush orange tabby markings, green irises and an animated tai
  });
  assert.ok(stripes>=5,'Kitten must have clearly visible rear tabby markings');
  assert.ok([...mats].some(m=>m.isMeshPhysicalMaterial));
- assert.ok([...mats].some(m=>m.color?.getHex()===0x54b88e),'Kitten should have green irises');
+ assert.equal(actor.group.getObjectByName('cat-distinct-head').userData.cuteFace.iris,0x54b88e,'Kitten should have the unified green-eye face design');
  animateAnimal(actor,.27,true,false);
  assert.ok(Math.abs(actor.catTail.rotation.z)>0);
  animateAnimal(actor,.27,false,false);

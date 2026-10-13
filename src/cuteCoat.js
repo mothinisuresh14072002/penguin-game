@@ -11,7 +11,7 @@ const hex=n=>'#'+n.toString(16).padStart(6,'0');
 function softOval(ctx,x,y,rx,ry,colour,opacity=.9){
  ctx.save();
  ctx.translate(x,y);
- const radial=ctx.createRadialGradient(0,0,rx*.12,0,0,Math.max(rx,ry));
+ const radial=ctx.createRadialGradient(0,0,.12,0,0,1);
  radial.addColorStop(0,colour);
  radial.addColorStop(.55,colour);
  radial.addColorStop(1,colour+'00');

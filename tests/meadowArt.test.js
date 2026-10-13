@@ -6,7 +6,7 @@ import {
 } from '../src/meadowArt.js';
 import {createAnimal,animateAnimal} from '../src/animalArt.js';
 
-test('Bella Bunny has a plush two-sided ear design and an actual flower dress',()=>{
+test('Bella Bunny has soft sculpted ears and a small pastel floral accent',()=>{
  const bunny=createAnimal('bunny');
  assert.ok(bunny.group.getObjectByName('bunny-dress-back'));
  assert.ok(bunny.group.getObjectByName('bunny-dress-flower'));
@@ -18,7 +18,8 @@ test('Bella Bunny has a plush two-sided ear design and an actual flower dress',(
   mats.add(o.material);
   geometries.add(o.geometry);
  });
- assert.ok(colors.size>=12,'Bunny should have multiple complementary colours');
+ assert.ok(colors.size>=5,'Bunny retains gentle complementary colours without piled-on face meshes');
+ assert.equal(bunny.group.getObjectByName('bunny-distinct-head').userData.cuteFace.eyeStyle,'soft-oval-catchlight-v1');
  assert.ok([...mats].some(m=>m.isMeshPhysicalMaterial),'Fur should use a soft PBR sheen');
  animateAnimal(bunny,.21,true,false);
  assert.ok(Math.abs(bunny.ears[0].rotation.z)>0);

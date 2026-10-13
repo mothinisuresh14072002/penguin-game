@@ -54,3 +54,11 @@
  .energy-ui{top:92px;left:11px;width:164px}
  .world-label{top:92px;right:11px;left:auto;font-size:10px}
 }
+
+/* Temporary testing-only control, unobtrusive during a run. */
+.character-test-switcher{position:fixed;z-index:7;left:50%;bottom:48px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:8px 10px;background:#082b48df;border:1px solid #c9f5ff95;box-shadow:0 7px 24px #00243e66;border-radius:20px;backdrop-filter:blur(12px);color:#fff;font:700 12px 'Outfit',sans-serif}
+.character-test-switcher .test-heading{white-space:nowrap;font-size:10px;letter-spacing:.05em;color:#b9f9ff}
+.character-test-switcher button,.character-test-switcher select{border:1px solid #d4efff72;background:#ffffff21;color:#fff;border-radius:10px;padding:8px;font:700 12px 'Outfit',sans-serif;cursor:pointer}
+.character-test-switcher select{background:#153f61;max-width:145px}
+.character-test-switcher button:focus-visible,.character-test-switcher select:focus-visible{outline:2px solid #fff57f;outline-offset:2px}
+@media(max-width:640px){.character-test-switcher{bottom:42px;padding:6px;gap:4px}.character-test-switcher .test-heading{font-size:9px}.character-test-switcher select{max-width:112px;font-size:11px}.character-test-switcher button{padding:7px}}

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import './race.css';
-import {createAnimal, animateAnimal} from './animalArt.js';
+import {createAnimal, animateAnimal, alignAnimalFeetToRoad} from './animalArt.js';
 import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 import {create3DBackdrop} from './visual3d.js';
@@ -271,6 +271,7 @@ function updatePlayer(p,dt){
  p.hero.update?.(dt,p.time,p.stun<=0,p.y>.05);
  p.hero.group.scale.x=1.03;p.hero.group.scale.z=1.03;
  p.hero.group.scale.y=1.03*(p.slide>0?.57:(p.y>.05?1.04:1));
+ alignAnimalFeetToRoad(p.hero,.068,p.y);
  p.hero.shadow.position.x=px;
  p.hero.shadow.material.opacity=.55-Math.min(.43,p.y*.15);
  const fov=55+(currentSpeed-22)*.13;

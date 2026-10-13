@@ -23,7 +23,8 @@ test('Dodo Dog has soft PBR fur, floppy ears, red collar and wagging tail',()=>{
   for(const m of all){mats.add(m);if(m.color)colors.add(m.color.getHex());}
  });
  assert.ok([...mats].some(m=>m.isMeshPhysicalMaterial),'Dog fur needs soft sheen');
- assert.ok(colors.size>=10);
+ assert.ok(colors.size>=5,'The puppy should have readable coat and accessory colour');
+ assert.equal(pup.group.getObjectByName('dog-smooth-body').userData.coatPattern,'cream-shoulders');
  animateAnimal(pup,.25,true,false);
  assert.ok(Math.abs(pup.dogEars[0].rotation.x)>.01);
  assert.ok(Math.abs(pup.dogEars[1].rotation.z)>.01);

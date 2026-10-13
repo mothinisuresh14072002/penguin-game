@@ -20,6 +20,18 @@ function ellipse(ctx,x,y,rx,ry,color){
  ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);
  ctx.fillStyle=color;ctx.fill();
 }
+// Feather the edges of coat markings so they feel dyed into the fur,
+// not like flat stickers pasted over an otherwise soft 3D sculpture.
+function pigment(ctx,x,y,rx,ry,color,opacity=.94){
+ ctx.save();ctx.translate(x,y);ctx.scale(rx,ry);
+ const gradient=ctx.createRadialGradient(0,0,.15,0,0,1);
+ gradient.addColorStop(0,color);
+ gradient.addColorStop(.66,color);
+ gradient.addColorStop(1,color+'00');
+ ctx.globalAlpha=opacity;ctx.fillStyle=gradient;
+ ctx.beginPath();ctx.arc(0,0,1,0,Math.PI*2);ctx.fill();
+ ctx.restore();
+}
 function softBlush(ctx,x,y,shade){
  const grad=ctx.createRadialGradient(x,y,2,x,y,23);
  grad.addColorStop(0,shade+'95');
@@ -48,20 +60,20 @@ export function createCuteFaceTexture(id,coatOverride=null){
  const cx=128;
  // Species markings are subtle pigments instead of thick extra meshes.
  if(id==='penguin'){
-  ellipse(ctx,cx,262,79,126,'#fffaf3');
-  ellipse(ctx,cx-32,251,38,104,'#ffffff');
-  ellipse(ctx,cx+32,251,38,104,'#ffffff');
+  pigment(ctx,cx,262,79,126,'#fffaf3');
+  pigment(ctx,cx-32,251,38,104,'#ffffff');
+  pigment(ctx,cx+32,251,38,104,'#ffffff');
  }else if(id==='cow'){
-  ellipse(ctx,161,176,37,27,'#39333c');
-  ellipse(ctx,cx,298,44,29,'#f4c5cf');
+  pigment(ctx,161,176,37,27,'#39333c');
+  pigment(ctx,cx,298,44,29,'#f4c5cf');
  }else if(id==='horse'){
-  ellipse(ctx,cx,213,11,73,'#ffe6c8');
-  ellipse(ctx,cx,291,44,30,'#eac29e');
+  pigment(ctx,cx,213,11,73,'#ffe6c8');
+  pigment(ctx,cx,291,44,30,'#eac29e');
  }else if(id==='unicorn'){
-  ellipse(ctx,cx,183,43,14,'#e3d1fe');
+  pigment(ctx,cx,183,43,14,'#e3d1fe');
  }else if(id==='dog'){
-  ellipse(ctx,103,191,31,39,'#bb8b69');
-  ellipse(ctx,cx,299,43,25,'#fff6e8');
+  pigment(ctx,103,191,31,39,'#bb8b69');
+  pigment(ctx,cx,299,43,25,'#fff6e8');
  }else if(id==='cat'){
   ctx.lineCap='round';ctx.strokeStyle='#c17a3b';ctx.lineWidth=6;
   for(const offset of [-22,0,22]){
@@ -69,7 +81,7 @@ export function createCuteFaceTexture(id,coatOverride=null){
    ctx.quadraticCurveTo(cx+offset*.8,171,cx+offset*.7,183);ctx.stroke();
   }
  }else if(id==='bunny'){
-  ellipse(ctx,cx,292,39,23,'#fff5ed');
+  pigment(ctx,cx,292,39,23,'#fff5ed');
  }
  for(const direction of [-1,1]){
   const x=cx+direction*38;

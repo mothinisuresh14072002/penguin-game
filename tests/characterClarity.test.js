@@ -26,8 +26,8 @@ test('Bella has two distinguishable oval hind feet, single cotton tail and slend
  assert.ok(feet.every(Boolean));
  assert.ok(feet.every(foot=>Boolean(foot.getObjectByName('bunny-oval-toe'))));
  assert.ok(bunny.group.getObjectByName('bunny-cotton-tail'));
- assert.ok(bunny.group.getObjectByName('bunny-left-haunch'));
- assert.ok(bunny.group.getObjectByName('bunny-right-haunch'));
+ assert.equal(bunny.group.getObjectByName('bunny-smooth-body').geometry.type,'LatheGeometry');
+ assert.equal(bunny.group.getObjectByName('bunny-smooth-body').userData.coatPattern,'clean-cream');
  assert.ok(bunny.group.getObjectByName('bunny-left-ear'));
  assert.ok(bunny.group.getObjectByName('bunny-right-ear'));
  assert.equal(bunny.ears.length,2);

@@ -7,7 +7,7 @@ import {createWorldLandmarks} from '../src/landmarkArt.js';
 
 test('Pip Penguin has a soft coat, little blue scarf, flippers and snowy badge',()=>{
  const penguin=createAnimal('penguin');
- for(const part of ['penguin-cream-face-mask','penguin-blue-scarf',
+ for(const part of ['penguin-distinct-head','penguin-blue-scarf',
    'penguin-snowflake-badge']){
    assert.ok(penguin.group.getObjectByName(part),part+' is missing');
  }

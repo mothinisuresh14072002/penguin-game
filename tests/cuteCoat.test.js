@@ -31,3 +31,18 @@ test('Calf spots, tabby stripes and bunny hips are NOT glued-on rear spheres',()
   for(const m of materials)m.dispose();
  }
 });
+
+test('All seven front limbs are tapered continuous meshes, not stacked paw balls',()=>{
+ for(const id of ids){
+  const actor=createAnimal(id);
+  const name=id==='penguin'?'penguin-flipper':id==='bunny'?'bunny-slim-front-leg':id+'-soft-front-leg';
+  const limbs=[];
+  actor.group.traverse(o=>{if(o.name===name)limbs.push(o)});
+  assert.equal(limbs.length,2,id+' needs two sculpted front limbs');
+  assert.ok(limbs.every(o=>o.geometry.type==='LatheGeometry'));
+  const geos=new Set(),mats=new Set();
+  actor.group.traverse(o=>{if(o.isMesh){geos.add(o.geometry);mats.add(o.material)}});
+  for(const g of geos)g.dispose();
+  for(const m of mats)m.dispose();
+ }
+});

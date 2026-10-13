@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import './style.css';
-import {createAnimal, animateAnimal} from './animalArt.js';
+import {createAnimal, animateAnimal, alignAnimalFeetToRoad} from './animalArt.js';
 import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
 import {renderCharacterPreviews, renderImportedPreview} from './characterPreviews.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
@@ -612,6 +612,8 @@ function tick(now){
  // Characters occupy the lower part of the view like the reference art.
  character.group.scale.x=1.03;character.group.scale.z=1.03;
  character.group.scale.y=1.03*(sliding>0?.53:(playerY>.05?1.04:1));
+ // Keep the lowest animated foot touching the visible path rather than floating.
+ alignAnimalFeetToRoad(character,.29,playerY);
  if(run&&playerY<=.02&&sliding<=0&&clockTime-lastStepSound>.25){lastStepSound=clockTime;sound(165+(Math.floor(clockTime*10)%3)*21,.047,'triangle',.014)}
  // Wider field of view at higher speeds makes acceleration more noticeable.
  const desiredFov=55+(Math.min(58,speed)-18)*.15;

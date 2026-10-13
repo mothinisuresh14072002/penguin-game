@@ -7,7 +7,7 @@ import {createPrairieDetails,PRAIRIE_STRIPS,PRAIRIE_STRIP_LENGTH,WHEAT_PER_STRIP
 
 test('Hugo Horse has soft PBR coat, long chestnut mane and pony markings',()=>{
  const pony=createAnimal('horse');
- assert.ok(pony.group.getObjectByName('horse-face-blaze'));
+ assert.equal(pony.group.getObjectByName('horse-distinct-head').userData.cuteFace.eyeStyle,'soft-oval-catchlight-v1');
  assert.ok(pony.group.getObjectByName('horse-pony-mane'));
  assert.ok(pony.group.getObjectByName('horse-pony-blanket'));
  assert.equal(pony.ears.length,2);

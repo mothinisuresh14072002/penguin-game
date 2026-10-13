@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {createSoftEarGeometry,createRoundedTriangleGeometry} from './chibiGeometry.js';
+import {createCuteFaceTexture,getCuteFaceStyle,FACE_EYE_STYLE} from './cuteFace.js';
 
 // Shared character design system for solo and split-screen play.
 // These are genuine animated Three.js meshes (not flat screenshots or image cards).
@@ -99,53 +100,24 @@ export function createAnimal(id, palette = {}) {
   const face=groupAt(root,0,id==='bunny'?1.77:1.82,.035);
   const head=ell(face,coat,0,0,0,...shape.head);
   head.name=id+'-distinct-head';
-  if(id==='penguin'){
-    // The little penguin has a prominent rounded white mask and gentle
-    // powder-blue highlights instead of looking like a featureless dark ball.
-    const mask=ell(face,ivory,0,-.06,.43,.55,.52,.16);
-    mask.name='penguin-cream-face-mask';
-    for(const side of [-1,1]){
-      ell(face,m(0xffb5ba),side*.46,-.24,.41,.11,.075,.05);
-      ell(face,m(0x47556d),side*.58,-.03,-.08,.15,.35,.20,side*.30);
-    }
-  }else if(id==='dog'){
-    ell(face,ivory,0,-.22,.42,.48,.24,.18);
-    ell(face,m(0xb78153),-.32,.14,.42,.20,.28,.14,.18);
-  }else if(id==='cow'){
-    ell(face,m(0x343138),.28,.28,.36,.27,.27,.14,-.35);
-  }else if(id==='horse'){
-    ell(face,m(0xe8b88c),0,-.29,.48,.37,.26,.29);
+  // Paint the eyes, cheeks, nose, smile and species markings onto the head.
+  // No stacked eyeball or muzzle spheres projecting through one another.
+  const cuteFaceStyle=getCuteFaceStyle(id);
+  const faceTexture=createCuteFaceTexture(id,coat.color.getHex());
+  if(faceTexture){
+    head.material=new THREE.MeshPhysicalMaterial({
+      color:0xffffff,map:faceTexture,roughness:.86,
+      metalness:0,sheen:.48,sheenRoughness:.9,clearcoat:.015
+    });
   }
-  // Large reflective eyes, two eye highlights and eyelashes.
-  for(const side of [-1,1]){
-    ell(face,cream,side*.285,.10,.492,.183,.228,.09);
-    ell(face,ink,side*.285,.095,.566,.134,.174,.061);
-    ell(face,m(id==='penguin'?0x328ebc:id==='cat'?0x54b88e:0x413645,true),side*.277,.105,.616,.077,.117,.025);
-    ell(face,cream,side*.24,.169,.65,.044,.055,.024);
-    ell(face,cream,side*.32,.046,.657,.019,.025,.013);
-    ell(face,blush,side*.45,-.226,.38,.152,.089,.06);
-    if(['bunny','unicorn','cat'].includes(id)){
-      const lash=ell(face,ink,side*.406,.28,.49,.035,.10,.023);
-      lash.rotation.z=side*.45;
-    }
-  }
+  head.userData.cuteFace={
+    eyeStyle:FACE_EYE_STYLE,iris:cuteFaceStyle.iris,
+    blush:cuteFaceStyle.blush,painted:!!faceTexture
+  };
   if(id==='penguin'){
-    const beak=triangle(face,peach,0,-.18,.605,.145,.26);
-    beak.rotation.x=Math.PI/2;
-  }else{
-    if(id==='cow'){
-      ell(face,m(0xf0a6b4),0,-.30,.56,.42,.29,.24);
-      for(const side of [-1,1])ell(face,m(0xa96978),side*.19,-.35,.777,.05,.038,.025);
-    }else if(id==='horse'||id==='unicorn'){
-      ell(face,id==='unicorn'?ivory:m(0xe8bc92),0,-.31,.55,.27,.23,.26);
-      for(const side of [-1,1])ell(face,brown,side*.12,-.43,.77,.038,.03,.018);
-    }else{
-      ell(face,ivory,0,-.30,.50,.29,.20,.18);
-      ell(face,id==='dog'?ink:nose,0,-.244,.668,.10,.071,.065);
-    }
-    // Small smiling mouth and muzzle dimples.
-    ell(face,ink,0,-.443,.675,.072,.022,.022);
-    for(const side of [-1,1])ell(face,blush,side*.19,-.41,.63,.06,.025,.025);
+    // One tiny three-dimensional beak remains a defining silhouette.
+    const beak=triangle(face,peach,0,-.22,.44,.115,.18);
+    beak.name='penguin-soft-beak';beak.rotation.x=Math.PI/2;
   }
   const ears=[];
   for(const side of [-1,1]){
@@ -254,52 +226,21 @@ export function createAnimal(id, palette = {}) {
     }
   }
   if(id==='horse'){
-    const mane=m(0x80513d);
-    for(let i=0;i<7;i++)ell(face,mane,-.35+i*.12,.55+(i%3)*.09,-.12,.16,.26,.17);
-    // Cream blaze and rounded muzzle contrast with the chestnut fur.
-    const blaze=ell(face,m(0xffead3),0,.12,.526,.15,.34,.05);
-    blaze.name='horse-face-blaze';
-    for(const side of [-1,1]){
-      ell(face,m(0xffd5b2),side*.48,-.24,.30,.18,.16,.12);
-      ell(face,m(0x9a6442),side*.28,-.48,.64,.045,.025,.025);
-    }
+    // A few flat locks blend into the head; the cream blaze is painted.
+    const maneMat=m(0x80513d);
+    for(let i=0;i<5;i++)
+      ell(face,maneMat,-.26+i*.13,.49+(i%2)*.025,-.10,
+        .085,.16,.09,(i-2)*-.09);
   }
   if(id==='cat'){
-    // Wide kitten cheeks, soft orange tabby stripes and green-glass irises.
-    const stripe=m(0xc77a36);
-    for(const side of [-1,0,1]){
-      const mark=ell(face,stripe,side*.15,.43,.45,.075,.17,.045,-side*.22);
-      mark.name='cat-tabby-forehead';
-    }
-    for(const side of [-1,1]){
-      ell(face,m(0xffd69c),side*.50,-.27,.24,.22,.24,.19,-side*.25);
-      ell(face,m(0xfff1de),side*.31,-.38,.47,.21,.16,.12);
-      ell(face,m(0xe68d9f),side*.53,-.20,.40,.13,.07,.045);
-    }
+    // Delicate whiskers provide depth; stripes, irises and blush are
+    // pigment on the head surface, not protruding spheres.
     const whiskMat=m(0xf4e7d9);
     for(const side of [-1,1])for(let i=-1;i<=1;i++){
-      const whisker=part(face,geometries.cylinder,whiskMat,side*.57,-.32+i*.085,.52,.009,.48,.009);
-      whisker.rotation.z=Math.PI/2+side*i*.13;
+      const whisker=part(face,geometries.cylinder,whiskMat,
+        side*.51,-.29+i*.08,.28,.006,.27,.006);
+      whisker.rotation.z=Math.PI/2+side*i*.14;
     }
-  }
-  if(id==='bunny'){
-    // Two tiny cheek highlights on the face; no piled pom-pom cheeks.
-    for(const side of [-1,1])
-      ell(face,m(0xfff2e8),side*.38,-.28,.35,.13,.10,.10);
-  }
-  if(id==='cow'){
-    const fringe=m(0xfff8ee);
-    for(let i=0;i<3;i++)ell(face,fringe,(i-1)*.16,.52,.15,.16,.21,.16);
-    // Rounded cheeks and a broader blushing muzzle make the calf read as
-    // a baby animal in the front-facing character shop.
-    for(const side of [-1,1]){
-      ell(face,m(0xffd9de),side*.50,-.25,.34,.19,.18,.13);
-      ell(face,m(0xf9aebe),side*.45,-.27,.48,.12,.08,.04);
-    }
-  }
-  if(id==='dog'){
-    ell(face,m(0xc7926d),.34,.3,.4,.18,.22,.12);
-    ell(face,ink,0,-.43,.71,.1,.036,.016);
   }
   // Shoulders are inside the body's silhouette: no floating side pom-poms.
   const shoulderWidth={

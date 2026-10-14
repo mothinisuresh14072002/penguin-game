@@ -16,6 +16,9 @@ import {createParkDetails} from './parkArt.js';
 import {createGlacierDetails} from './glacierArt.js';
 import {createFarmDetails} from './farmArt.js';
 import {configureGameRenderer,browserQualityOptions} from './graphicsQuality.js';
+import {applyLighting,addCloudPuffs} from './lightingPresets.js';
+import {createAdaptiveResolution} from './adaptiveResolution.js';
+import {installCurvedWorld,curveRequested} from './curvedWorld.js';
 import {giveSurfaceDetail,surfaceKindForColor} from './hdSurface.js';
 import {createPickupArtwork} from './foodArt.js';
 import {FOODS,FOOD_BY_ANIMAL,DAILY_GOALS,WEEKLY_GOALS,createEconomy,synchronizeEconomy,collectFood,sellFood,openSurpriseBox,recordEvent,goalProgress,claimGoal,dailyKey} from './gameEconomy.js';
@@ -69,13 +72,16 @@ const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x80caef);scene.fog=new THREE.FogExp2(0xb9e8ff,.0075);
 const camera=new THREE.PerspectiveCamera(57,innerWidth/innerHeight,.1,300);
 camera.position.set(0,6.7,16.9);camera.lookAt(0,1.38,-21);
+if(curveRequested())installCurvedWorld();
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 const graphicsQuality=configureGameRenderer(renderer,browserQualityOptions());
 renderer.setSize(innerWidth,innerHeight);
+const adaptiveRes=createAdaptiveResolution({maxRatio:renderer.getPixelRatio(),minRatio:Math.min(.75,renderer.getPixelRatio())});
 document.body.prepend(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xd5f4ff,0x3f8bae,1.65));
+const hemi=new THREE.HemisphereLight(0xd5f4ff,0x3f8bae,1.65);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfffaf1,2.5);sun.position.set(-7,16,7);sun.castShadow=true;sun.shadow.mapSize.set(graphicsQuality.shadowSize,graphicsQuality.shadowSize);sun.shadow.bias=-.0005;sun.shadow.normalBias=.035;sun.shadow.camera.left=-16;sun.shadow.camera.right=16;sun.shadow.camera.top=18;sun.shadow.camera.bottom=-22;sun.shadow.camera.near=1;sun.shadow.camera.far=70;scene.add(sun);
 const glow=new THREE.DirectionalLight(0x379cf5,.72);glow.position.set(6,4,-13);scene.add(glow);
+const fillLight=new THREE.DirectionalLight(0xffe0e8,.55);fillLight.position.set(7,7,11);scene.add(fillLight);
 const mat=(c,r=.85,metalness=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness});
 const snowMat=mat(0xf3fbff),iceMat=mat(0x8fddf1,.27,.12),deepIce=mat(0x309ac8,.38,.1),rockMat=mat(0x627589),dark=mat(0x1a222d),white=mat(0xfffcf3),pink=mat(0xdb8584),gold=mat(0xffd64f,.28,.65),energyMat=mat(0x41e6ad,.3,.18),powerMat=mat(0xbb81ff,.3,.3),wood=mat(0x7c5638);
 const sphere=new THREE.SphereGeometry(1,18,12),cube=new THREE.BoxGeometry(1,1,1),coneGeo=new THREE.ConeGeometry(1,1,7);
@@ -195,7 +201,7 @@ const skyClouds=[];
 const cloudMaterial=mat(0xffffff,.95);
 for(let i=0;i<15;i++){
  const g=new THREE.Group();scene.add(g);
- for(const offset of [-1,0,1])orb(g,cloudMaterial,offset*.85,Math.abs(offset)*-.13,0,.98, .5+(offset===0?.27:0),.68);
+ addCloudPuffs(g,(grp,x,y,z,sx,sy,sz)=>orb(grp,cloudMaterial,x,y,z,sx,sy,sz));g.scale.setScalar(1.35);
  skyClouds.push(g);
 }
 const butterflies=[];
@@ -213,6 +219,7 @@ function applyBiome(){
  const picked=CHARS.find(c=>c.id===profile.selected)||CHARS[0];
  const biome=BIOMES[picked.biome];currentTheme=biome;
  scene.background.setHex(biome.sky);scene.fog.color.setHex(biome.fog);
+ applyLighting(picked.biome,{renderer,hemi,sun,fill:fillLight});
  backdrop.setBiome(picked.biome,biome.sky);
  cloudMaterial.color.setHex(picked.biome==='rainbow'?0xffe4ff:0xffffff);
  if(weatherParticles)weatherParticles.visible=picked.biome==='rainbow';
@@ -516,6 +523,7 @@ let last=performance.now(),lastMilestone=0,noticeUntil=0,combo=0,lastCoinDistanc
 function showSpeedNotice(message){const banner=$('speedNotice');if(banner){banner.textContent=message;banner.classList.remove('hidden');noticeUntil=clockTime+1.4;}}
 function tick(now){
  requestAnimationFrame(tick);
+ if(running&&!paused){const r=adaptiveRes.sample(now-last);if(r!==null){renderer.setPixelRatio(r);renderer.setSize(innerWidth,innerHeight)}}
  const dt=Math.min(.043,(now-last)/1000);last=now;
  if(running&&!paused){
   clockTime+=dt;
@@ -648,7 +656,7 @@ function tick(now){
  backdrop.update(clockTime,camera);
  renderer.render(scene,camera);
 }
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();configureGameRenderer(renderer,browserQualityOptions());renderer.setSize(innerWidth,innerHeight)});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();configureGameRenderer(renderer,browserQualityOptions());adaptiveRes.setMax(renderer.getPixelRatio());renderer.setPixelRatio(adaptiveRes.ratio);renderer.setSize(innerWidth,innerHeight)});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&!paused)$('pauseBtn').click()});
 window.addEventListener('blur',()=>{if(running&&!paused)$('pauseBtn').click();keys.clear()});
 try{audioEnabled=localStorage.getItem('polar-dash-sound')==='on'}catch{};

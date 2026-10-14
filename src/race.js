@@ -15,6 +15,9 @@ import {createParkDetails} from './parkArt.js';
 import {createGlacierDetails} from './glacierArt.js';
 import {createFarmDetails} from './farmArt.js';
 import {configureGameRenderer,browserQualityOptions} from './graphicsQuality.js';
+import {lightingFor,addCloudPuffs} from './lightingPresets.js';
+import {createAdaptiveResolution} from './adaptiveResolution.js';
+import {installCurvedWorld,curveRequested} from './curvedWorld.js';
 import {giveSurfaceDetail,surfaceKindForColor} from './hdSurface.js';
 import {createJourneyArt} from './journeyArt.js';
 import {loopZ,layerTravel} from './worldMotion.js';
@@ -38,9 +41,11 @@ const geom = {
  cylinder:new THREE.CylinderGeometry(1,1,1,8)
 };
 const bodyMat = color => new THREE.MeshStandardMaterial({color,roughness:.76});
+if(curveRequested())installCurvedWorld();
 const renderer = new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
 const graphicsQuality=configureGameRenderer(renderer,browserQualityOptions(true));
 renderer.setSize(innerWidth,innerHeight);
+const adaptiveRes=createAdaptiveResolution({maxRatio:renderer.getPixelRatio(),minRatio:Math.min(.75,renderer.getPixelRatio())});
 renderer.autoClear=false;
 renderer.domElement.style.touchAction='none';
 document.body.prepend(renderer.domElement);
@@ -70,8 +75,10 @@ function prop(scene,type,ch,x,z,index){
 function newRacePlayer(ch,index){
  const scene=new THREE.Scene();
  scene.background=new THREE.Color(ch.sky);scene.fog=new THREE.FogExp2(ch.sky,.0075);
- scene.add(new THREE.HemisphereLight(0xecfbff,0x728da1,1.65));
- const sun=new THREE.DirectionalLight(0xfff5e5,2.25);sun.position.set(-8,15,6);sun.castShadow=graphicsQuality.name==='hd';sun.shadow.mapSize.set(1024,1024);sun.shadow.normalBias=.035;scene.add(sun);
+ const biomeLight=lightingFor({bunny:'meadow',unicorn:'rainbow',horse:'grassland',cat:'city',dog:'park',penguin:'arctic',cow:'farm'}[ch.id]);
+ scene.add(new THREE.HemisphereLight(biomeLight.sky,biomeLight.ground,biomeLight.hemiI));
+ const fillLight=new THREE.DirectionalLight(biomeLight.fill,biomeLight.fillI);fillLight.position.set(7,7,11);scene.add(fillLight);
+ const sun=new THREE.DirectionalLight(biomeLight.sun,biomeLight.sunI);sun.position.set(-8,15,6);sun.castShadow=graphicsQuality.name==='hd';sun.shadow.mapSize.set(1024,1024);sun.shadow.normalBias=.035;scene.add(sun);
  const camera=new THREE.PerspectiveCamera(63,1,.1,290);
  camera.position.set(0,6.7,16.9);camera.lookAt(0,1.38,-21);
  const biomeId={bunny:'meadow',unicorn:'rainbow',horse:'grassland',cat:'city',dog:'park',penguin:'arctic',cow:'farm'}[ch.id]||'meadow';
@@ -102,7 +109,7 @@ function newRacePlayer(ch,index){
  const skyClouds=[],cloudMat=material(0xffffff);
  for(let i=0;i<14;i++){
   const cloud=new THREE.Group();
-  for(let k=-1;k<=1;k++)ball(cloud,cloudMat,k*.83,Math.abs(k)*-.1,0,.91,k===0?.73:.49,.57);
+  addCloudPuffs(cloud,(grp,x,y,z,sx,sy,sz)=>ball(grp,cloudMat,x,y,z,sx,sy,sz));cloud.scale.setScalar(1.35);
   scene.add(cloud);skyClouds.push(cloud);
  }
  const scenery=[];
@@ -314,6 +321,7 @@ function draw(){
 }
 function frame(now){
  requestAnimationFrame(frame);
+ if(playing&&!paused&&!finished){const r=adaptiveRes.sample(now-last);if(r!==null){renderer.setPixelRatio(r);renderer.setSize(innerWidth,innerHeight)}}
  const dt=Math.min(.042,Math.max(0,(now-last)/1000));last=now;
  if(playing&&!paused&&!finished){
   elapsed+=dt;
@@ -404,7 +412,7 @@ renderer.domElement.addEventListener('pointerup',event=>{
  else if(dy<0)jump(p);else slide(p);
 });
 renderer.domElement.addEventListener('pointercancel',()=>touchStart=null);
-addEventListener('resize',()=>{configureGameRenderer(renderer,browserQualityOptions(true));renderer.setSize(innerWidth,innerHeight)});
+addEventListener('resize',()=>{configureGameRenderer(renderer,browserQualityOptions(true));adaptiveRes.setMax(renderer.getPixelRatio());renderer.setPixelRatio(adaptiveRes.ratio);renderer.setSize(innerWidth,innerHeight)});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing&&!paused)pauseToggle()});
 addEventListener('blur',()=>{held.clear();if(playing&&!paused)pauseToggle()});
 // Opt-in read-only diagnostics for real-browser gameplay QA.

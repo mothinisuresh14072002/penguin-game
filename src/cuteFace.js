@@ -9,7 +9,7 @@ export const CUTE_FACE_STYLES=Object.freeze({
  horse:   Object.freeze({coat:0xc58b60,iris:0x413645,blush:0xeeb7a0,nose:0xb27d65}),
  cat:     Object.freeze({coat:0xf5a94f,iris:0x54b88e,blush:0xe99991,nose:0xb67672}),
  dog:     Object.freeze({coat:0xf4dcac,iris:0x413645,blush:0xf0b9a7,nose:0x3a3537}),
- penguin: Object.freeze({coat:0x222936,iris:0x413645,blush:0xf3b6c3,nose:0xf5a75d}),
+ penguin: Object.freeze({coat:0x1f2430,iris:0x2a2430,blush:0xf7c8d3,nose:0xf5bf54}),
  cow:     Object.freeze({coat:0xfffcf5,iris:0x413645,blush:0xf3b0be,nose:0xce8da2})
 });
 export const FACE_EYE_STYLE='soft-oval-catchlight-v1';
@@ -60,9 +60,10 @@ export function createCuteFaceTexture(id,coatOverride=null){
  const cx=128;
  // Species markings are subtle pigments instead of thick extra meshes.
  if(id==='penguin'){
-  pigment(ctx,cx,262,79,126,'#fffaf3');
-  pigment(ctx,cx-32,251,38,104,'#ffffff');
-  pigment(ctx,cx+32,251,38,104,'#ffffff');
+  pigment(ctx,cx,270,92,138,'#fffaf7');
+  pigment(ctx,cx-38,250,44,112,'#ffffff');
+  pigment(ctx,cx+38,250,44,112,'#ffffff');
+  pigment(ctx,cx,318,58,34,'#fffdf8');
  }else if(id==='cow'){
   pigment(ctx,161,176,37,27,'#39333c');
   pigment(ctx,cx,298,44,29,'#f4c5cf');
@@ -84,14 +85,22 @@ export function createCuteFaceTexture(id,coatOverride=null){
   pigment(ctx,cx,292,39,23,'#fff5ed');
  }
  for(const direction of [-1,1]){
-  const x=cx+direction*38;
-  softBlush(ctx,cx+direction*67,296,hex(palette.blush));
-  // The same eye system is used on ALL seven characters.
-  ellipse(ctx,x,233,24,31,'#fffefc');
-  ellipse(ctx,x,234,19,26,'#3a2d36');
-  ellipse(ctx,x,239,12.5,19,hex(palette.iris));
-  ellipse(ctx,x-6,222,7,8,'#ffffff');
-  ellipse(ctx,x+7,242,3.1,3.8,'#ffffff');
+  const isPenguin=id==='penguin';
+  const x=cx+direction*(isPenguin?42:38);
+  softBlush(ctx,cx+direction*(isPenguin?62:67),isPenguin?286:296,hex(palette.blush));
+  if(isPenguin){
+   ellipse(ctx,x,236,28,34,'#fffefc');
+   ellipse(ctx,x,237,22,29,'#2b2430');
+   ellipse(ctx,x,241,14,21,hex(palette.iris));
+   ellipse(ctx,x-7,224,8,9,'#ffffff');
+   ellipse(ctx,x+8,245,3.5,4.2,'#ffffff');
+  }else{
+   ellipse(ctx,x,233,24,31,'#fffefc');
+   ellipse(ctx,x,234,19,26,'#3a2d36');
+   ellipse(ctx,x,239,12.5,19,hex(palette.iris));
+   ellipse(ctx,x-6,222,7,8,'#ffffff');
+   ellipse(ctx,x+7,242,3.1,3.8,'#ffffff');
+  }
  }
  if(id!=='penguin'){
   ellipse(ctx,cx,286,id==='cow'?6:9,id==='cow'?4:6,hex(palette.nose));
@@ -102,10 +111,9 @@ export function createCuteFaceTexture(id,coatOverride=null){
   ctx.moveTo(cx,302);ctx.quadraticCurveTo(cx+9,310,cx+16,303);
   ctx.stroke();
  }else{
-  // A tiny painted triangle matches the solid beak from side angles.
-  ctx.beginPath();
-  ctx.moveTo(cx,281);ctx.lineTo(cx-10,297);ctx.lineTo(cx+10,297);ctx.closePath();
-  ctx.fillStyle='#f4ad68';ctx.fill();
+  // A rounded beak shade complements the tiny 3D beak.
+  ellipse(ctx,cx,286,24,15,'#f5bf54');
+  ellipse(ctx,cx,289,18,9,'#f0ad32');
  }
  ctx.restore();
  const texture=new THREE.CanvasTexture(canvas);

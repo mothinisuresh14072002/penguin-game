@@ -85,7 +85,7 @@ export function createAnimal(id, palette = {}) {
     cat:{body:[.40,.59,.35],head:[.53,.51,.46],belly:[.30,.43,.12]},
     dog:{body:[.51,.61,.43],head:[.57,.55,.49],belly:[.39,.46,.14]},
     penguin:{body:[.52,.68,.47],head:[.66,.62,.58],belly:[.46,.56,.14]},
-    cow:{body:[.56,.62,.48],head:[.59,.53,.49],belly:[.45,.49,.14]}
+    cow:{body:[.53,.60,.47],head:[.66,.60,.56],belly:[.47,.50,.14]}
   };
   const shape=shapes[id]||shapes.bunny;
   const torso=part(root,
@@ -199,101 +199,22 @@ export function createAnimal(id, palette = {}) {
       ear.add(inner);
       ears.push(ear);
     }else if(id==='cow'){
-      const ear=groupAt(face,side*.61,.27,-.08);
+      const ear=groupAt(face,side*.58,.30,-.06);
       ear.name=side<0?'cow-left-ear':'cow-right-ear';
-      ell(ear,coat,side*.14,.05,0,.30,.18,.19,side*.18);
-      ell(ear,m(0xf5b1c0),side*.16,.05,.17,.18,.10,.045);
-      // Inner ears are also visible from the runner's rear view.
-      ell(ear,m(0xf9c1d0),side*.16,.05,-.18,.18,.10,.048);
+      ell(ear,coat,side*.12,.03,0,.26,.17,.18,side*.14);
+      ell(ear,m(0xf6bfd0),side*.14,.03,.15,.16,.10,.05);
+      ell(ear,m(0xf9cddd),side*.14,.03,-.15,.16,.10,.05);
       ears.push(ear);
-      const horn=triangle(face,ivory,side*.28,.62,-.05,.14,.33);
+      const horn=ell(face,ivory,side*.25,.58,-.03,.08,.13,.08);
       horn.name='cow-small-horn';
-    }
-  }
-  if(id==='unicorn'){
-    // Gold horn with subtle pearlescent winding bands visible in the shop
-    // and from above in gameplay.
-    const horn=triangle(face,gold,0,.84,-.035,.165,.73);
-    horn.name='unicorn-golden-horn';
-    const tip=triangle(face,m(0xfff3ad,true),0,1.10,-.05,.078,.27);
-    tip.rotation.z=.12;
-    const pastel=[0xf79cc7,0xaedbff,0xffdc90,0xcba5f9,0x9bdfd2];
-    for(let i=0;i<7;i++){
-      const x=-.36+i*.12;
-      ell(face,m(pastel[i%5]),x,.52-(i%3)*.06,.17,.15,.24,.21,(i-3)*.1);
-    }
-    // Layered cloudlike wings extend beyond the silhouette from the back.
-    for(const side of [-1,1]){
-      const wing=groupAt(root,side*.49,1.11,-.25);
-      wing.name=side<0?'unicorn-left-wing':'unicorn-right-wing';
-      // A single leaf-shaped wing with a narrow coloured inner vane.
-      ell(wing,m(0xfbe8ff),side*.23,.10,-.08,.17,.34,.12,side*.52);
-      ell(wing,m(0xe7d5ff),side*.34,.13,-.15,.08,.23,.06,side*.63);
-    }
-  }
-  if(id==='horse'){
-    // A few flat locks blend into the head; the cream blaze is painted.
-    const maneMat=m(0x80513d);
-    for(let i=0;i<5;i++)
-      ell(face,maneMat,-.26+i*.13,.49+(i%2)*.025,-.10,
-        .085,.16,.09,(i-2)*-.09);
-  }
-  if(id==='cat'){
-    // Delicate whiskers provide depth; stripes, irises and blush are
-    // pigment on the head surface, not protruding spheres.
-    const whiskMat=m(0xf4e7d9);
-    for(const side of [-1,1])for(let i=-1;i<=1;i++){
-      const whisker=part(face,geometries.cylinder,whiskMat,
-        side*.51,-.29+i*.08,.28,.006,.27,.006);
-      whisker.rotation.z=Math.PI/2+side*i*.14;
-    }
-  }
-  // Shoulders are inside the body's silhouette: no floating side pom-poms.
-  const shoulderWidth={
-    bunny:.39,unicorn:.46,horse:.45,cat:.37,dog:.45,penguin:.43,cow:.50
-  }[id]??.43;
-  const pivotL=groupAt(root,-shoulderWidth,1.32,0);
-  const pivotR=groupAt(root,shoulderWidth,1.32,0);
-  for(const side of [-1,1]){
-    const pivot=side===-1?pivotL:pivotR;
-    if(id==='penguin'){
-      // One tapered flipper mesh: no second dark round piece at the tip.
-      const flipper=part(pivot,geometries.softLimb,coat,
-        side*.12,-.26,-.02,.15,.28,.11,-side*.22);
-      flipper.name='penguin-flipper';
-    }else if(id==='bunny'){
-      // Shoulder broadens into one rounded paw with no visible segment
-      // joining two ball shapes.
-      const paw=part(pivot,geometries.softLimb,coat,
-        side*.008,-.24,.025,.135,.29,.135,-side*.13);
-      paw.name='bunny-slim-front-leg';
-    }else{
-      const thickness=id==='cat'?.16:id==='horse'?.16:.18;
-      const arm=part(pivot,geometries.softLimb,coat,
-        side*.06,-.29,.035,thickness,.35,.17,-side*.12);
-      arm.name=id+'-soft-front-leg';
-    }
-  }
-  const feet=[];
-  for(const side of [-1,1]){
-    const rearFacing=id==='bunny'||id==='horse'||id==='cow'||id==='dog';
-    const foot=groupAt(root,side*(id==='bunny'?.285:.31),.46,rearFacing?-.15:.04);
-    foot.name=id+'-'+(side<0?'left':'right')+'-hind-foot';
-    if(id==='bunny'){
-      // Exaggerated *long* bunny hind feet, two clearly separate shapes.
-      ell(foot,coat,0,-.18,-.055,.19,.27,.17);
-      const toe=ell(foot,m(0xfff4ec),0,-.37,-.33,.22,.095,.30);
-      toe.name='bunny-oval-toe';
-      for(const dx of [-.11,.11])
-        ell(foot,m(0xeebccc),dx,-.375,-.59,.06,.032,.03);
     }else if(id==='penguin'){
       ell(foot,coat,0,-.18,.02,.18,.21,.16);
       const flipperFoot=ell(foot,m(0xf5bf54),0,-.34,-.12,.30,.12,.32);
       flipperFoot.name='penguin-orange-foot';
     }else{
-      const hoof=id==='cow'?m(0x62505a):id==='horse'?brown:id==='cat'?m(0xffcf91):ivory;
-      ell(foot,coat,0,-.22,0,id==='cow'?.245:.21,.29,.20);
-      ell(foot,hoof,0,-.40,-.20,id==='cow'?.26:.23,.115,.31);
+      const hoof=id==='cow'?m(0x74626d):id==='horse'?brown:id==='cat'?m(0xffcf91):ivory;
+      ell(foot,coat,0,id==='cow'?-.19:-.22,0,id==='cow'?.22:.21,id==='cow'?.24:.29,id==='cow'?.18:.20);
+      ell(foot,hoof,0,id==='cow'?-.34:-.40,id==='cow'?-.16:-.20,id==='cow'?.24:.23,id==='cow'?.11:.115,id==='cow'?.24:.31);
     }
     feet.push(foot);
   }
@@ -327,7 +248,7 @@ export function createAnimal(id, palette = {}) {
   }else if(id==='dog'){
     ell(tail,coat,.20,.18,-.07,.15,.35,.12,-.45);
     ell(tail,coat,.38,.44,-.06,.12,.16,.12);
-  }else if(id==='cow')ell(tail,coat,.15,-.17,-.12,.10,.36,.10,-.30);
+  }else if(id==='cow')ell(tail,coat,.11,-.11,-.10,.08,.24,.08,-.22);
   else if(id!=='penguin')ell(tail,coat,0,-.12,0,.19,.24,.21);
 
   // Rear-view artwork matters in an endless runner: the camera looks at -Z
@@ -426,22 +347,19 @@ export function createAnimal(id, palette = {}) {
   }else if(id==='penguin'){
     // The rear silhouette stays clean and seamless, without a scarf or badge.
   }else if(id==='cow'){
-    // Rounded black/charcoal markings arranged asymmetrically across a
-    // plush white calf silhouette, all legible from behind.
-    // Rounded charcoal calf spots now belong to the torso paint instead
-    // of separate dark spheres floating off the white fur.
-    const bow=groupAt(rear,0,1.29,-.54);
-    bow.name='cow-pink-bow';
-    bow.scale.setScalar(.48); // Small charm, not a distracting floating bow
-    ell(bow,m(0xf5b4cc),0,0,0,.13,.15,.12);
+    // A small red hair bow remains visible above the head during running.
+    const bow=groupAt(face,.25,.57,-.22);
+    bow.name='cow-red-head-bow';
+    const ribbon=m(0xd92746);
+    ell(bow,ribbon,0,0,-.03,.105,.11,.07);
     for(const side of [-1,1]){
-      ell(bow,m(0xffcbdf),side*.19,.02,.018,.22,.16,.10,side*.34);
-      ell(bow,m(0xf8abc9),side*.12,-.18,.018,.11,.19,.07,-side*.24);
+      ell(bow,ribbon,side*.15,.03,0,.16,.115,.065,-side*.25);
+      ell(bow,m(0xf34b65),side*.11,-.12,0,.075,.13,.045,side*.2);
     }
-    const tailTip=ell(tail,m(0x39363e),.16,-.42,-.10,.11,.19,.12,-.34);
+    // Back spots use the existing soft coat texture rather than raised patches.
+    const tailTip=ell(tail,m(0x39363e),.10,-.30,-.09,.09,.14,.09,-.24);
     tailTip.name='cow-tail-tuft';
-    const tag=ell(rear,m(0xffdf85),0,.54,-.53,.12,.12,.075);
-    tag.name='cow-gold-bell';
+
   }
   const mane=id==='unicorn'?root.getObjectByName('unicorn-rainbow-mane')
     :id==='horse'?root.getObjectByName('horse-pony-mane'):null;

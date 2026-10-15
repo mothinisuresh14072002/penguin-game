@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {ACCESSORIES,SLOTS,sanitizeWardrobe,buyAccessory,equipAccessory,unequipAccessory,applyWardrobe} from './dressUp.js';
 import './style.css';
 import {createAnimal, animateAnimal, alignAnimalFeetToRoad} from './animalArt.js';
 import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
@@ -49,7 +50,7 @@ const LEGACY_KEY='penguin-ice-runner-v2';
 let saved;
 try { saved=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(LEGACY_KEY)||'{}'); } catch { saved={}; }
 const validIds=new Set(CHARS.map(c=>c.id));
-const profile={coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['bunny','penguin'],selected:saved.selected||'bunny',economy:createEconomy(saved.economy)};
+const profile={coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['bunny','penguin'],selected:saved.selected||'bunny',economy:createEconomy(saved.economy),wardrobe:sanitizeWardrobe(saved.wardrobe)};
 for(const id of ['bunny','penguin'])if(!profile.unlocked.includes(id))profile.unlocked.push(id);
 if(!profile.unlocked.includes(profile.selected))profile.selected='penguin';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(profile))}catch{}};
@@ -88,7 +89,7 @@ const sphere=new THREE.SphereGeometry(1,18,12),cube=new THREE.BoxGeometry(1,1,1)
 function part(parent,geo,m,x=0,y=0,z=0,sx=1,sy=1,sz=1){const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
 const orb=(p,m,x,y,z,sx,sy,sz)=>part(p,sphere,m,x,y,z,sx,sy,sz);
 function model(id){return createAnimal(id)}
-let character=model(profile.selected);scene.add(character.group);
+let character=model(profile.selected);applyWardrobe(character,profile.wardrobe.equipped[profile.selected]);scene.add(character.group);
 let characterLoadSequence=0;
 function attemptImportedCharacter(id, sequence){
  // Optional authored GLB overrides are supported for all seven animals.
@@ -102,6 +103,7 @@ function attemptImportedCharacter(id, sequence){
   if(character.imported)releaseImportedAnimal(character);
   else disposeGroup(character.group);
   character=imported;
+  applyWardrobe(character,profile.wardrobe.equipped[profile.selected]);
   character.group.rotation.y=Math.PI;
   scene.add(character.group);
  });
@@ -116,6 +118,7 @@ function swapCharacter(){
  if(character.imported)releaseImportedAnimal(character);
  else disposeGroup(character.group);
  character=model(profile.selected);
+ applyWardrobe(character,profile.wardrobe.equipped[profile.selected]);
  scene.add(character.group);
  applyBiome();sound(690,.12,'triangle');
  attemptImportedCharacter(profile.selected,characterLoadSequence);
@@ -318,6 +321,7 @@ const importedPreviewCache=new Map();
 function shop(tab='characters'){
  if(typeof tab!=='string')tab='characters';
  if(!characterPreviews)characterPreviews=renderCharacterPreviews(CHARS,BIOMES);
+ if(tab!=='dress')disposeDressingRoom();
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.remove('hidden');$('overlay').classList.add('hidden');
  const grid=$('charGrid');grid.replaceChildren();
  for(const c of CHARS){
@@ -343,11 +347,82 @@ function shop(tab='characters'){
  $('wallet').textContent=profile.coins;
  showShopTab(tab);
 }
-// Four real shop sections, keeping the old seven-character shop intact.
+
+// The dressing room uses a separate renderer so it does not disturb the runner.
+let dressingRenderer=null,dressingScene=null,dressingCamera=null,dressingActor=null,dressingTick=0;
+let dressingPreview={};
+function disposeDressingRoom(){
+ if(dressingRenderer){dressingRenderer.dispose();dressingRenderer.domElement.remove();}
+ if(dressingActor?.group)disposeGroup(dressingActor.group);
+ dressingRenderer=dressingScene=dressingCamera=dressingActor=null;
+}
+function renderDressingRoom(panel){
+ disposeDressingRoom();
+ panel.replaceChildren();
+ const title=document.createElement('h2');title.textContent='👗 Baby Animal Dressing Room';
+ const desc=document.createElement('p');desc.textContent='Try any of 20 cute styles in 3D, buy with earned coins, then wear them during your runs. Outfits are saved separately for each animal.';
+ const choose=document.createElement('select');choose.setAttribute('aria-label','Dressing room animal');
+ for(const a of CHARS){const option=document.createElement('option');option.value=a.id;option.textContent=a.icon+' '+a.name;choose.append(option)}
+ choose.value=profile.selected;
+ const stage=document.createElement('div');stage.className='dress-stage';
+ const tools=document.createElement('div');tools.className='dress-actions';
+ const balance=document.createElement('strong');balance.textContent='🪙 '+profile.coins+' coins';
+ const reset=document.createElement('button');reset.type='button';reset.className='secondary';reset.textContent='↻ Clear preview';tools.append(balance,reset);
+ const list=document.createElement('div');list.className='dress-grid';
+ const note=document.createElement('p');note.setAttribute('role','status');
+ panel.append(title,desc,choose,stage,tools,note,list);
+ let animal=choose.value;
+ function buildPreview(){
+  disposeDressingRoom();
+  dressingScene=new THREE.Scene();dressingScene.background=new THREE.Color(0xf6eafd);
+  dressingScene.add(new THREE.HemisphereLight(0xffffff,0xb7a5ca,2.5));
+  const key=new THREE.DirectionalLight(0xffffff,2.1);key.position.set(-3,5,6);dressingScene.add(key);
+  dressingCamera=new THREE.PerspectiveCamera(34,1.3,.1,50);dressingCamera.position.set(0,1.35,6.1);dressingCamera.lookAt(0,1.2,0);
+  dressingActor=createAnimal(animal);dressingActor.group.rotation.y=Math.PI;
+  applyWardrobe(dressingActor,dressingPreview);dressingScene.add(dressingActor.group);
+  dressingRenderer=new THREE.WebGLRenderer({alpha:false,antialias:true});
+  dressingRenderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));
+  dressingRenderer.setSize(390,300);
+  dressingRenderer.domElement.setAttribute('aria-label','3D outfit preview');
+  stage.replaceChildren(dressingRenderer.domElement);
+  dressingRenderer.render(dressingScene,dressingCamera);
+ }
+ function updatePreview(){if(dressingActor){applyWardrobe(dressingActor,dressingPreview);dressingRenderer.render(dressingScene,dressingCamera)}}
+ function refresh(){
+  dressingPreview={...(profile.wardrobe.equipped[animal]||{})};
+  buildPreview();list.replaceChildren();
+  for(const item of ACCESSORIES){
+   const owned=profile.wardrobe.owned.includes(item.id);
+   const equipped=profile.wardrobe.equipped[animal]?.[item.slot]===item.id;
+   const card=document.createElement('div');card.className='dress-card';
+   const head=document.createElement('strong');head.textContent=item.emoji+' '+item.name;
+   const caption=document.createElement('small');caption.textContent=item.slot.toUpperCase()+' · '+(owned?'OWNED':'🪙 '+item.price);
+   const preview=document.createElement('button');preview.type='button';preview.className='secondary';preview.textContent=dressingPreview[item.slot]===item.id?'PREVIEWING':'TRY ON';
+   preview.onclick=()=>{dressingPreview[item.slot]=item.id;updatePreview();note.textContent='Previewing '+item.name+' — try before you buy';list.querySelectorAll('.dress-card button').forEach(b=>{});};
+   const action=document.createElement('button');action.type='button';action.textContent=equipped?'REMOVE':owned?'WEAR':'BUY';
+   action.disabled=!owned&&profile.coins<item.price;
+   action.onclick=()=>{
+    if(equipped){unequipAccessory(profile,animal,item.slot);note.textContent='Removed '+item.name;}
+    else if(!owned&&!buyAccessory(profile,item.id)){note.textContent='Not enough coins';return}
+    else{equipAccessory(profile,animal,item.id);note.textContent='Wearing '+item.name+'!'}
+    save();updateHUD();
+    if(animal===profile.selected)applyWardrobe(character,profile.wardrobe.equipped[animal]);
+    refresh();balance.textContent='🪙 '+profile.coins+' coins';
+   };
+   card.append(head,caption,preview,action);list.append(card);
+  }
+ }
+ choose.onchange=()=>{animal=choose.value;refresh();};
+ reset.onclick=()=>{dressingPreview={};updatePreview();note.textContent='Preview cleared';};
+ refresh();
+}
+
+// Five shop sections including the live 3D dressing room.
 function showShopTab(tab='characters'){
- const names=['characters','sell','boxes','goals'];
+ const names=['characters','dress','sell','boxes','goals'];
  if(!names.includes(tab))tab='characters';
  const panel=$('economyPanel'),grid=$('charGrid');
+ if(tab!=='dress')disposeDressingRoom();
  grid.hidden=tab!=='characters';
  panel.hidden=tab==='characters';
  for(const button of document.querySelectorAll('.shop-tab')){
@@ -356,6 +431,7 @@ function showShopTab(tab='characters'){
  }
  $('wallet').textContent=profile.coins;
  if(tab==='characters'){panel.replaceChildren();return;}
+ if(tab==='dress'){renderDressingRoom(panel);return;}
  synchronizeEconomy(profile);save();panel.replaceChildren();
  const heading=(title,description)=>{
   const h=document.createElement('h2');h.textContent=title;panel.append(h);
@@ -426,12 +502,14 @@ for(const button of document.querySelectorAll('.shop-tab')){
  button.onclick=()=>showShopTab(button.dataset.tab);
 }
 function menu(){
+ disposeDressingRoom();
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.add('hidden');updateHUD();
  showScreen('PAWVERSE DASH','A cute animal adventure across magical worlds. Switch lanes, jump obstacles, collect energy and unlock new animal friends.',[
-  {text:'🏃 SOLO RUN',action:start},{text:'🏁 2 FRIEND RACE',action:()=>location.assign('./race.html')},{text:'CHARACTERS & SHOP',secondary:true,action:()=>shop('characters')},{text:'🧺 SELL FOOD',secondary:true,action:()=>shop('sell')},{text:'🎯 DAILY & WEEKLY',secondary:true,action:()=>shop('goals')}
+  {text:'🏃 SOLO RUN',action:start},{text:'🏁 2 FRIEND RACE',action:()=>location.assign('./race.html')},{text:'CHARACTERS & SHOP',secondary:true,action:()=>shop('characters')},{text:'👗 DRESSING ROOM',secondary:true,action:()=>shop('dress')},{text:'🧺 SELL FOOD',secondary:true,action:()=>shop('sell')},{text:'🎯 DAILY & WEEKLY',secondary:true,action:()=>shop('goals')}
  ]);
 }
 function start(){
+ disposeDressingRoom();
  ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;runFood=0;distance=0;speed=18;spawnNext=26;invincible=1;combo=0;lastCoinDistance=-100;lastMilestone=0;noticeUntil=0;$('speedNotice')?.classList.add('hidden');
  clearObjects();$('overlay').classList.add('hidden');$('shop').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';
  for(let i=0;i<8;i++){row(spawnNext);spawnNext+=17;}

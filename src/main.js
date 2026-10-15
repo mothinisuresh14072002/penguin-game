@@ -500,6 +500,7 @@ addEventListener('keydown',e=>{
 addEventListener('keyup',e=>keys.delete(e.code));
 let touch=null;
 renderer.domElement.addEventListener('pointerdown',e=>touch={x:e.clientX,y:e.clientY});
+renderer.domElement.addEventListener('pointercancel',()=>{touch=null});
 renderer.domElement.addEventListener('pointerup',e=>{
  if(!touch)return;const dx=e.clientX-touch.x,dy=e.clientY-touch.y;touch=null;
  if(Math.abs(dx)<25&&Math.abs(dy)<25){jump();return;}

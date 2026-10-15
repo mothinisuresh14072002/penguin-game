@@ -2,6 +2,11 @@ import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
+  server: {
+    watch: {
+      ignored: ['**/*.zip', '**/pawverse-banner-update/**', '**/polar-dash-bunny-push/**']
+    }
+  },
   build: {
     rollupOptions: {
       input: {

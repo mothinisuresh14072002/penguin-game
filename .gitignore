@@ -8,3 +8,6 @@ android/app/build/
 *.keystore
 *.jks
 .env*
+*.zip
+pawverse-banner-update/
+polar-dash-bunny-push/

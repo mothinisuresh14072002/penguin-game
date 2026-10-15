@@ -62,3 +62,11 @@
 .character-test-switcher select{background:#153f61;max-width:145px}
 .character-test-switcher button:focus-visible,.character-test-switcher select:focus-visible{outline:2px solid #fff57f;outline-offset:2px}
 @media(max-width:640px){.character-test-switcher{bottom:42px;padding:6px;gap:4px}.character-test-switcher .test-heading{font-size:9px}.character-test-switcher select{max-width:112px;font-size:11px}.character-test-switcher button{padding:7px}}
+
+/* Baby animal wardrobe */
+.dress-stage{display:flex;justify-content:center;align-items:center;border-radius:20px;background:linear-gradient(#eedfff,#fff4e7);min-height:300px;overflow:hidden;margin:12px 0}
+.dress-stage canvas{max-width:100%;height:auto;touch-action:none}
+.dress-actions{display:flex;align-items:center;gap:16px;justify-content:space-between;margin:10px 0}
+.dress-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-top:12px}
+.dress-card{display:flex;flex-direction:column;gap:8px;padding:13px;border-radius:15px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25)}
+.dress-card small{opacity:.85}.dress-card button{min-height:37px}

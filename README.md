@@ -535,7 +535,7 @@ penguin-game/
 │   ├── style.css                 Solo game interface
 │   └── race.css                  Split-screen interface
 ├── tests/                        Collision, race, worlds and art tests
-├── public/models/               Optional downloaded GLB assets
+├── public/models/               3D animal character models (includes Bella Bunny bunny.glb)
 ├── assets/readme-banner.png      Seven magical baby-animal worlds README header
 ├── capacitor.config.json         Android wrapper configuration
 ├── docs/PLAY_STORE_RELEASE.md    Android release checklist
@@ -556,12 +556,11 @@ use lighter render settings to protect frame rate. On the game URL, use
 into the professionally textured animals in the user's reference art.**
 
 Every hero can now be replaced with an *authored, painted* `.glb` file
-by putting the correctly named model in `public/models/`:
-`bunny.glb`, `unicorn.glb`, `horse.glb`, `cat.glb`,
-`dog.glb`, `penguin.glb`, and `cow.glb`. The game loads these
-optional files in solo play and the two-player race and previews them
-in the character shop. Missing, invalid, or plain uncoloured meshes
-retain the current playable procedural fallback.
+in `public/models/`: Bella Bunny (`bunny.glb`) is included out-of-the-box,
+with support for `unicorn.glb`, `horse.glb`, `cat.glb`, `dog.glb`,
+`penguin.glb`, and `cow.glb`. The game loads these files in solo play
+and the two-player race and previews them in the character shop.
+Missing or invalid files retain the current playable procedural fallback.
 
 **Recommended production asset workflow:** Sculpt and rig each chibi animal
 in Blender (or acquire legitimately licensed models), author 1K–2K PBR
@@ -571,9 +570,7 @@ and commit/push it. Use the same asset approach for more intricate biome
 props in future. See the [seven-model installation guide](public/models/README.md)
 for filenames and requirements.
 
-**Current status:** No seven finished, professionally textured and rigged
-animal GLB binaries were added by this graphics pass, and pixel-level
-fidelity to the promotional reference has not yet been demonstrated.
+**Current status:** Bella Bunny (`public/models/bunny.glb`) has been integrated as the first rigged/textured 3D character model. The remaining six animal models use procedural fallbacks and can be enhanced with optional GLBs following the guide.
 
 ## 📱 Android prototype
 

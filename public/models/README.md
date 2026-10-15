@@ -3,15 +3,15 @@
 Pawverse Dash can use **one textured and animated GLB model per animal**.
 Drop your legitimately owned or openly licensed models in this folder:
 
-| Animal | Required filename | Biome |
-| --- | --- | --- |
-| Bella Bunny | `bunny.glb` | Bunny Meadow |
-| Ula Unicorn | `unicorn.glb` | Unicorn Skyland |
-| Hugo Horse | `horse.glb` | Horse Prairie |
-| Coco Cat | `cat.glb` | Cat Town |
-| Dodo Dog | `dog.glb` | Puppy Park |
-| Pip Penguin | `penguin.glb` | Penguin Glacier |
-| Mimi Cow | `cow.glb` | Mimi Farm |
+| Animal | Required filename | Biome | Status |
+| --- | --- | --- | --- |
+| Bella Bunny | `bunny.glb` | Bunny Meadow | ✅ Included (`public/models/bunny.glb`) |
+| Ula Unicorn | `unicorn.glb` | Unicorn Skyland | Procedural fallback (GLB optional) |
+| Hugo Horse | `horse.glb` | Horse Prairie | Procedural fallback (GLB optional) |
+| Coco Cat | `cat.glb` | Cat Town | Procedural fallback (GLB optional) |
+| Dodo Dog | `dog.glb` | Puppy Park | Procedural fallback (GLB optional) |
+| Pip Penguin | `penguin.glb` | Penguin Glacier | Procedural fallback (GLB optional) |
+| Mimi Cow | `cow.glb` | Mimi Farm | Procedural fallback (GLB optional) |
 
 The same model override is used in solo play, split-screen multiplayer
 and the character shop. If a file is absent or invalid, the game uses
@@ -52,6 +52,4 @@ single untextured mesh, with no painted colours, skin or animation clips.
 It is **not** enough to create the detailed HD reference appearance.
 The importer intentionally rejects unpainted white meshes.
 
-No production-ready, textured and rigged 3D animal binary is included
-in this repository by these code changes. You must supply such GLBs
-before the character appearance can approach the cinematic reference.
+Bella Bunny (`public/models/bunny.glb`) is now included in this repository as the first official imported 3D character asset. The remaining six animal models currently use procedural fallbacks and can be replaced whenever additional GLBs are added.

@@ -8,7 +8,7 @@ export const CUTE_FACE_STYLES=Object.freeze({
  unicorn: Object.freeze({coat:0xf9f4ff,iris:0x413645,blush:0xeab2cc,nose:0xcd99c1}),
  horse:   Object.freeze({coat:0xc58b60,iris:0x413645,blush:0xeeb7a0,nose:0xb27d65}),
  cat:     Object.freeze({coat:0xf5a94f,iris:0x54b88e,blush:0xe99991,nose:0xb67672}),
- dog:     Object.freeze({coat:0xf4dcac,iris:0x413645,blush:0xf0b9a7,nose:0x3a3537}),
+ dog:     Object.freeze({coat:0xf4dcac,iris:0x352d38,blush:0xf3c0b2,nose:0x3a3537}),
  penguin: Object.freeze({coat:0x1f2430,iris:0x2a2430,blush:0xf7c8d3,nose:0xf5bf54}),
  cow:     Object.freeze({coat:0xfffcf5,iris:0x352d38,blush:0xf5c0cd,nose:0xd79ab0})
 });
@@ -85,9 +85,9 @@ export function createCuteFaceTexture(id,coatOverride=null){
   pigment(ctx,cx,292,39,23,'#fff5ed');
  }
  for(const direction of [-1,1]){
-  const isPenguin=id==='penguin',isCow=id==='cow';
-  const x=cx+direction*(isPenguin?42:isCow?40:38);
-  softBlush(ctx,cx+direction*(isPenguin?62:isCow?63:67),isPenguin?286:isCow?292:296,hex(palette.blush));
+  const isPenguin=id==='penguin',isCow=id==='cow',isDog=id==='dog';
+  const x=cx+direction*(isPenguin?42:isCow?40:isDog?40:38);
+  softBlush(ctx,cx+direction*(isPenguin?62:isCow?63:isDog?64:67),isPenguin?286:isCow?292:isDog?292:296,hex(palette.blush));
   if(isCow){
    ellipse(ctx,x,234,26,32,'#fffefc');
    ellipse(ctx,x,235,20,27,'#352d38');
@@ -100,6 +100,12 @@ export function createCuteFaceTexture(id,coatOverride=null){
    ellipse(ctx,x,241,14,21,hex(palette.iris));
    ellipse(ctx,x-7,224,8,9,'#ffffff');
    ellipse(ctx,x+8,245,3.5,4.2,'#ffffff');
+  }else if(isDog){
+   ellipse(ctx,x,235,25,32,'#fffefc');
+   ellipse(ctx,x,236,20,27,'#352d38');
+   ellipse(ctx,x,240,13,20,hex(palette.iris));
+   ellipse(ctx,x-6,223,7.5,8.2,'#ffffff');
+   ellipse(ctx,x+7,243,3.2,4,'#ffffff');
   }else{
    ellipse(ctx,x,233,24,31,'#fffefc');
    ellipse(ctx,x,234,19,26,'#3a2d36');

@@ -1,0 +1,19 @@
+{
+  "name": "Pawverse Dash",
+  "short_name": "Pawverse",
+  "description": "Cute baby animal endless runner",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#9bdcf5",
+  "theme_color": "#0b294b",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./pawverse-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

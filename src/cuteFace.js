@@ -10,7 +10,7 @@ export const CUTE_FACE_STYLES=Object.freeze({
  cat:     Object.freeze({coat:0xf5a94f,iris:0x54b88e,blush:0xe99991,nose:0xb67672}),
  dog:     Object.freeze({coat:0xf4dcac,iris:0x413645,blush:0xf0b9a7,nose:0x3a3537}),
  penguin: Object.freeze({coat:0x1f2430,iris:0x2a2430,blush:0xf7c8d3,nose:0xf5bf54}),
- cow:     Object.freeze({coat:0xfffcf5,iris:0x413645,blush:0xf3b0be,nose:0xce8da2})
+ cow:     Object.freeze({coat:0xfffcf5,iris:0x352d38,blush:0xf5c0cd,nose:0xd79ab0})
 });
 export const FACE_EYE_STYLE='soft-oval-catchlight-v1';
 const stored=new Map();
@@ -65,8 +65,8 @@ export function createCuteFaceTexture(id,coatOverride=null){
   pigment(ctx,cx+38,250,44,112,'#ffffff');
   pigment(ctx,cx,318,58,34,'#fffdf8');
  }else if(id==='cow'){
-  pigment(ctx,161,176,37,27,'#39333c');
-  pigment(ctx,cx,298,44,29,'#f4c5cf');
+  pigment(ctx,161,176,34,25,'#39333c');
+  pigment(ctx,cx,298,46,31,'#f6ccd7');
  }else if(id==='horse'){
   pigment(ctx,cx,213,11,73,'#ffe6c8');
   pigment(ctx,cx,291,44,30,'#eac29e');
@@ -85,10 +85,16 @@ export function createCuteFaceTexture(id,coatOverride=null){
   pigment(ctx,cx,292,39,23,'#fff5ed');
  }
  for(const direction of [-1,1]){
-  const isPenguin=id==='penguin';
-  const x=cx+direction*(isPenguin?42:38);
-  softBlush(ctx,cx+direction*(isPenguin?62:67),isPenguin?286:296,hex(palette.blush));
-  if(isPenguin){
+  const isPenguin=id==='penguin',isCow=id==='cow';
+  const x=cx+direction*(isPenguin?42:isCow?40:38);
+  softBlush(ctx,cx+direction*(isPenguin?62:isCow?63:67),isPenguin?286:isCow?292:296,hex(palette.blush));
+  if(isCow){
+   ellipse(ctx,x,234,26,32,'#fffefc');
+   ellipse(ctx,x,235,20,27,'#352d38');
+   ellipse(ctx,x,240,13.5,20,hex(palette.iris));
+   ellipse(ctx,x-6,223,7.5,8.5,'#ffffff');
+   ellipse(ctx,x+7,243,3.2,4,'#ffffff');
+  }else if(isPenguin){
    ellipse(ctx,x,236,28,34,'#fffefc');
    ellipse(ctx,x,237,22,29,'#2b2430');
    ellipse(ctx,x,241,14,21,hex(palette.iris));

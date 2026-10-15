@@ -11,9 +11,9 @@
 [![Build](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml/badge.svg)](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml)
 [![Three.js](https://img.shields.io/badge/Three.js-WebGL-222222?logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)](https://vite.dev/)
-[![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Android%20prototype-74c69d)](#-android-prototype)
+[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Windows%20%7C%20Linux-74c69d)](#️-play-on-windows-linux-and-android)
 
-[Play locally](#-quick-start) · [Animal worlds](#-meet-the-seven-heroes) · [Controls](#-controls) · [Two-player race](#-two-player-duo-race) · [Contribute](#-contributing)
+[Cross-platform setup](docs/PLATFORM_SUPPORT.md) · [Play locally](#-quick-start) · [Animal worlds](#-meet-the-seven-heroes) · [Controls](#-controls) · [Two-player race](#-two-player-duo-race) · [Contribute](#-contributing)
 
 </div>
 
@@ -26,6 +26,78 @@
 The game runs in the browser with **Three.js + Vite**. It uses lightweight procedural 3D art, runtime-generated road textures and sky shaders. The same codebase includes a **local two-player race** with independently themed views.
 
 > **Visual fidelity:** The concept illustration is a design target, **not** an actual in-game screenshot. Current models and props are stylized procedural meshes; achieving film-quality fur, perfectly sculpted animals and detailed environments requires additional textured/rigged assets. The header SVG is illustrative artwork, not a live render.
+
+## 🖥️📱 Play on Windows, Linux and Android
+
+Pawverse Dash uses **one Three.js/Vite web codebase** for all three platforms. Windows and Linux players use a WebGL-capable desktop browser; Android players use a mobile browser (touch/swipe controls) or a **Capacitor Android build**. The web app includes a home-screen manifest and icon. **There is no Windows .exe or Linux native binary yet**, and Android APK compatibility still requires Android Studio and real-device verification.
+
+### Quick start — Windows CMD
+
+Install Node.js **22+**. Open **CMD** in the cloned repository:
+
+```cmd
+git clone https://github.com/mothinisuresh14072002/penguin-game.git
+cd penguin-game
+npm install
+npm run dev
+```
+
+Open the local URL displayed by Vite (typically `http://localhost:5173`).
+
+### Quick start — Linux terminal
+
+Install Node.js **22+**, then:
+
+```bash
+git clone https://github.com/mothinisuresh14072002/penguin-game.git
+cd penguin-game
+npm install
+npm run dev
+```
+
+To prepare production web files on either OS:
+
+```bash
+npm run build
+npm run preview
+```
+
+Deploy the contents of `dist/` to an **HTTPS web host** for access on Android phones and desktop browsers. The development computer's `localhost` address is not reachable from a separate phone.
+
+### Android app (Capacitor)
+
+On a Windows or Linux development PC, install Node.js 22+, Android Studio, Android SDK and the JDK required by your installed Android toolchain (the current setup targets Java 17). Run in the project directory:
+
+```bash
+npm install
+npm run android:add
+npm run android:sync
+npm run android:open
+```
+
+Run `android:add` **only once** when there is no `android/` project; subsequent updates need `npm run android:sync`. Android Studio handles emulator/device runs and signed APK/AAB output. **CI does not currently compile or sign an APK.**
+
+Full instructions and compatibility limitations: **[Platform support guide](docs/PLATFORM_SUPPORT.md)** · [Play Store release checklist](docs/PLAY_STORE_RELEASE.md).
+
+### 🎮 Controls on all devices
+
+| Mode | Keyboard (Windows / Linux) | Android / touch |
+|---|---|---|
+| Solo | ←/→ or A/D: lanes; ↑/W/Space: jump; ↓/S: slide | Swipe left/right: lanes; up: jump; down: slide; tap: jump |
+| Two-player race | Player 1: WASD; Player 2: IJKL or arrow keys | Swipe within your own half of the screen |
+| Pause | P or Escape, or pause button | Tap pause button |
+
+In solo mode, the **🧪 Character Test** panel temporarily switches between all seven animals while evaluating artwork, even when characters are locked. It does **not** purchase or permanently unlock them.
+
+### 🐣 Baby-animal artwork
+
+All seven playable characters are designed as children: **Bella the baby bunny, Ula the baby unicorn, Hugo the foal, Coco the kitten, Dodo the puppy, Pip the penguin chick, and Mimi the calf**. Their latest procedural 3D models use enlarged round heads, shorter limbs and species-specific silhouettes. Coco wears a **red scarf** and Mimi wears a **red head bow**. Pip's rounded silhouette has **no scarf or crown tuft**. The 3D art is still stylized and must be visually reviewed against the reference pictures in actual gameplay.
+
+### ✅ Tests and release status
+
+GitHub Actions checks JavaScript syntax, unit tests, Vite production assets and solo/two-player **Chromium** browser gameplay on Linux. Track the [latest CI results](https://github.com/mothinisuresh14072002/penguin-game/actions/workflows/build.yml). Passing CI does not prove real Android devices, every Windows/Linux GPU, or signed APK packaging work. Physical-device testing, visual approval and Android release signing remain outstanding.
+
+---
 
 ## 🌎 Meet the seven heroes
 
@@ -526,8 +598,8 @@ Run `npm run android:add` only if no Android project already exists. For subsequ
 - [x] Hugo Horse Phase 3: chestnut baby pony, golden wheatfields and animated windmills
 - [x] Coco Cat Phase 4: green-eyed tabby, moving tail, pastel village and clock tower
 - [x] Dodo Dog Phase 5: floppy-ear puppy, garden scenery, lily pond and off-road gazebo
-- [x] Pip Penguin Phase 6: scarf, flippers, falling snow and crystalline glacier portal
-- [x] Mimi Cow Phase 7: pink bow, spots, animated tail and living sunflower farm
+- [x] Pip Penguin Phase 6: rounded penguin chick, short flippers, falling snow and crystalline glacier portal
+- [x] Mimi Cow Phase 7: red head bow, calf proportions, animated tail and living sunflower farm
 - [x] Seven selectable characters with matching 3D environments
 - [x] Distinct road textures, landscape colours, props and landmarks
 - [x] Solo gameplay with coins, energy, shields and magnets
@@ -538,7 +610,8 @@ Run `npm run android:add` only if no Android project already exists. For subsequ
 - [x] Reliable high-speed swept collision logic and automated regression tests
 - [x] Custom sky shader, animated weather and world scenery
 - [x] CI checks for JavaScript, world art, race physics and builds
-- [ ] Browser-based gameplay automation and physical-device collision testing
+- [x] Browser-based solo and two-player gameplay automation on Linux Chromium
+- [ ] Physical-device collision, input and performance testing on Android, Windows and Linux
 - [ ] Fully textured and rigged cinematic-quality character assets
 - [ ] Mobile FPS tuning, accessibility review and quality presets
 - [ ] Original real gameplay screenshots, trailer and complete onboarding

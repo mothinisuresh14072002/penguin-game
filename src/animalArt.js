@@ -46,7 +46,7 @@ export function createAnimal(id, palette = {}) {
   };
   const colors = {
     bunny:0xfffaf5, unicorn:0xf9f4ff, horse:0xc58b60, cat:0xf5a94f,
-    dog:0xf4dcac, penguin:0x222936, cow:0xfffcf5
+    dog:0xf4dcac, penguin:0x1f2430, cow:0xfffcf5
   };
   const mats = new Map();
   function m(hex, shiny=false) {
@@ -84,7 +84,7 @@ export function createAnimal(id, palette = {}) {
     horse:{body:[.49,.69,.42],head:[.50,.52,.45],belly:[.35,.48,.14]},
     cat:{body:[.40,.59,.35],head:[.53,.51,.46],belly:[.30,.43,.12]},
     dog:{body:[.51,.61,.43],head:[.57,.55,.49],belly:[.39,.46,.14]},
-    penguin:{body:[.48,.75,.43],head:[.54,.50,.46],belly:[.41,.56,.14]},
+    penguin:{body:[.52,.68,.47],head:[.66,.62,.58],belly:[.46,.56,.14]},
     cow:{body:[.56,.62,.48],head:[.59,.53,.49],belly:[.45,.49,.14]}
   };
   const shape=shapes[id]||shapes.bunny;
@@ -128,8 +128,8 @@ export function createAnimal(id, palette = {}) {
   };
   if(id==='penguin'){
     // One tiny three-dimensional beak remains a defining silhouette.
-    const beak=triangle(face,peach,0,-.22,.44,.115,.18);
-    beak.name='penguin-soft-beak';beak.rotation.x=Math.PI/2;
+    const beak=ell(face,m(0xf5bf54),0,-.20,.575,.13,.085,.075);
+    beak.name='penguin-soft-beak';
   }
   const ears=[];
   for(const side of [-1,1]){
@@ -208,12 +208,6 @@ export function createAnimal(id, palette = {}) {
       ears.push(ear);
       const horn=triangle(face,ivory,side*.28,.62,-.05,.14,.33);
       horn.name='cow-small-horn';
-    }else if(id==='penguin'){
-      // The forehead's little feather crest is readable in shop previews.
-      if(side===1)for(let i=0;i<3;i++){
-        const tuft=ell(face,coat,(i-1)*.13,.61,-.06,.12,.22,.13,(i-1)*-.2);
-        tuft.name='penguin-crown-tuft';
-      }
     }
   }
   if(id==='unicorn'){
@@ -265,7 +259,7 @@ export function createAnimal(id, palette = {}) {
     if(id==='penguin'){
       // One tapered flipper mesh: no second dark round piece at the tip.
       const flipper=part(pivot,geometries.softLimb,coat,
-        side*.18,-.31,-.035,.19,.37,.13,-side*.40);
+        side*.12,-.26,-.02,.15,.28,.11,-side*.22);
       flipper.name='penguin-flipper';
     }else if(id==='bunny'){
       // Shoulder broadens into one rounded paw with no visible segment
@@ -293,8 +287,8 @@ export function createAnimal(id, palette = {}) {
       for(const dx of [-.11,.11])
         ell(foot,m(0xeebccc),dx,-.375,-.59,.06,.032,.03);
     }else if(id==='penguin'){
-      ell(foot,coat,0,-.22,.02,.20,.26,.18);
-      const flipperFoot=ell(foot,peach,0,-.40,-.16,.26,.10,.36);
+      ell(foot,coat,0,-.18,.02,.18,.21,.16);
+      const flipperFoot=ell(foot,m(0xf5bf54),0,-.34,-.12,.30,.12,.32);
       flipperFoot.name='penguin-orange-foot';
     }else{
       const hoof=id==='cow'?m(0x62505a):id==='horse'?brown:id==='cat'?m(0xffcf91):ivory;
@@ -334,7 +328,7 @@ export function createAnimal(id, palette = {}) {
     ell(tail,coat,.20,.18,-.07,.15,.35,.12,-.45);
     ell(tail,coat,.38,.44,-.06,.12,.16,.12);
   }else if(id==='cow')ell(tail,coat,.15,-.17,-.12,.10,.36,.10,-.30);
-  else ell(tail,coat,0,-.12,0,.19,.24,.21);
+  else if(id!=='penguin')ell(tail,coat,0,-.12,0,.19,.24,.21);
 
   // Rear-view artwork matters in an endless runner: the camera looks at -Z
   // because the hero is turned toward -Z. These features sit on the *back*
@@ -430,25 +424,7 @@ export function createAnimal(id, palette = {}) {
     const heart=ell(badge,m(0xeb7795),0,-.09,-.025,.15,.13,.06);
     heart.rotation.z=Math.PI/4;
   }else if(id==='penguin'){
-    // Oversized soft charcoal head, pale feather trim and adorable ice-blue
-    // scarf are designed for the behind-the-runner camera.
-    const trim=m(0xd6f5ff);
-    // Feather shading is baked into the coat; the scarf supplies the only
-    // meaningful layered rear accessory.
-    const scarf=groupAt(rear,0,1.36,-.48);
-    scarf.name='penguin-blue-scarf';
-    scarf.scale.setScalar(.52); // Keep the clean black-white penguin silhouette
-    ell(scarf,m(0x83dafa),0,0,-.015,.51,.14,.18);
-    ell(scarf,m(0x60bce8),-.34,-.27,-.15,.17,.34,.14,.11);
-    ell(scarf,trim,-.36,-.55,-.17,.17,.08,.14);
-    // Single stitched snowflake emblem stands out from the dark coat.
-    const badge=groupAt(rear,.20,.81,-.61);
-    badge.name='penguin-snowflake-badge';
-    ell(badge,trim,0,0,0,.12,.12,.04);
-    for(let k=0;k<6;k++){
-      const a=k*Math.PI/3;
-      ell(badge,m(0xb6ecff),Math.cos(a)*.17,Math.sin(a)*.17,-.015,.068,.067,.04);
-    }
+    // The rear silhouette stays clean and seamless, without a scarf or badge.
   }else if(id==='cow'){
     // Rounded black/charcoal markings arranged asymmetrically across a
     // plush white calf silhouette, all legible from behind.

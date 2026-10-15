@@ -79,10 +79,10 @@ export function createAnimal(id, palette = {}) {
   // Species-specific proportions prevent seven animals from looking like
   // identical stacks of balls. The camera sees their rear profiles.
   const shapes={
-    bunny:{body:[.48,.59,.39],head:[.47,.47,.43],belly:[.33,.43,.11]},
-    unicorn:{body:[.50,.67,.44],head:[.53,.52,.46],belly:[.37,.49,.13]},
-    horse:{body:[.49,.69,.42],head:[.50,.52,.45],belly:[.35,.48,.14]},
-    cat:{body:[.40,.59,.35],head:[.53,.51,.46],belly:[.30,.43,.12]},
+    bunny:{body:[.47,.58,.39],head:[.49,.49,.45],belly:[.33,.43,.11]},
+    unicorn:{body:[.49,.62,.43],head:[.59,.56,.50],belly:[.37,.49,.13]},
+    horse:{body:[.48,.64,.41],head:[.57,.55,.49],belly:[.35,.48,.14]},
+    cat:{body:[.42,.58,.36],head:[.62,.58,.52],belly:[.33,.44,.12]},
     dog:{body:[.50,.58,.42],head:[.65,.61,.56],belly:[.41,.47,.14]},
     penguin:{body:[.52,.68,.47],head:[.66,.62,.58],belly:[.46,.56,.14]},
     cow:{body:[.53,.60,.47],head:[.66,.60,.56],belly:[.47,.50,.14]}
@@ -159,16 +159,16 @@ export function createAnimal(id, palette = {}) {
       }
       ears.push(ear);
     }else if(id==='unicorn'||id==='horse'||id==='cat'){
-      const ear=groupAt(face,side*(id==='cat'?.42:.39),.42,-.04);
+      const ear=groupAt(face,side*(id==='cat'?.46:.39),id==='cat'?.47:.42,-.04);
       ear.name=id+'-'+(side<0?'left':'right')+'-ear';
       const isCat=id==='cat';
       const shape=new THREE.Mesh(createRoundedTriangleGeometry({
-        width:isCat?.37:.31,height:isCat?.47:.41,depth:.14
+        width:isCat?.41:.31,height:isCat?.52:.41,depth:.15
       }),coat);
       shape.rotation.z=-side*.18;
       shape.castShadow=true;ear.add(shape);
       const pink=new THREE.Mesh(createRoundedTriangleGeometry({
-        width:isCat?.18:.16,height:isCat?.30:.26,depth:.015
+        width:isCat?.20:.16,height:isCat?.33:.26,depth:.02
       }),m(0xf6b4c8));
       pink.position.set(0,.085,.11);
       pink.rotation.z=-side*.18;
@@ -259,9 +259,9 @@ export function createAnimal(id, palette = {}) {
         side*.008,-.24,.025,.135,.29,.135,-side*.13);
       paw.name='bunny-slim-front-leg';
     }else{
-      const thickness=id==='cat'?.16:id==='horse'?.16:id==='dog'?.17:.18;
+      const thickness=id==='cat'?.15:id==='horse'?.16:id==='dog'?.17:.18;
       const arm=part(pivot,geometries.softLimb,coat,
-        side*.05,id==='dog'?-.25:-.29,.035,thickness,id==='dog'?.30:.35,id==='dog'?.16:.17,-side*.10);
+        side*.05,(id==='dog'||id==='cat')?-.25:-.29,.035,thickness,(id==='dog'||id==='cat')?.30:.35,(id==='dog'||id==='cat')?.16:.17,-side*.10);
       arm.name=id+'-soft-front-leg';
     }
   }
@@ -282,7 +282,7 @@ export function createAnimal(id, palette = {}) {
       const flipperFoot=ell(foot,m(0xf5bf54),0,-.34,-.12,.30,.12,.32);
       flipperFoot.name='penguin-orange-foot';
     }else{
-      const hoof=id==='cow'?m(0x74626d):id==='horse'?brown:id==='cat'?m(0xffcf91):id==='dog'?m(0xfff6ea):ivory;
+      const hoof=id==='cow'?m(0x74626d):id==='horse'?brown:id==='cat'?m(0xffe0b0):id==='dog'?m(0xfff6ea):ivory;
       ell(foot,coat,0,id==='cow'?-.19:id==='dog'?-.20:-.22,0,id==='cow'?.22:id==='dog'?.22:.21,id==='cow'?.24:id==='dog'?.25:.29,id==='cow'?.18:id==='dog'?.19:.20);
       ell(foot,hoof,0,id==='cow'?-.34:id==='dog'?-.35:-.40,id==='cow'?-.16:id==='dog'?-.17:-.20,id==='cow'?.24:id==='dog'?.24:.23,id==='cow'?.11:id==='dog'?.12:.115,id==='cow'?.24:id==='dog'?.26:.31);
     }
@@ -387,18 +387,13 @@ export function createAnimal(id, palette = {}) {
       ell(blanket,m(0xe0a790),side*.37,-.11,-.07,.10,.27,.12,side*.18);
     }
   }else if(id==='cat'){
-    const tabby=groupAt(rear,0,1.65,-.45);
-    tabby.name='cat-tabby-back';
-    // Orange tabby stripes are painted onto the seamless torso surface.
-    // A little lavender scarf with a clear bow on the back.
-    const scarf=groupAt(rear,0,1.26,-.49);
-    scarf.name='cat-lavender-scarf';
-    scarf.scale.setScalar(.55); // Small accent, not a giant accessory around the kitten
-    ell(scarf,m(0xceaadf),0,0,0,.47,.14,.23);
-    for(const side of [-1,1])ell(scarf,m(0xe5c2ed),side*.18,-.13,-.19,
-      .20,.13,.11,side*.35);
+    // Compact crimson neck scarf, readable from behind without hiding kitten ears.
+    const scarf=groupAt(rear,0,1.25,-.49);
+    scarf.name='cat-red-scarf';
+    scarf.scale.setScalar(.58);
+    ell(scarf,m(0xd82d43),0,0,0,.47,.14,.23);
+    for(const side of [-1,1])ell(scarf,m(0xf04b63),side*.18,-.13,-.19,.20,.13,.11,side*.35);
     ell(scarf,m(0xffdcb4),0,-.1,-.27,.09,.09,.07);
-    // Sculpted kitten ears already have rear pink inner surfaces.
   }else if(id==='dog'){
     const rearCollar=ell(rear,m(0xe78cab),0,1.30,-.48,.50,.11,.16);
     rearCollar.name='dog-collar-back';

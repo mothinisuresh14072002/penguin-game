@@ -99,6 +99,22 @@ GitHub Actions checks JavaScript syntax, unit tests, Vite production assets and 
 
 ---
 
+## 👗 Baby Animal Dressing Room
+
+Open **CHARACTERS & SHOP → 👗 Dressing Room** (or use **👗 DRESSING ROOM** on the main menu) to style any of the seven baby animals. You can preview cosmetics on a separate 3D character model, buy them using **in-game coins only**, and equip different looks per animal. Wardrobe purchases and equipped outfits are saved in browser storage along with your other progress.
+
+There are **20 items**, grouped into five slots:
+
+| Slot | Four choices |
+|---|---|
+| 😎 Glasses | Cool Sunglasses · Heart Glasses · Star Glasses · Sky Glasses |
+| 🧣 Scarves | Red Scarf · Ocean Scarf · Pink Scarf · Rainbow Scarf |
+| 🎀 Head | Cherry Bow · Blush Bow · Daisy Crown · Sky Cap |
+| 👗 Outfits | Berry Outfit · Lemon Outfit · Mint Outfit · Lilac Outfit |
+| ✨ Charms | Golden Charm · Heart Charm · Tiny Bell · Snowflake Charm |
+
+**Try On** previews an accessory without spending coins. **Buy** unlocks it permanently in this browser's saved game, **Wear** outfits the selected character and **Remove** takes it off. No real-money purchases or payment integration are included. Accessories are simple lightweight Three.js geometry, not separately rigged apparel assets; polish and device visual tests are ongoing.
+
 ## 🌎 Meet the seven heroes
 
 | Hero | World | Road and main landmarks | Solo unlock |

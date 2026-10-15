@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/readme-banner.svg" alt="Pawverse Dash — illustrative animated Arctic banner" width="100%" />
+<img src="assets/readme-banner.png" alt="Pawverse Dash — Seven magical baby-animal worlds banner" width="100%" />
 
 # 🐾 PAWVERSE DASH
 
@@ -25,7 +25,7 @@
 
 The game runs in the browser with **Three.js + Vite**. It uses lightweight procedural 3D art, runtime-generated road textures and sky shaders. The same codebase includes a **local two-player race** with independently themed views.
 
-> **Visual fidelity:** The concept illustration is a design target, **not** an actual in-game screenshot. Current models and props are stylized procedural meshes; achieving film-quality fur, perfectly sculpted animals and detailed environments requires additional textured/rigged assets. The header SVG is illustrative artwork, not a live render.
+> **Visual fidelity:** The concept illustration is a design target, **not** an actual in-game screenshot. Current models and props are stylized procedural meshes; achieving film-quality fur, perfectly sculpted animals and detailed environments requires additional textured/rigged assets. The header banner is illustrative artwork, not a live render.
 
 ## 🖥️📱 Play on Windows, Linux and Android
 
@@ -536,7 +536,7 @@ penguin-game/
 │   └── race.css                  Split-screen interface
 ├── tests/                        Collision, race, worlds and art tests
 ├── public/models/               Optional downloaded GLB assets
-├── assets/readme-banner.svg      Illustrative animated README header
+├── assets/readme-banner.png      Seven magical baby-animal worlds README header
 ├── capacitor.config.json         Android wrapper configuration
 ├── docs/PLAY_STORE_RELEASE.md    Android release checklist
 ├── PRIVACY.md                    Prototype privacy notes

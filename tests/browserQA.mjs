@@ -354,7 +354,7 @@ try{
     economy:{inventory:{carrot:9}}}
   });
   await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();
-  assert.equal(await page.locator('.shop-tab').count(),4);
+  assert.equal(await page.locator('.shop-tab').count(),5);
   await page.locator('.shop-tab[data-tab="sell"]').click();
   const carrot=page.locator('.economy-item').filter({hasText:'Carrot'});
   assert.match(await carrot.textContent(),/Owned: 9/);

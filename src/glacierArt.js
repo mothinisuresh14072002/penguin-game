@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {loopZ} from './worldMotion.js';
+import {createWorldStory} from './worldStories.js';
 
 // Phase 6 — Pip Penguin. Real 3D faceted ice, powdery snowbanks and falling
 // snow, without GLB downloads. Crystals and snow mounds are instanced.
@@ -95,9 +96,11 @@ export function createGlacierDetails(scene){
  snowfall.frustumCulled=false;
  root.add(snowfall);
  let lastDistance=0,lastTime=0;
+ const story=createWorldStory(strips,'arctic',GLACIER_STRIP_LENGTH);
  function update(distance=0,time=0){
   for(let i=0;i<strips.length;i++)
    strips[i].position.z=loopZ(i,GLACIER_STRIP_LENGTH,Math.max(0,distance),GLACIER_STRIPS,14);
+  story.update(distance);
   const deltaTime=Math.max(0,Math.min(.055,time-lastTime));
   const forward=Math.max(0,Math.min(3.6,(distance-lastDistance)*.28));
   for(let i=0;i<SNOWFLAKES;i++){
@@ -113,6 +116,7 @@ export function createGlacierDetails(scene){
   lastDistance=distance;lastTime=time;
  }
  function dispose(){
+  story.dispose();
   scene.remove(root);
   snowGeometry.dispose();
   for(const g of Object.values(geometry))g.dispose();
@@ -120,5 +124,5 @@ export function createGlacierDetails(scene){
      material.shard,material.flakes])m.dispose();
  }
  update(0);
- return {root,strips,snowfall,update,dispose};
+ return {root,strips,story,snowfall,update,dispose};
 }

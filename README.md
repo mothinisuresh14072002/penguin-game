@@ -115,6 +115,22 @@ There are **20 items**, grouped into five slots:
 
 **Try On** previews an accessory without spending coins. **Buy** unlocks it permanently in this browser's saved game, **Wear** outfits the selected character and **Remove** takes it off. No real-money purchases or payment integration are included. Accessories are simple lightweight Three.js geometry, not separately rigged apparel assets; polish and device visual tests are ongoing.
 
+## 🌍 Changing story areas in every animal world
+
+Every animal world now has **six themed roadside areas** that change as the runner travels. Each world retains its existing track, collectibles and biome scenery while lightweight decorative landmarks appear in the background. These sections use reusable geometries/materials and a fixed number of scenery-strip groups; they are kept away from the playable lanes.
+
+| Baby animal | Six story areas |
+|---|---|
+| 🐰 Bella Bunny | Bunny Village · Flower Garden · Carrot Farm · Enchanted Forest · Bunny Market · Rainbow Pond |
+| 🦄 Ula Unicorn | Cloud Nursery · Rainbow Gate · Star Garden · Crystal Castle · Moon Market · Wish Islands |
+| 🐴 Hugo Foal | Foal Stables · Apple Orchard · Hay Meadow · Windmill Fair · Flower Ranch · Sunset Corral |
+| 🐱 Coco Kitten | Kitten Homes · Fish Market · Yarn Garden · Bakery Street · Cat Playground · Rooftop Parade |
+| 🐶 Dodo Puppy | Puppy Homes · Bone Garden · Dog Playground · Duck Pond · Treat Market · Puppy Festival |
+| 🐧 Pip Penguin Chick | Penguin Village · Snowflake Garden · Fish Harbor · Crystal Cave · Ice Festival · Aurora Lake |
+| 🐮 Mimi Calf | Calf Cottages · Clover Meadow · Milk Market · Corn Farm · Sunflower Fair · Barnyard Pond |
+
+The journey areas repeat over long distances with altered positions; they are **not yet six handcrafted unique full levels**. Decorative architecture is procedural and performance still needs testing on real Android devices.
+
 ## 🌎 Meet the seven heroes
 
 | Hero | World | Road and main landmarks | Solo unlock |

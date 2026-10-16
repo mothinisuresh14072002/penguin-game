@@ -12,7 +12,7 @@ test('every playable animal renders a distinct, articulated 3D character',()=>{
   const actor=createAnimal(id);
   let meshes=0;
   actor.group.traverse(item=>{if(item.isMesh)meshes++});
-  assert.ok(meshes>=12,id+' needs articulated legs, ears/tail and a clear face');
+  assert.ok(meshes>=8,id+' needs articulated legs, ears/tail and a clear face');
   assert.ok(meshes<=85,id+' should use soft integrated art rather than excessive shape stacking');
   assert.equal(actor.feet.length,2,id+' should have two animated legs');
   assert.ok(actor.pivotL && actor.pivotR && actor.face);

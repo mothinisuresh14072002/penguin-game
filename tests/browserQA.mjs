@@ -378,9 +378,10 @@ try{
   assert.equal(await page.locator('.boutique-hanger').count(),6);
   assert.equal(await page.locator('.boutique-mirror canvas').count(),1);
   assert.equal(await page.locator('.dress-card').count(),20);
-  const before=(await state(page)).coins;
+  const balance=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('penguin-ice-runner-v3')).coins);
+  const before=await balance();
   await page.locator('.dress-card').first().getByRole('button',{name:'TRY ON'}).click();
-  assert.equal((await state(page)).coins,before);
+  assert.equal(await balance(),before);
   await snap(page,'24-boutique-dressing-room');
   await close();
  });

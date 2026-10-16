@@ -10,7 +10,7 @@ test('Dodo Dog has soft PBR fur, floppy ears, red collar and wagging tail',()=>{
  assert.ok(pup.group.getObjectByName('dog-red-collar'));
  assert.ok(pup.group.getObjectByName('dog-collar-tag'));
  assert.ok(pup.group.getObjectByName('dog-collar-back'));
- assert.ok(pup.group.getObjectByName('dog-park-heart'));
+ assert.ok(pup.group.getObjectByName('dog-paw-badge'));
  assert.equal(pup.dogEars.length,2);
  assert.equal(pup.dogEars[0].name,'dog-left-floppy-ear');
  assert.equal(pup.dogEars[1].name,'dog-right-floppy-ear');

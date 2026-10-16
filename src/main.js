@@ -364,17 +364,38 @@ function renderDressingRoom(panel){
  const choose=document.createElement('select');choose.setAttribute('aria-label','Dressing room animal');
  for(const a of CHARS){const option=document.createElement('option');option.value=a.id;option.textContent=a.icon+' '+a.name;choose.append(option)}
  choose.value=profile.selected;
+ const boutique=document.createElement('div');boutique.className='boutique-room';
+ const boutiqueHeading=document.createElement('div');boutiqueHeading.className='boutique-heading';boutiqueHeading.textContent='✨ COCO’S CUTE COUTURE · DRESS-UP STUDIO ✨';
+ const rack=document.createElement('div');rack.className='boutique-rack';
+ rack.setAttribute('aria-label','Hanging outfits and scarves');
+ for(const [emoji,name] of [['👗','Berry dress'],['🧥','Cozy outfit'],['🧣','Rainbow scarf'],['🎀','Pink bow'],['🧢','Cute cap'],['👚','Mint outfit']]){
+  const hanger=document.createElement('div');hanger.className='boutique-hanger';
+  hanger.innerHTML='<span class="hanger-hook">⌒</span><span class="hanger-piece"></span>';
+  const image=document.createElement('span');image.className='hanger-icon';image.textContent=emoji;image.setAttribute('aria-label',name);
+  hanger.append(image);rack.append(hanger);
+ }
+ const studio=document.createElement('div');studio.className='boutique-studio';
+ const sideShelf=document.createElement('div');sideShelf.className='boutique-shelf';
+ for(const icon of ['😎','👒','💖','👑','🕶️','🎀']){const item=document.createElement('span');item.textContent=icon;sideShelf.append(item)}
+ const mirror=document.createElement('div');mirror.className='boutique-mirror';
+ const mirrorLabel=document.createElement('span');mirrorLabel.className='mirror-label';mirrorLabel.textContent='🪞 YOUR BABY ANIMAL';
  const stage=document.createElement('div');stage.className='dress-stage';
+ mirror.append(mirrorLabel,stage);
+ const shelves=document.createElement('div');shelves.className='boutique-shelves';
+ shelves.append(Object.assign(document.createElement('div'),{textContent:'👜 👓 🎩'}),Object.assign(document.createElement('div'),{textContent:'🧣 🎀 👒'}));
+ studio.append(sideShelf,mirror,shelves);
+ const rug=document.createElement('div');rug.className='boutique-rug';rug.textContent='♡ LITTLE STAR FASHION ♡';
+ boutique.append(boutiqueHeading,rack,studio,rug);
  const tools=document.createElement('div');tools.className='dress-actions';
  const balance=document.createElement('strong');balance.textContent='🪙 '+profile.coins+' coins';
  const reset=document.createElement('button');reset.type='button';reset.className='secondary';reset.textContent='↻ Clear preview';tools.append(balance,reset);
  const list=document.createElement('div');list.className='dress-grid';
  const note=document.createElement('p');note.setAttribute('role','status');
- panel.append(title,desc,choose,stage,tools,note,list);
+ panel.append(title,desc,choose,boutique,tools,note,list);
  let animal=choose.value;
  function buildPreview(){
   disposeDressingRoom();
-  dressingScene=new THREE.Scene();dressingScene.background=new THREE.Color(0xf6eafd);
+  dressingScene=new THREE.Scene();dressingScene.background=new THREE.Color(0xfff1f8);
   dressingScene.add(new THREE.HemisphereLight(0xffffff,0xb7a5ca,2.5));
   const key=new THREE.DirectionalLight(0xffffff,2.1);key.position.set(-3,5,6);dressingScene.add(key);
   dressingCamera=new THREE.PerspectiveCamera(34,1.3,.1,50);dressingCamera.position.set(0,1.35,6.1);dressingCamera.lookAt(0,1.2,0);
@@ -382,7 +403,7 @@ function renderDressingRoom(panel){
   applyWardrobe(dressingActor,dressingPreview);dressingScene.add(dressingActor.group);
   dressingRenderer=new THREE.WebGLRenderer({alpha:false,antialias:true});
   dressingRenderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));
-  dressingRenderer.setSize(390,300);
+  dressingRenderer.setSize(390,340);
   dressingRenderer.domElement.setAttribute('aria-label','3D outfit preview');
   stage.replaceChildren(dressingRenderer.domElement);
   dressingRenderer.render(dressingScene,dressingCamera);
@@ -398,7 +419,7 @@ function renderDressingRoom(panel){
    const head=document.createElement('strong');head.textContent=item.emoji+' '+item.name;
    const caption=document.createElement('small');caption.textContent=item.slot.toUpperCase()+' · '+(owned?'OWNED':'🪙 '+item.price);
    const preview=document.createElement('button');preview.type='button';preview.className='secondary';preview.textContent=dressingPreview[item.slot]===item.id?'PREVIEWING':'TRY ON';
-   preview.onclick=()=>{dressingPreview[item.slot]=item.id;updatePreview();note.textContent='Previewing '+item.name+' — try before you buy';list.querySelectorAll('.dress-card button').forEach(b=>{});};
+   preview.onclick=()=>{dressingPreview[item.slot]=item.id;updatePreview();note.textContent='Previewing '+item.name+' — try before you buy';for(const button of list.querySelectorAll('.dress-card button.secondary'))button.textContent='TRY ON';preview.textContent='PREVIEWING';};
    const action=document.createElement('button');action.type='button';action.textContent=equipped?'REMOVE':owned?'WEAR':'BUY';
    action.disabled=!owned&&profile.coins<item.price;
    action.onclick=()=>{

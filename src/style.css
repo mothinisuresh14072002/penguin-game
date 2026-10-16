@@ -70,3 +70,22 @@
 .dress-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-top:12px}
 .dress-card{display:flex;flex-direction:column;gap:8px;padding:13px;border-radius:15px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25)}
 .dress-card small{opacity:.85}.dress-card button{min-height:37px}
+
+
+/* Dedicated pastel boutique: hanging garments, dress-up mirror and display shelves. */
+.boutique-room{margin:18px auto;max-width:780px;border-radius:26px;padding:16px;background:linear-gradient(145deg,#fff5fb 0%,#ffe6f1 52%,#f1e9ff 100%);border:3px solid #f4c8e4;box-shadow:inset 0 3px 24px #fff9,0 12px 32px #20163230;color:#723957}
+.boutique-heading{text-align:center;letter-spacing:.10em;font-weight:900;font-size:.84rem;color:#ad5b94;padding:8px 4px 14px}
+.boutique-rack{display:flex;justify-content:space-around;gap:6px;align-items:flex-start;position:relative;border-top:8px solid #e9aa7f;margin:8px 2% 16px;border-radius:8px;padding:10px 4px 4px;min-height:90px}
+.boutique-hanger{flex:1;min-width:0;max-width:94px;text-align:center;position:relative;filter:drop-shadow(0 3px 3px #a64c7826)}
+.hanger-hook{display:block;font-size:24px;line-height:16px;color:#ba849f}.hanger-piece{display:block;height:7px;background:#c993b1;border-radius:6px;margin:0 auto;width:70%}
+.hanger-icon{font-size:clamp(24px,4vw,42px);display:block;line-height:1.45}
+.boutique-studio{display:grid;grid-template-columns:minmax(48px,1fr) minmax(190px,390px) minmax(48px,1fr);align-items:center;gap:8px}
+.boutique-mirror{position:relative;border:10px solid #f2b8d3;border-radius:140px 140px 24px 24px;overflow:hidden;box-shadow:inset 0 0 0 4px #fff9,0 6px 18px #b7709a42;background:#fffbfe}
+.mirror-label{position:absolute;top:12px;left:0;right:0;text-align:center;color:#a25380;font-size:12px;font-weight:800;z-index:1;letter-spacing:.05em;pointer-events:none}
+.boutique-mirror .dress-stage{margin:0;min-height:330px;border-radius:0;background:#fff0f9}
+.boutique-mirror canvas{display:block;max-width:100%;height:auto}
+.boutique-shelf,.boutique-shelves{display:flex;flex-direction:column;align-items:center;justify-content:space-around;min-height:190px;border-radius:15px;background:#fff9;box-shadow:inset 0 -8px 0 #f1cfb4;border:2px solid #f4d1db;padding:8px 3px}
+.boutique-shelf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));font-size:clamp(18px,3vw,31px);gap:8px}
+.boutique-shelves{font-size:clamp(18px,3vw,28px);word-break:break-word;text-align:center}
+.boutique-rug{text-align:center;margin:14px auto 2px;max-width:340px;padding:10px 0;color:#b56b8e;border-radius:50%;background:linear-gradient(90deg,#f9cfe6,#fff8fd,#ecccf9);font-size:12px;font-weight:900;letter-spacing:.12em}
+@media(max-width:540px){.boutique-room{padding:8px;border-radius:16px}.boutique-studio{grid-template-columns:35px minmax(0,1fr) 35px;gap:3px}.boutique-mirror{border-width:6px}.boutique-shelf,.boutique-shelves{font-size:15px;padding:4px 1px;min-height:110px}.boutique-shelf{grid-template-columns:1fr}.boutique-shelf span:nth-child(n+4){display:none}.boutique-rack{min-height:65px}.boutique-heading{font-size:10px}.mirror-label{font-size:10px}}

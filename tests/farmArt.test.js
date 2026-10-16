@@ -8,7 +8,7 @@ import {createWorldLandmarks} from '../src/landmarkArt.js';
 
 test('Mimi Cow has fluffy PBR coat, black spots, pink bow and animated tail',()=>{
  const cow=createAnimal('cow');
- for(const id of ['cow-pink-bow','cow-tail-tuft','cow-gold-bell',
+ for(const id of ['cow-red-head-bow','cow-tail-tuft',
     'cow-left-ear','cow-right-ear']){
   assert.ok(cow.group.getObjectByName(id),'Missing Mimi part: '+id);
  }

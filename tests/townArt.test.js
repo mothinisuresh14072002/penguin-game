@@ -7,8 +7,8 @@ import {createTownDetails,TOWN_STRIPS,TOWN_STRIP_LENGTH,HOUSES_PER_STRIP} from '
 
 test('Coco Cat has plush orange tabby markings, green irises and an animated tail',()=>{
  const actor=createAnimal('cat');
- assert.ok(actor.group.getObjectByName('cat-tabby-back'));
- assert.ok(actor.group.getObjectByName('cat-lavender-scarf'));
+ assert.equal(actor.group.getObjectByName('cat-smooth-body').userData.coatPattern,'orange-tabby');
+ assert.ok(actor.group.getObjectByName('cat-red-scarf'));
  assert.ok(actor.group.getObjectByName('cat-tail-tip'));
  assert.ok(actor.catTail);
  const mats=new Set(),geos=new Set();

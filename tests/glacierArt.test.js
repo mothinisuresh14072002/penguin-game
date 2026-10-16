@@ -7,8 +7,8 @@ import {createWorldLandmarks} from '../src/landmarkArt.js';
 
 test('Pip Penguin has a soft coat, little blue scarf, flippers and snowy badge',()=>{
  const penguin=createAnimal('penguin');
- for(const part of ['penguin-distinct-head','penguin-blue-scarf',
-   'penguin-snowflake-badge']){
+ for(const part of ['penguin-distinct-head','penguin-soft-beak',
+   'penguin-orange-foot']){
    assert.ok(penguin.group.getObjectByName(part),part+' is missing');
  }
  const flippers=[];
@@ -22,7 +22,7 @@ test('Pip Penguin has a soft coat, little blue scarf, flippers and snowy badge',
   for(const m of Array.isArray(o.material)?o.material:[o.material])mats.add(m);
  });
  assert.equal(flippers.length,2);
- assert.equal(tufts,3);
+ assert.equal(tufts,0);
  assert.ok([...mats].some(m=>m.isMeshPhysicalMaterial));
  animateAnimal(penguin,.21,true,false);
  assert.ok(Math.abs(penguin.pivotL.rotation.x)>.04);

@@ -371,6 +371,19 @@ try{
   await snap(page,'15-food-inventory-and-sell');
   await close();
  });
+ await test('Dressing boutique has hanging outfits, mirror and free try-on',async()=>{
+  const {page,close}=await openGame('/?qa=1',{profile:{coins:210,best:0,unlocked:['bunny','penguin'],selected:'bunny'}});
+  await page.getByRole('button',{name:/DRESSING ROOM/}).first().click();
+  assert.equal(await page.locator('.boutique-room').count(),1);
+  assert.equal(await page.locator('.boutique-hanger').count(),6);
+  assert.equal(await page.locator('.boutique-mirror canvas').count(),1);
+  assert.equal(await page.locator('.dress-card').count(),20);
+  const before=(await state(page)).coins;
+  await page.locator('.dress-card').first().getByRole('button',{name:'TRY ON'}).click();
+  assert.equal((await state(page)).coins,before);
+  await snap(page,'24-boutique-dressing-room');
+  await close();
+ });
  await test('Daily gift box can be claimed once and remains claimed after reload',async()=>{
   const {page,close}=await openGame('/?qa=1');
   await page.getByRole('button',{name:/CHARACTERS.*SHOP/}).click();

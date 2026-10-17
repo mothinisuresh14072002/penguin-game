@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {animate,stagger} from 'animejs';
 import {ACCESSORIES,SLOTS,sanitizeWardrobe,buyAccessory,equipAccessory,unequipAccessory,applyWardrobe} from './dressUp.js';
 import './style.css';
 import {createAnimal, animateAnimal, alignAnimalFeetToRoad} from './animalArt.js';
@@ -27,6 +28,8 @@ import {createJourneyArt} from './journeyArt.js';
 import {loopZ,layerTravel,journeyChapter} from './worldMotion.js';
 
 const $ = id => document.getElementById(id);
+const motionOK=()=>!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+function popIn(target){if(target&&motionOK())animate(target,{opacity:[0,1],y:[14,0],scale:[.985,1],duration:500,ease:'outCubic'})}
 const CHARS=[
  {id:'bunny',name:'Bella Bunny',cost:0,icon:'🐰',color:0xf9e5ef,biome:'meadow'},
  {id:'unicorn',name:'Ula Unicorn',cost:150,icon:'🦄',color:0xf5e5ff,biome:'rainbow'},
@@ -312,6 +315,7 @@ function row(at){
 function clearObjects(){for(const e of entities){scene.remove(e.root);disposeGroup(e.root)}entities.length=0}
 function showScreen(title,message,buttons){
  const screen=$('overlay');screen.classList.remove('hidden');
+ popIn(screen.querySelector('.glass')||screen);
  $('screenTitle').textContent=title;$('screenText').textContent=message;
  const actions=$('screenActions');actions.replaceChildren();
  for(const b of buttons){const btn=document.createElement('button');btn.textContent=b.text;btn.className=b.secondary?'secondary':'';btn.onclick=b.action;actions.appendChild(btn)}
@@ -323,6 +327,7 @@ function shop(tab='characters'){
  if(!characterPreviews)characterPreviews=renderCharacterPreviews(CHARS,BIOMES);
  if(tab!=='dress')disposeDressingRoom();
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.remove('hidden');$('overlay').classList.add('hidden');
+ popIn($('shop').querySelector('.shop-panel'));
  const grid=$('charGrid');grid.replaceChildren();
  for(const c of CHARS){
   const unlocked=profile.unlocked.includes(c.id),selected=profile.selected===c.id;
@@ -386,6 +391,9 @@ function renderDressingRoom(panel){
  studio.append(sideShelf,mirror,shelves);
  const rug=document.createElement('div');rug.className='boutique-rug';rug.textContent='♡ LITTLE STAR FASHION ♡';
  boutique.append(boutiqueHeading,rack,studio,rug);
+ if(motionOK()){
+  animate([...rack.children],{opacity:[0,1],y:[-12,0],rotate:[-5,0],delay:stagger(65),duration:600,ease:'outCubic'});
+ }
  const tools=document.createElement('div');tools.className='dress-actions';
  const balance=document.createElement('strong');balance.textContent='🪙 '+profile.coins+' coins';
  const reset=document.createElement('button');reset.type='button';reset.className='secondary';reset.textContent='↻ Clear preview';tools.append(balance,reset);
@@ -407,6 +415,7 @@ function renderDressingRoom(panel){
   dressingRenderer.domElement.setAttribute('aria-label','3D outfit preview');
   stage.replaceChildren(dressingRenderer.domElement);
   dressingRenderer.render(dressingScene,dressingCamera);
+  if(motionOK())animate(dressingActor.group.rotation,{y:[Math.PI-.24,Math.PI],duration:850,ease:'outBack',onUpdate:()=>dressingRenderer?.render(dressingScene,dressingCamera)});
  }
  function updatePreview(){if(dressingActor){applyWardrobe(dressingActor,dressingPreview);dressingRenderer.render(dressingScene,dressingCamera)}}
  function refresh(){
@@ -419,7 +428,7 @@ function renderDressingRoom(panel){
    const head=document.createElement('strong');head.textContent=item.emoji+' '+item.name;
    const caption=document.createElement('small');caption.textContent=item.slot.toUpperCase()+' · '+(owned?'OWNED':'🪙 '+item.price);
    const preview=document.createElement('button');preview.type='button';preview.className='secondary';preview.textContent=dressingPreview[item.slot]===item.id?'PREVIEWING':'TRY ON';
-   preview.onclick=()=>{dressingPreview[item.slot]=item.id;updatePreview();note.textContent='Previewing '+item.name+' — try before you buy';for(const button of list.querySelectorAll('.dress-card button.secondary'))button.textContent='TRY ON';preview.textContent='PREVIEWING';};
+   preview.onclick=()=>{dressingPreview[item.slot]=item.id;updatePreview();if(motionOK()&&dressingActor){animate(dressingActor.group.rotation,{y:[Math.PI-.13,Math.PI],duration:540,ease:'outCubic',onUpdate:()=>dressingRenderer?.render(dressingScene,dressingCamera)});} note.textContent='Previewing '+item.name+' — try before you buy';for(const button of list.querySelectorAll('.dress-card button.secondary'))button.textContent='TRY ON';preview.textContent='PREVIEWING';};
    const action=document.createElement('button');action.type='button';action.textContent=equipped?'REMOVE':owned?'WEAR':'BUY';
    action.disabled=!owned&&profile.coins<item.price;
    action.onclick=()=>{

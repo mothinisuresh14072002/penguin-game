@@ -406,7 +406,12 @@ function renderDressingRoom(panel){
  const reset=document.createElement('button');reset.type='button';reset.className='secondary';reset.textContent='↻ Clear preview';tools.append(level,balance,reset);
  const list=document.createElement('div');list.className='dress-grid';
  const note=document.createElement('p');note.setAttribute('role','status');
- panel.append(title,desc,choose,boutique,tools,note,list);
+ const workspace=document.createElement('div');workspace.className='dressing-workspace';
+ const catalog=document.createElement('section');catalog.className='dressing-catalog';catalog.setAttribute('aria-label','All outfits and accessories');
+ const catalogTitle=document.createElement('h3');catalogTitle.textContent='👗 All styles · Preview before buying';
+ const catalogHelp=document.createElement('p');catalogHelp.className='dressing-help';catalogHelp.textContent='Every outfit can be tried on, even if it is locked. Level and pink cash are required only to purchase.';
+ catalog.append(catalogTitle,catalogHelp,tools,note,list);workspace.append(boutique,catalog);
+ panel.append(title,desc,choose,workspace);
  let animal=choose.value;
  function chooseBoutique(){
   const theme=DRESS_SHOPS[animal];boutique.style.setProperty('--boutique-accent',theme.color);
@@ -454,11 +459,12 @@ function renderDressingRoom(panel){
    const head=document.createElement('strong');head.textContent=item.emoji+' '+item.name;
    const caption=document.createElement('small');caption.textContent=item.slot.toUpperCase()+' · Lv '+item.level+' · '+(owned?'OWNED':'💗 '+item.price);
    const preview=document.createElement('button');preview.type='button';preview.className='secondary';preview.textContent=dressingPreview[item.slot]===item.id?'PREVIEWING':'TRY ON';
-   preview.onclick=()=>{dressingPreview[item.slot]=item.id;updatePreview();if(motionOK()&&dressingActor){animate(dressingActor.group.rotation,{y:[Math.PI-.13,Math.PI],duration:540,ease:'outCubic',onUpdate:()=>dressingRenderer?.render(dressingScene,dressingCamera)});} note.textContent='Previewing '+item.name+' — try before you buy';for(const button of list.querySelectorAll('.dress-card button.secondary'))button.textContent='TRY ON';preview.textContent='PREVIEWING';};
+   preview.setAttribute('aria-label','Preview '+item.name+(levelFromBest(profile.best)<item.level?' (locked for purchase)':''));
+   preview.onclick=()=>{dressingPreview[item.slot]=item.id;updatePreview();if(motionOK()&&dressingActor){animate(dressingActor.group.rotation,{y:[Math.PI-.13,Math.PI],duration:540,ease:'outCubic',onUpdate:()=>dressingRenderer?.render(dressingScene,dressingCamera)});} note.textContent='Previewing '+item.name+' — try before you buy';for(const button of list.querySelectorAll('.dress-card button.secondary'))button.textContent='TRY ON';preview.textContent='PREVIEWING';card.classList.add('preview-active');for(const other of list.children)if(other!==card)other.classList.remove('preview-active');};
    const action=document.createElement('button');action.type='button';action.textContent=equipped?'REMOVE':owned?'WEAR':'BUY';
    const levelLocked=levelFromBest(profile.best)<item.level;
    action.disabled=!owned&&!canPurchase(profile,item);
-   if(!owned&&levelLocked)action.textContent='🔒 LEVEL '+item.level;
+   if(!owned&&levelLocked){action.textContent='🔒 LEVEL '+item.level;card.classList.add('purchase-locked');}
    if(!owned)card.title=levelLocked?'Run further to unlock Level '+item.level:'Buy for '+item.price+' pink cash';
    action.onclick=()=>{
     if(equipped){unequipAccessory(profile,animal,item.slot);note.textContent='Removed '+item.name;}

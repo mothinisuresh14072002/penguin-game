@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import './race.css';
 import {createAnimal, animateAnimal, alignAnimalFeetToRoad} from './animalArt.js';
+import {applyWardrobe,sanitizeWardrobe} from './dressUp.js';
 import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 import {create3DBackdrop} from './visual3d.js';
@@ -57,8 +58,10 @@ function piece(parent,geo,mat,x,y,z,sx=1,sy=1,sz=1){
  mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);parent.add(mesh);return mesh;
 }
 function ball(parent,mat,x,y,z,sx,sy,sz){return piece(parent,geom.ball,mat,x,y,z,sx,sy,sz)}
+const raceWardrobe=(()=>{try{return sanitizeWardrobe(JSON.parse(localStorage.getItem('penguin-ice-runner-v3')||'{}').wardrobe)}catch{return sanitizeWardrobe({})}})();
 function createHero(id,scene){
  const actor=createAnimal(id);
+ applyWardrobe(actor,raceWardrobe.equipped[id]||{});
  scene.add(actor.group);
  actor.group.rotation.y=Math.PI;
  const shadowMaterial=new THREE.MeshBasicMaterial({color:0x284b66,transparent:true,opacity:.32,depthWrite:false});
@@ -367,6 +370,7 @@ function tryImportedRaceHero(player){
   for(const g of oldGeo)g.dispose();
   for(const m of oldMats)m.dispose();
   imported.group.rotation.y=Math.PI;
+  applyWardrobe(imported,raceWardrobe.equipped[player.ch.id]||{});
   player.scene.add(imported.group);
   player.hero={...imported,shadow:previous.shadow};
  });

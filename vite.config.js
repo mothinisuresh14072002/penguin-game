@@ -11,7 +11,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
-        race: fileURLToPath(new URL('./race.html', import.meta.url))
+        race: fileURLToPath(new URL('./race.html', import.meta.url)),
+        walk: fileURLToPath(new URL('./walk.html', import.meta.url))
       }
     }
   }

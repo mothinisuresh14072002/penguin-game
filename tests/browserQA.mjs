@@ -386,7 +386,7 @@ try{
   assert.equal(await page.locator('.dress-card').count(),20);
   const balance=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('penguin-ice-runner-v3')).coins);
   const before=await balance();
-  await page.locator('.dress-card').first().getByRole('button',{name:'TRY ON'}).click();
+  await page.locator('.dress-card').first().getByRole('button',{name:/Preview Cool Sunglasses/}).click();
   assert.equal(await balance(),before);
   const locked=page.locator('.dress-card').filter({hasText:'Lilac Outfit'});
   assert.equal(await locked.getByRole('button',{name:/LEVEL 5/}).isDisabled(),true);

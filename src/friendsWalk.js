@@ -25,6 +25,8 @@ scene.add(new THREE.HemisphereLight(0xffffff,0x9bc7a1,2.1));
 const sunlight=new THREE.DirectionalLight(0xfff3df,2.1);sunlight.position.set(-6,10,7);scene.add(sunlight);
 const mat=(color)=>new THREE.MeshLambertMaterial({color});
 const grass=mat(0x83cb83),path=mat(0xffddba),trim=mat(0xfff8df),wood=mat(0xa57657),leaves=mat(0x78bd82),flowers=[mat(0xffb2d2),mat(0xffe48d),mat(0xc9b3fa)];
+// Reuse the same GPU materials during every scenic strip recycle.
+const cottageWall=mat(0xffe1cf),cottageRoof=mat(0xf4a6bb),pond=mat(0x99e9ed),magicStone=mat(0xc9a7ee);
 const box=new THREE.BoxGeometry(1,1,1),sphere=new THREE.SphereGeometry(1,9,7);
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(250,250),grass);ground.rotation.x=-Math.PI/2;ground.position.y=-.09;scene.add(ground);
 const road=new THREE.Mesh(new THREE.PlaneGeometry(7.8,250),path);road.rotation.x=-Math.PI/2;road.position.y=-.045;scene.add(road);
@@ -34,8 +36,8 @@ const segments=Array.from({length:12},(_,i)=>{const group=new THREE.Group();scen
 const geo=(parent,shape,material,x,y,z,sx,sy,sz)=>{const m=new THREE.Mesh(shape,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);parent.add(m);return m;};
 const tree=(g,x,z)=>{geo(g,box,wood,x,.8,z,.23,1.6,.25);geo(g,sphere,leaves,x,2.05,z,1.08,.95,.89)};
 const bloom=(g,x,z,i)=>{geo(g,box,leaves,x,.24,z,.06,.44,.06);geo(g,sphere,flowers[i%3],x,.52,z,.22,.2,.2)};
-const cottage=(g,x,z)=>{geo(g,box,mat(0xffe1cf),x,.7,z,1.6,1.3,1.5);const roof=geo(g,box,mat(0xf4a6bb),x,1.49,z,1.85,.32,1.78);roof.rotation.z=.08};
-function fillSegment(g,index){g.clear();const theme=Math.floor(index/4)%6;for(const side of [-1,1]){const x=side*(6.5+(index%3));if(theme===0||theme===4)cottage(g,x,-3);if(theme!==2)tree(g,x+side*2.6,-8);if(theme===2){for(let j=0;j<5;j++)bloom(g,x+side*(j%2)*.6,-j*2,j)}else for(let j=0;j<3;j++)bloom(g,x+side*.8,-j*3-2,j+index);if(theme===3||theme===5)geo(g,sphere,mat(theme===5?0x99e9ed:0xc9a7ee),x,.19,-5,1.6,.16,1.5)}}
+const cottage=(g,x,z)=>{geo(g,box,cottageWall,x,.7,z,1.6,1.3,1.5);const roof=geo(g,box,cottageRoof,x,1.49,z,1.85,.32,1.78);roof.rotation.z=.08};
+function fillSegment(g,index){g.clear();const theme=Math.floor(index/4)%6;for(const side of [-1,1]){const x=side*(6.5+(index%3));if(theme===0||theme===4)cottage(g,x,-3);if(theme!==2)tree(g,x+side*2.6,-8);if(theme===2){for(let j=0;j<5;j++)bloom(g,x+side*(j%2)*.6,-j*2,j)}else for(let j=0;j<3;j++)bloom(g,x+side*.8,-j*3-2,j+index);if(theme===3||theme===5)geo(g,sphere,theme===5?pond:magicStone,x,.19,-5,1.6,.16,1.5)}}
 let distance=0,running=false,paused=false,front=false,time=0,actors=[];
 const selectors=[$('friend-one'),$('friend-two')];
 for(const select of selectors)for(const animal of WALK_ANIMALS){const option=document.createElement('option');option.value=animal.id;option.textContent=animal.emoji+' '+animal.name;select.append(option)}

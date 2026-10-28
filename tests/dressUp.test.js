@@ -9,9 +9,10 @@ test('dressing shop has exactly twenty unique cute cosmetics across five slots',
  for(const slot of SLOTS)assert.equal(ACCESSORIES.filter(x=>x.slot===slot).length,4);
 });
 test('coins, purchases and per-character equipment persist safely',()=>{
- const profile={coins:200,wardrobe:sanitizeWardrobe({})};
+ const profile={coins:200,pinkCash:200,wardrobe:sanitizeWardrobe({})};
  assert.ok(buyAccessory(profile,'sunny'));
- assert.equal(profile.coins,120);
+ assert.equal(profile.pinkCash,120);
+ assert.equal(profile.coins,200);
  assert.equal(buyAccessory(profile,'sunny'),false);
  assert.equal(equipAccessory(profile,'cat','sunny'),true);
  assert.equal(profile.wardrobe.equipped.cat.eyes,'sunny');

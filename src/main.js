@@ -30,6 +30,8 @@ import {loopZ,layerTravel,journeyChapter} from './worldMotion.js';
 const $ = id => document.getElementById(id);
 const motionOK=()=>!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 function popIn(target){if(target&&motionOK())animate(target,{opacity:[0,1],y:[14,0],scale:[.985,1],duration:500,ease:'outCubic'})}
+function rewardPop(target){if(!target||!motionOK())return;animate(target,{scale:[1,1.28,1],rotate:[0,-6,0],duration:460,ease:'outCubic'});}
+function floatInCards(elements){if(!motionOK()||!elements?.length)return;animate(elements,{opacity:[0,1],y:[22,0],scale:[.94,1],delay:stagger(42),duration:500,ease:'outCubic'});}
 const CHARS=[
  {id:'bunny',name:'Bella Bunny',cost:0,icon:'🐰',color:0xf9e5ef,biome:'meadow'},
  {id:'unicorn',name:'Ula Unicorn',cost:150,icon:'🦄',color:0xf5e5ff,biome:'rainbow'},
@@ -350,6 +352,7 @@ function shop(tab='characters'){
   });
  }
  $('wallet').textContent=profile.coins;
+ floatInCards([...grid.children]);
  showShopTab(tab);
 }
 
@@ -460,8 +463,8 @@ function showShopTab(tab='characters'){
   button.setAttribute('aria-pressed',String(button.dataset.tab===tab));
  }
  $('wallet').textContent=profile.coins;
- if(tab==='characters'){panel.replaceChildren();return;}
- if(tab==='dress'){renderDressingRoom(panel);return;}
+ if(tab==='characters'){panel.replaceChildren();floatInCards([...grid.children]);return;}
+ if(tab==='dress'){renderDressingRoom(panel);popIn(panel.querySelector('.boutique-room'));return;}
  synchronizeEconomy(profile);save();panel.replaceChildren();
  const heading=(title,description)=>{
   const h=document.createElement('h2');h.textContent=title;panel.append(h);
@@ -629,7 +632,7 @@ const flakes=new THREE.Points(flakesGeo,new THREE.PointsMaterial({color:0xffffff
 weatherParticles=flakes;
 flakes.visible=CHARS.find(c=>c.id===profile.selected)?.biome==='rainbow';
 let last=performance.now(),lastMilestone=0,noticeUntil=0,combo=0,lastCoinDistance=-100;
-function showSpeedNotice(message){const banner=$('speedNotice');if(banner){banner.textContent=message;banner.classList.remove('hidden');noticeUntil=clockTime+1.4;}}
+function showSpeedNotice(message){const banner=$('speedNotice');if(banner){banner.textContent=message;banner.classList.remove('hidden');popIn(banner);noticeUntil=clockTime+1.4;}}
 function tick(now){
  requestAnimationFrame(tick);
  if(running&&!paused){const r=adaptiveRes.sample(now-last);if(r!==null){renderer.setPixelRatio(r);renderer.setSize(innerWidth,innerHeight)}}
@@ -678,7 +681,7 @@ function tick(now){
      isPick?(e.at>=previousDistance-.76&&e.at<=distance+.76&&sameLane):Boolean(hazardContact)
    )){
     if(isPick){
-      if(e.kind==='coin'){combo=distance-lastCoinDistance<9?combo+1:1;lastCoinDistance=distance;runCoins++;sound(760+Math.min(combo,8)*35,.07,'sine',.04);if(combo===5||combo===10||combo===20)showSpeedNotice('✨ '+combo+' COIN STREAK!')}
+      if(e.kind==='coin'){combo=distance-lastCoinDistance<9?combo+1:1;lastCoinDistance=distance;runCoins++;if(combo===1||combo===5||combo===10)rewardPop($('coins'));sound(760+Math.min(combo,8)*35,.07,'sine',.04);if(combo===5||combo===10||combo===20)showSpeedNotice('✨ '+combo+' COIN STREAK!')}
       if(e.kind==='food'){
        const food=collectFood(profile,profile.selected);
        if(food){runFood++;save();sound(700,.08,'triangle',.04);showSpeedNotice(food.emoji+' '+food.label.toUpperCase()+' COLLECTED!')}

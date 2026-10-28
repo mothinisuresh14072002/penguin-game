@@ -32,3 +32,7 @@ test('outfits render on the character and can be changed without affecting anato
  assert.equal(actor.group.getObjectByName('wardrobe-cosmetics').children.length,2);
  assert.ok(actor.group.getObjectByName('cat-distinct-head'));
 });
+
+import {DRESS_SHOPS,levelFromBest} from '../src/dressShops.js';
+test('all seven animals have individualized dress shop themes',()=>{assert.equal(Object.keys(DRESS_SHOPS).length,7);for(const shop of Object.values(DRESS_SHOPS)){assert.equal(shop.styles.length,5);assert.ok(shop.title&&shop.color)}});
+test('premium dresses require both sufficient running level and pink cash',()=>{const p={coins:999,pinkCash:400,best:0,wardrobe:sanitizeWardrobe({})};assert.equal(levelFromBest(p.best),1);assert.equal(buyAccessory(p,'lilac'),false);assert.equal(p.pinkCash,400);p.best=1000;assert.equal(levelFromBest(p.best),5);assert.equal(buyAccessory(p,'lilac'),true);assert.equal(p.pinkCash,205);assert.equal(p.coins,999)});

@@ -78,10 +78,10 @@ export function sellFood(profile,id,amount=1,now=new Date()){
  const e=synchronizeEconomy(profile,now);
  if(e.inventory[id]<n)return null;
  e.inventory[id]-=n;
- const coins=n*food.price;
- profile.coins=whole(profile.coins)+coins;
+ const pinkCash=n*food.price;
+ profile.pinkCash=whole(profile.pinkCash)+pinkCash;
  e.daily.sold+=n;e.weekly.sold+=n;
- return {food,quantity:n,coins};
+ return {food,quantity:n,pinkCash};
 }
 export function goalProgress(profile,period,id,now=new Date()){
  const e=synchronizeEconomy(profile,now);

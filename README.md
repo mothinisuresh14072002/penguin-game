@@ -99,6 +99,10 @@ GitHub Actions checks JavaScript syntax, unit tests, Vite production assets and 
 
 ---
 
+## 💕 Friends Walk — two baby animals together
+
+Choose **💕 FRIENDS WALK** from the main menu to open `walk.html`. Pick any two different baby animals and enjoy a shared, obstacle-free walk through a softly decorated, continuously recycled 3D landscape. Both animals display their **saved boutique accessories**. The mode includes pause/resume, front/rear camera switching, distance tracking, mobile-friendly controls, and a return-to-selection button. Friends Walk is a peaceful *local* side-by-side experience; it does **not** create an online room or synchronize two remote players. The separate two-player competitive race is unchanged.
+
 ## 👗 Baby Animal Dressing Room
 
 The dress shop now has **seven selectable themed boutique corners** based on each animal's wardrobe-showcase concept: berry pink for Bella, rainbow stars for Ula, orchard greens for Hugo, cherry couture for Coco, sunny blue for Dodo, frosty lilac for Pip, and sunflowers for Mimi. Select an animal, click a hanging garment to try it on in the live 3D mirror, and buy accessories using **earned pink cash only**. The room uses Anime.js for gentle transitions. Fashion level is derived from your **best solo running distance**: level 1 at 0m, then +1 per 250m (up to level 99). Outfits are gated at levels 1, 2, 3 or 5. Level unlocks make items *eligible to purchase*, not free; purchases spend pink cash and are saved locally. The illustrated showcase images are design references rather than embedded 3D assets.

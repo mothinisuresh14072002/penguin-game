@@ -348,7 +348,7 @@ try{
   await snap(page,'14-mimi-farm-vs-penguin-glacier');
   await close();
  });
- await test('Shop food inventory sells exact quantities and saves coins',async()=>{
+ await test('Shop food inventory sells exact quantities for pink cash',async()=>{
   const {page,close}=await openGame('/?qa=1',{
    profile:{coins:10,best:0,unlocked:['bunny','penguin'],selected:'bunny',
     economy:{inventory:{carrot:9}}}
@@ -360,11 +360,13 @@ try{
   assert.match(await carrot.textContent(),/Owned: 9/);
   await carrot.getByRole('button',{name:'SELL 1'}).click();
   assert.equal((await state(page)).inventory.carrot,8);
-  assert.equal(await page.locator('#walletHud').textContent(),'13');
+  assert.equal(await page.locator('#walletHud').textContent(),'10');
+  assert.equal(await page.locator('#pinkCashHud').textContent(),'3');
   await page.locator('.economy-item').filter({hasText:'Carrot'})
    .getByRole('button',{name:'SELL ALL'}).click();
   assert.equal((await state(page)).inventory.carrot,0);
-  assert.equal(await page.locator('#walletHud').textContent(),'37');
+  assert.equal(await page.locator('#walletHud').textContent(),'10');
+  assert.equal(await page.locator('#pinkCashHud').textContent(),'27');
   const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('penguin-ice-runner-v3')));
   assert.equal(saved.economy.inventory.carrot,0);
   assert.equal(saved.economy.weekly.sold,9);

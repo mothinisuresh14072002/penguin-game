@@ -401,8 +401,9 @@ function renderDressingRoom(panel){
   animate([...rack.children],{opacity:[0,1],y:[-12,0],rotate:[-5,0],delay:stagger(65),duration:600,ease:'outCubic'});
  }
  const tools=document.createElement('div');tools.className='dress-actions';
+ const level=document.createElement('span');level.className='fashion-level';level.textContent='👑 Fashion Level '+levelFromBest(profile.best)+' · '+(250-(profile.best%250))+'m to next level';
  const balance=document.createElement('strong');balance.textContent='💗 '+profile.pinkCash+' pink cash';
- const reset=document.createElement('button');reset.type='button';reset.className='secondary';reset.textContent='↻ Clear preview';tools.append(balance,reset);
+ const reset=document.createElement('button');reset.type='button';reset.className='secondary';reset.textContent='↻ Clear preview';tools.append(level,balance,reset);
  const list=document.createElement('div');list.className='dress-grid';
  const note=document.createElement('p');note.setAttribute('role','status');
  panel.append(title,desc,choose,boutique,tools,note,list);
@@ -458,6 +459,7 @@ function renderDressingRoom(panel){
    const levelLocked=levelFromBest(profile.best)<item.level;
    action.disabled=!owned&&!canPurchase(profile,item);
    if(!owned&&levelLocked)action.textContent='🔒 LEVEL '+item.level;
+   if(!owned)card.title=levelLocked?'Run further to unlock Level '+item.level:'Buy for '+item.price+' pink cash';
    action.onclick=()=>{
     if(equipped){unequipAccessory(profile,animal,item.slot);note.textContent='Removed '+item.name;}
     else if(!owned&&!buyAccessory(profile,item.id)){note.textContent=levelLocked?'Reach level '+item.level+' by running further':'Sell collected food for more pink cash';return}

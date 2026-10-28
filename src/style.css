@@ -89,3 +89,13 @@
 .boutique-shelves{font-size:clamp(18px,3vw,28px);word-break:break-word;text-align:center}
 .boutique-rug{text-align:center;margin:14px auto 2px;max-width:340px;padding:10px 0;color:#b56b8e;border-radius:50%;background:linear-gradient(90deg,#f9cfe6,#fff8fd,#ecccf9);font-size:12px;font-weight:900;letter-spacing:.12em}
 @media(max-width:540px){.boutique-room{padding:8px;border-radius:16px}.boutique-studio{grid-template-columns:35px minmax(0,1fr) 35px;gap:3px}.boutique-mirror{border-width:6px}.boutique-shelf,.boutique-shelves{font-size:15px;padding:4px 1px;min-height:110px}.boutique-shelf{grid-template-columns:1fr}.boutique-shelf span:nth-child(n+4){display:none}.boutique-rack{min-height:65px}.boutique-heading{font-size:10px}.mirror-label{font-size:10px}}
+
+/* Seven character boutiques; themed like the wardrobe illustration references. */
+.boutique-room{border-color:var(--boutique-accent,#f4c8e4);background:linear-gradient(135deg,color-mix(in srgb,var(--boutique-accent,#ffc2df) 24%,#fff) 0%,#fff6fc 56%,color-mix(in srgb,var(--boutique-accent,#ffc2df) 30%,#fff) 100%);}
+.boutique-map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:10px 0 20px}
+.boutique-zone{font:700 12px 'Outfit',sans-serif;padding:9px 5px;border-radius:12px;border:1px solid #e4a4bf;background:#fff9;color:#854d70;cursor:pointer;transition:background .2s,transform .2s}
+.boutique-zone.active{background:var(--boutique-accent,#ffc2df);color:#59374b;border-color:#bb85a4;box-shadow:0 3px 8px #0002;transform:translateY(-2px)}
+.boutique-hanger{background:none;border:0;color:#915073;cursor:pointer;min-height:68px}
+.boutique-hanger small{font-size:10px;display:block;line-height:1.1}
+.boutique-hanger:hover,.boutique-hanger:focus-visible{filter:drop-shadow(0 4px 7px #8f588a66);transform:translateY(-3px)}
+@media(max-width:540px){.boutique-map{grid-template-columns:repeat(3,minmax(0,1fr))}.boutique-zone{font-size:11px;padding:7px 3px}.boutique-hanger small{font-size:9px}}

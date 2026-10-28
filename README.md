@@ -101,7 +101,9 @@ GitHub Actions checks JavaScript syntax, unit tests, Vite production assets and 
 
 ## 👗 Baby Animal Dressing Room
 
-Open **CHARACTERS & SHOP → 👗 Dressing Room** (or use **👗 DRESSING ROOM** on the main menu) to style any of the seven baby animals. You can preview cosmetics on a separate 3D character model, buy them using **in-game coins only**, and equip different looks per animal. Wardrobe purchases and equipped outfits are saved in browser storage along with your other progress.
+**Gameplay economy:** Collect 🪙 coins during runs for character unlocks and gifts; collect your animal’s food (🥕 bunny carrots, 🍎 horse apples, 🐟 cat/penguin fish, 🦴 puppy bones, 🌽 calf corn, 🌈 unicorn rainbow fruit). Sell food under **🧺 Sell Food** for 💗 pink cash. Spend pink cash in the boutique to buy clothes, glasses, scarves and charms. Both currencies and inventory are saved separately. There are no real-money payments.
+
+Open **CHARACTERS & SHOP → 👗 Dressing Room** (or use **👗 DRESSING ROOM** on the main menu) to style any of the seven baby animals. You can preview cosmetics on a separate 3D character model, buy them using **pink cash earned from selling collected animal food**, and equip different looks per animal. Wardrobe purchases and equipped outfits are saved in browser storage along with your other progress.
 
 There are **20 items**, grouped into five slots:
 
@@ -113,7 +115,7 @@ There are **20 items**, grouped into five slots:
 | 👗 Outfits | Berry Outfit · Lemon Outfit · Mint Outfit · Lilac Outfit |
 | ✨ Charms | Golden Charm · Heart Charm · Tiny Bell · Snowflake Charm |
 
-**Try On** previews an accessory without spending coins. **Buy** unlocks it permanently in this browser's saved game, **Wear** outfits the selected character and **Remove** takes it off. No real-money purchases or payment integration are included. Accessories are simple lightweight Three.js geometry, not separately rigged apparel assets; polish and device visual tests are ongoing.
+**Try On** previews an accessory without spending pink cash. **Buy** unlocks it permanently in this browser's saved game, **Wear** outfits the selected character and **Remove** takes it off. No real-money purchases or payment integration are included. Accessories are simple lightweight Three.js geometry, not separately rigged apparel assets; polish and device visual tests are ongoing.
 
 ## 🌍 Changing story areas in every animal world
 

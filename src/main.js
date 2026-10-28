@@ -352,6 +352,7 @@ function shop(tab='characters'){
   });
  }
  $('wallet').textContent=profile.coins;
+ if($('pinkWallet'))$('pinkWallet').textContent=profile.pinkCash;
  floatInCards([...grid.children]);
  showShopTab(tab);
 }
@@ -463,6 +464,7 @@ function showShopTab(tab='characters'){
   button.setAttribute('aria-pressed',String(button.dataset.tab===tab));
  }
  $('wallet').textContent=profile.coins;
+ if($('pinkWallet'))$('pinkWallet').textContent=profile.pinkCash;
  if(tab==='characters'){panel.replaceChildren();floatInCards([...grid.children]);return;}
  if(tab==='dress'){renderDressingRoom(panel);popIn(panel.querySelector('.boutique-room'));return;}
  synchronizeEconomy(profile);save();panel.replaceChildren();
@@ -571,6 +573,7 @@ function updateHUD(){
  foodHud.title=food.label+' collected during this run';
  $('energyFill').style.width=energy+'%';
  $('walletHud').textContent=profile.coins;
+ if($('pinkCashHud'))$('pinkCashHud').textContent=profile.pinkCash;
  $('power').textContent=shield>0?'🛡 '+Math.ceil(shield)+'s':magnet>0?'🧲 '+Math.ceil(magnet)+'s':'';
 }
 // Temporary visual QA controls: test every animal without purchasing or restarting.

@@ -668,3 +668,15 @@ Bug reports and contributions are welcome through [GitHub Issues](https://github
 Built with Three.js · Vite · JavaScript · Capacitor
 
 </div>
+
+## 🧊 Optimized 3D animal models (glTF-Transform + meshoptimizer)
+
+The optional authored animal GLBs live in `public/models/{bunny,unicorn,horse,cat,dog,penguin,cow}.glb`. To prepare them for faster downloads, run:
+
+```cmd
+npm run models:optimize
+npm run build
+```
+
+The script calls **@gltf-transform/cli 4.5.1** via npx to optimize each installed GLB with **Meshopt compression** and **WebP textures**, preserving all originals. Output is written to `public/models/optimized/<animal>.glb` and the game automatically prefers that version when present. Three.js's GLTFLoader has **MeshoptDecoder** enabled; it falls back to the unoptimized GLB (or the procedural animal when no authored GLB exists). The script skips missing models. First execution of npx requires internet; WebP texture conversion may slightly change texture quality, so inspect all characters and their animations before committing generated assets. Run the script again when replacing an original GLB. This optimizes existing models — it does not create new detailed 3D art.
+

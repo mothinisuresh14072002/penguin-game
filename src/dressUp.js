@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-// Virtual coin-only cosmetics: five slots, four choices each.
+// Virtual pink-cash cosmetics: five slots, four choices each.
 export const ACCESSORIES=Object.freeze([
  {id:'sunny',name:'Cool Sunglasses',emoji:'😎',slot:'eyes',price:80,color:0x26304b},
  {id:'heart',name:'Heart Glasses',emoji:'💗',slot:'eyes',price:95,color:0xf26ca0},
@@ -42,8 +42,8 @@ export function sanitizeWardrobe(saved){
 }
 export function buyAccessory(profile,id){
  const item=byId.get(id);
- if(!item||profile.wardrobe.owned.includes(id)||profile.coins<item.price)return false;
- profile.coins-=item.price;
+ if(!item||profile.wardrobe.owned.includes(id)||(profile.pinkCash||0)<item.price)return false;
+ profile.pinkCash-=item.price;
  profile.wardrobe.owned.push(id);
  return true;
 }

@@ -55,7 +55,7 @@ const LEGACY_KEY='penguin-ice-runner-v2';
 let saved;
 try { saved=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(LEGACY_KEY)||'{}'); } catch { saved={}; }
 const validIds=new Set(CHARS.map(c=>c.id));
-const profile={coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['bunny','penguin'],selected:saved.selected||'bunny',economy:createEconomy(saved.economy),wardrobe:sanitizeWardrobe(saved.wardrobe)};
+const profile={pinkCash:Math.max(0,Math.floor(Number(saved.pinkCash)||0)),coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['bunny','penguin'],selected:saved.selected||'bunny',economy:createEconomy(saved.economy),wardrobe:sanitizeWardrobe(saved.wardrobe)};
 for(const id of ['bunny','penguin'])if(!profile.unlocked.includes(id))profile.unlocked.push(id);
 if(!profile.unlocked.includes(profile.selected))profile.selected='penguin';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(profile))}catch{}};
@@ -368,7 +368,7 @@ function renderDressingRoom(panel){
  disposeDressingRoom();
  panel.replaceChildren();
  const title=document.createElement('h2');title.textContent='👗 Baby Animal Dressing Room';
- const desc=document.createElement('p');desc.textContent='Try any of 20 cute styles in 3D, buy with earned coins, then wear them during your runs. Outfits are saved separately for each animal.';
+ const desc=document.createElement('p');desc.textContent='Try any of 20 cute styles in 3D, sell your animal treats for pink cash, then dress your baby animal. Outfits are saved separately for each animal.';
  const choose=document.createElement('select');choose.setAttribute('aria-label','Dressing room animal');
  for(const a of CHARS){const option=document.createElement('option');option.value=a.id;option.textContent=a.icon+' '+a.name;choose.append(option)}
  choose.value=profile.selected;
@@ -398,7 +398,7 @@ function renderDressingRoom(panel){
   animate([...rack.children],{opacity:[0,1],y:[-12,0],rotate:[-5,0],delay:stagger(65),duration:600,ease:'outCubic'});
  }
  const tools=document.createElement('div');tools.className='dress-actions';
- const balance=document.createElement('strong');balance.textContent='🪙 '+profile.coins+' coins';
+ const balance=document.createElement('strong');balance.textContent='💗 '+profile.pinkCash+' pink cash';
  const reset=document.createElement('button');reset.type='button';reset.className='secondary';reset.textContent='↻ Clear preview';tools.append(balance,reset);
  const list=document.createElement('div');list.className='dress-grid';
  const note=document.createElement('p');note.setAttribute('role','status');
@@ -429,18 +429,18 @@ function renderDressingRoom(panel){
    const equipped=profile.wardrobe.equipped[animal]?.[item.slot]===item.id;
    const card=document.createElement('div');card.className='dress-card';
    const head=document.createElement('strong');head.textContent=item.emoji+' '+item.name;
-   const caption=document.createElement('small');caption.textContent=item.slot.toUpperCase()+' · '+(owned?'OWNED':'🪙 '+item.price);
+   const caption=document.createElement('small');caption.textContent=item.slot.toUpperCase()+' · '+(owned?'OWNED':'💗 '+item.price);
    const preview=document.createElement('button');preview.type='button';preview.className='secondary';preview.textContent=dressingPreview[item.slot]===item.id?'PREVIEWING':'TRY ON';
    preview.onclick=()=>{dressingPreview[item.slot]=item.id;updatePreview();if(motionOK()&&dressingActor){animate(dressingActor.group.rotation,{y:[Math.PI-.13,Math.PI],duration:540,ease:'outCubic',onUpdate:()=>dressingRenderer?.render(dressingScene,dressingCamera)});} note.textContent='Previewing '+item.name+' — try before you buy';for(const button of list.querySelectorAll('.dress-card button.secondary'))button.textContent='TRY ON';preview.textContent='PREVIEWING';};
    const action=document.createElement('button');action.type='button';action.textContent=equipped?'REMOVE':owned?'WEAR':'BUY';
-   action.disabled=!owned&&profile.coins<item.price;
+   action.disabled=!owned&&profile.pinkCash<item.price;
    action.onclick=()=>{
     if(equipped){unequipAccessory(profile,animal,item.slot);note.textContent='Removed '+item.name;}
-    else if(!owned&&!buyAccessory(profile,item.id)){note.textContent='Not enough coins';return}
+    else if(!owned&&!buyAccessory(profile,item.id)){note.textContent='Sell collected food for more pink cash';return}
     else{equipAccessory(profile,animal,item.id);note.textContent='Wearing '+item.name+'!'}
     save();updateHUD();
     if(animal===profile.selected)applyWardrobe(character,profile.wardrobe.equipped[animal]);
-    refresh();balance.textContent='🪙 '+profile.coins+' coins';
+    refresh();balance.textContent='💗 '+profile.pinkCash+' pink cash';
    };
    card.append(head,caption,preview,action);list.append(card);
   }
@@ -485,16 +485,16 @@ function showShopTab(tab='characters'){
  };
  const notice=(message)=>{$('shopMessage').textContent=message;updateHUD();};
  if(tab==='sell'){
-  heading('🧺 Food inventory','Collect animal treats while running, then sell them for in-game coins. Your food is saved automatically.');
+  heading('🧺 Food inventory','Collect your animal’s favorite food while running and sell it for 💗 pink cash to spend in the dressing room. Inventory and cash are saved.');
   for(const food of FOODS){
    const amount=profile.economy.inventory[food.id];
    const sell=(quantity)=>{
     const result=sellFood(profile,food.id,quantity);
     if(!result)return;
     save();showShopTab('sell');
-    notice('Sold '+quantity+' '+food.label+' for '+result.coins+' coins!');
+    notice('Sold '+quantity+' '+food.label+' for 💗 '+result.pinkCash+' pink cash!');
    };
-   row(food.emoji+' '+food.label,'Owned: '+amount+' · '+food.price+' coins each',[
+   row(food.emoji+' '+food.label,'Owned: '+amount+' · 💗 '+food.price+' pink cash each',[
     ['SELL 1',amount<1,()=>sell(1)],['SELL ALL',amount<1,()=>sell(amount)]
    ]);
   }

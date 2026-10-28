@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {animate,stagger} from 'animejs';
 import {ACCESSORIES,SLOTS,sanitizeWardrobe,buyAccessory,equipAccessory,unequipAccessory,applyWardrobe} from './dressUp.js';
+import {DRESS_SHOPS,levelFromBest,canPurchase} from './dressShops.js';
 import './style.css';
 import {createAnimal, animateAnimal, alignAnimalFeetToRoad} from './animalArt.js';
 import {populateHabitat,WORLD_GEOMETRIES} from './worldArt.js';
@@ -374,6 +375,7 @@ function renderDressingRoom(panel){
  for(const a of CHARS){const option=document.createElement('option');option.value=a.id;option.textContent=a.icon+' '+a.name;choose.append(option)}
  choose.value=profile.selected;
  const boutique=document.createElement('div');boutique.className='boutique-room';
+ const shopMap=document.createElement('nav');shopMap.className='boutique-map';shopMap.setAttribute('aria-label','Seven animal boutiques');
  const boutiqueHeading=document.createElement('div');boutiqueHeading.className='boutique-heading';boutiqueHeading.textContent='✨ COCO’S CUTE COUTURE · DRESS-UP STUDIO ✨';
  const rack=document.createElement('div');rack.className='boutique-rack';
  rack.setAttribute('aria-label','Hanging outfits and scarves');
@@ -394,7 +396,7 @@ function renderDressingRoom(panel){
  shelves.append(Object.assign(document.createElement('div'),{textContent:'👜 👓 🎩'}),Object.assign(document.createElement('div'),{textContent:'🧣 🎀 👒'}));
  studio.append(sideShelf,mirror,shelves);
  const rug=document.createElement('div');rug.className='boutique-rug';rug.textContent='♡ LITTLE STAR FASHION ♡';
- boutique.append(boutiqueHeading,rack,studio,rug);
+ boutique.append(boutiqueHeading,shopMap,rack,studio,rug);
  if(motionOK()){
   animate([...rack.children],{opacity:[0,1],y:[-12,0],rotate:[-5,0],delay:stagger(65),duration:600,ease:'outCubic'});
  }
@@ -405,6 +407,24 @@ function renderDressingRoom(panel){
  const note=document.createElement('p');note.setAttribute('role','status');
  panel.append(title,desc,choose,boutique,tools,note,list);
  let animal=choose.value;
+ function chooseBoutique(){
+  const theme=DRESS_SHOPS[animal];boutique.style.setProperty('--boutique-accent',theme.color);
+  boutiqueHeading.textContent='✨ '+theme.title.toUpperCase()+' ✨';
+  rug.textContent=theme.decor.join('  ')+' · '+theme.label+' · '+theme.pose+' Pose';
+  shopMap.replaceChildren();
+  for(const [id,style] of Object.entries(DRESS_SHOPS)){
+   const b=document.createElement('button');b.type='button';b.className='boutique-zone'+(id===animal?' active':'');b.textContent=style.icon+' '+id[0].toUpperCase()+id.slice(1);b.setAttribute('aria-pressed',String(id===animal));
+   b.onclick=()=>{animal=id;choose.value=id;refresh()};shopMap.append(b);
+  }
+  rack.replaceChildren();
+  for(const id of theme.styles){const item=ACCESSORIES.find(x=>x.id===id);const b=document.createElement('button');b.type='button';b.className='boutique-hanger';b.title='Try '+item.name;
+   const hook=document.createElement('span');hook.className='hanger-hook';hook.textContent='⌒';
+   const garment=document.createElement('span');garment.className='hanger-icon';garment.textContent=item.emoji;
+   const name=document.createElement('small');name.textContent=item.name;
+   b.append(hook,garment,name);b.onclick=()=>{dressingPreview[item.slot]=item.id;updatePreview();note.textContent='Trying '+item.name;};rack.append(b);
+  }
+  if(motionOK())animate([...rack.children],{opacity:[0,1],y:[-10,0],delay:stagger(55),duration:450,ease:'outCubic'});
+ }
  function buildPreview(){
   disposeDressingRoom();
   dressingScene=new THREE.Scene();dressingScene.background=new THREE.Color(0xfff1f8);
@@ -423,6 +443,7 @@ function renderDressingRoom(panel){
  }
  function updatePreview(){if(dressingActor){applyWardrobe(dressingActor,dressingPreview);dressingRenderer.render(dressingScene,dressingCamera)}}
  function refresh(){
+  chooseBoutique();
   dressingPreview={...(profile.wardrobe.equipped[animal]||{})};
   buildPreview();list.replaceChildren();
   for(const item of ACCESSORIES){
@@ -430,14 +451,16 @@ function renderDressingRoom(panel){
    const equipped=profile.wardrobe.equipped[animal]?.[item.slot]===item.id;
    const card=document.createElement('div');card.className='dress-card';
    const head=document.createElement('strong');head.textContent=item.emoji+' '+item.name;
-   const caption=document.createElement('small');caption.textContent=item.slot.toUpperCase()+' · '+(owned?'OWNED':'💗 '+item.price);
+   const caption=document.createElement('small');caption.textContent=item.slot.toUpperCase()+' · Lv '+item.level+' · '+(owned?'OWNED':'💗 '+item.price);
    const preview=document.createElement('button');preview.type='button';preview.className='secondary';preview.textContent=dressingPreview[item.slot]===item.id?'PREVIEWING':'TRY ON';
    preview.onclick=()=>{dressingPreview[item.slot]=item.id;updatePreview();if(motionOK()&&dressingActor){animate(dressingActor.group.rotation,{y:[Math.PI-.13,Math.PI],duration:540,ease:'outCubic',onUpdate:()=>dressingRenderer?.render(dressingScene,dressingCamera)});} note.textContent='Previewing '+item.name+' — try before you buy';for(const button of list.querySelectorAll('.dress-card button.secondary'))button.textContent='TRY ON';preview.textContent='PREVIEWING';};
    const action=document.createElement('button');action.type='button';action.textContent=equipped?'REMOVE':owned?'WEAR':'BUY';
-   action.disabled=!owned&&profile.pinkCash<item.price;
+   const levelLocked=levelFromBest(profile.best)<item.level;
+   action.disabled=!owned&&!canPurchase(profile,item);
+   if(!owned&&levelLocked)action.textContent='🔒 LEVEL '+item.level;
    action.onclick=()=>{
     if(equipped){unequipAccessory(profile,animal,item.slot);note.textContent='Removed '+item.name;}
-    else if(!owned&&!buyAccessory(profile,item.id)){note.textContent='Sell collected food for more pink cash';return}
+    else if(!owned&&!buyAccessory(profile,item.id)){note.textContent=levelLocked?'Reach level '+item.level+' by running further':'Sell collected food for more pink cash';return}
     else{equipAccessory(profile,animal,item.id);note.textContent='Wearing '+item.name+'!'}
     save();updateHUD();
     if(animal===profile.selected)applyWardrobe(character,profile.wardrobe.equipped[animal]);

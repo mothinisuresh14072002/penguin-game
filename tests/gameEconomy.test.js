@@ -4,7 +4,7 @@ import {FOOD_BY_ANIMAL,FOODS,createEconomy,synchronizeEconomy,collectFood,
  sellFood,openSurpriseBox,recordEvent,goalProgress,claimGoal,dailyKey,weeklyKey} from '../src/gameEconomy.js';
 const date=new Date('2026-10-12T10:00:00Z');
 const profile=(coins=0)=>({coins,economy:createEconomy({},date)});
-test('all seven animal treats have distinct IDs and coin sell prices',()=>{
+test('all seven animal treats have distinct IDs and pink cash sell prices',()=>{
  assert.equal(FOODS.length,7);
  assert.equal(new Set(FOODS.map(x=>x.id)).size,7);
  for(const [animal,item] of Object.entries(FOOD_BY_ANIMAL)){
@@ -28,14 +28,16 @@ test('pickup persists inventory and daily/weekly collection targets without doub
 test('selling converts only owned food and adds weekly seller progress',()=>{
  const p=profile(20);
  collectFood(p,'cat',12,date);
- assert.equal(sellFood(p,'catFish',6,date).coins,24);
- assert.equal(p.coins,44);
+ assert.equal(sellFood(p,'catFish',6,date).pinkCash,24);
+ assert.equal(p.pinkCash,24);
+ assert.equal(p.coins,20);
  assert.equal(p.economy.inventory.catFish,6);
  assert.equal(p.economy.weekly.sold,6);
  assert.equal(sellFood(p,'catFish',7,date),null);
  assert.equal(sellFood(p,'catFish',-1,date),null);
  assert.equal(sellFood(p,'nonexistent',1,date),null);
- assert.equal(p.coins,44);
+ assert.equal(p.coins,20);
+ assert.equal(p.pinkCash,24);
 });
 test('daily and weekly rollover reset only missions, not inventory or wallet',()=>{
  const p=profile(80);

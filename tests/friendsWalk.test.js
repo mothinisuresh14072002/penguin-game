@@ -16,3 +16,5 @@ test('Friends Walk keeps saved outfits, both players and a bounded recycled scen
  assert.match(code,/WALK_SPEED/);
  assert.match(code,/paused/);
 });
+
+test('Friends Walk scenery materials are shared across recycled sections',()=>{const code=readFileSync(new URL('../src/friendsWalk.js',import.meta.url),'utf8');assert.match(code,/const cottageWall=mat/);assert.match(code,/theme===5\?pond:magicStone/);assert.doesNotMatch(code,/geo\(g,sphere,mat\(theme/);});

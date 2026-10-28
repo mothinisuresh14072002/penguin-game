@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f9b9d5"><title>Friends Walk · Pawverse Dash</title></head>
+<body style="margin:0;background:#f7dff0;font-family:system-ui,sans-serif">
+<div id="walk-ui">
+ <header><a href="./index.html" aria-label="Back to Pawverse Dash">← BACK</a><strong>🐾 FRIENDS WALK</strong><span id="walk-distance">0 m</span></header>
+ <section id="friend-setup"><h1>Let's go on a walk! 💕</h1><p>Choose two baby-animal friends. Both will wear their saved wardrobe outfits.</p>
+ <div class="friend-select"><label>Friend one<select id="friend-one"></select></label><label>Friend two<select id="friend-two"></select></label></div>
+ <button id="walk-start">🌷 WALK TOGETHER</button><p>Peaceful walking mode · No obstacles · No competition</p></section>
+ <div id="walk-controls" hidden><button id="walk-pause" aria-label="Pause walking">⏸ Pause</button><button id="walk-camera">🔄 Camera</button><button id="walk-change">🐾 Choose Friends</button></div>
+</div>
+<script type="module" src="/src/friendsWalk.js"></script>
+<style>
+*{box-sizing:border-box}body{overflow:hidden;color:#623651}#walk-ui{position:fixed;inset:0;z-index:2;pointer-events:none}#walk-ui button,#walk-ui a,#walk-ui select{pointer-events:auto}header{display:flex;gap:12px;justify-content:space-between;align-items:center;padding:14px 22px;background:#fffcefdf;box-shadow:0 3px 20px #bc6a9b33;font-weight:900}a{color:#984474;text-decoration:none}#friend-setup{pointer-events:auto;max-width:520px;margin:clamp(24px,9vh,110px) auto 0;padding:28px;border-radius:28px;text-align:center;background:#fff9ffed;box-shadow:0 16px 45px #973f8039;border:2px solid #fff}#friend-setup h1{margin:0;color:#c24a93;font-size:clamp(25px,5vw,39px)}#friend-setup p{line-height:1.5}.friend-select{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:25px 0}.friend-select label{display:grid;gap:8px;font-weight:700}.friend-select select{padding:13px;border-radius:14px;border:2px solid #f1a8cf;background:white;font:inherit;color:#743d63}button{cursor:pointer;border:0;border-radius:18px;padding:13px 22px;background:#f17cb9;color:white;font:800 15px system-ui;box-shadow:0 4px 12px #9b477444}button:hover{background:#e35da7}#walk-controls{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);display:flex;gap:10px;justify-content:center;width:max-content;max-width:96vw}#walk-controls[hidden]{display:none}#walk-controls button{background:#fff9;color:#8d3a70}@media(max-width:520px){#friend-setup{margin:35px 10px;padding:20px}.friend-select{grid-template-columns:1fr}header{padding:12px;font-size:13px}#walk-controls{flex-wrap:wrap}}
+</style>
+</body></html>

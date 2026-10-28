@@ -62,7 +62,7 @@ function frame(){
  requestAnimationFrame(frame);
  const dt=Math.min(clock.getDelta(),.08);
  if(running&&!paused){time+=dt;distance=walkDistance(distance,dt,true);$('walk-distance').textContent=Math.floor(distance)+' m';
-  for(const actor of actors){animateAnimal(actor,time*.72,true,false);actor.group.position.y=0;alignAnimalFeetToRoad(actor,0);actor.group.position.z=3;actor.group.rotation.y=Math.PI; // Front camera sees the face; rear camera sees both friends walking away.}
+  for(const actor of actors){animateAnimal(actor,time*.72,true,false);actor.group.position.y=0;alignAnimalFeetToRoad(actor,0);actor.group.position.z=3;actor.group.rotation.y=Math.PI;} // Front camera sees faces; rear camera sees both friends from behind.
   for(const g of segments){g.position.z+=dt*WALK_SPEED; if(g.position.z>22){const smallest=Math.min(...segments.map(x=>x.position.z));g.position.z=smallest-17;g.userData.index+=segments.length;fillSegment(g,g.userData.index)}}
  }
  camera.position.set(0,front?3.2:4.3,front?-4.7:11.5);camera.lookAt(0,1.15,front?3.2:-4);renderer.render(scene,camera);

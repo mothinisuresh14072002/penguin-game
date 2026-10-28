@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {canPurchase} from './dressShops.js';
 
 // Virtual pink-cash cosmetics: five slots, four choices each.
 export const ACCESSORIES=Object.freeze([
@@ -14,15 +15,16 @@ export const ACCESSORIES=Object.freeze([
  {id:'pink-bow',name:'Blush Bow',emoji:'🌷',slot:'head',price:70,color:0xf49dbe},
  {id:'flower',name:'Daisy Crown',emoji:'🌼',slot:'head',price:125,color:0xffdf70},
  {id:'cap',name:'Sky Cap',emoji:'🧢',slot:'head',price:135,color:0x70b7fa},
- {id:'berry',name:'Berry Outfit',emoji:'🍓',slot:'outfit',price:180,color:0xe95269},
- {id:'lemon',name:'Lemon Outfit',emoji:'🍋',slot:'outfit',price:170,color:0xf3d16d},
- {id:'mint',name:'Mint Outfit',emoji:'🍃',slot:'outfit',price:185,color:0x88d5b3},
- {id:'lilac',name:'Lilac Outfit',emoji:'💜',slot:'outfit',price:195,color:0xba9def},
+ {id:'berry',name:'Berry Outfit',emoji:'🍓',slot:'outfit',level:1,price:180,color:0xe95269},
+ {id:'lemon',name:'Lemon Outfit',emoji:'🍋',slot:'outfit',level:2,price:170,color:0xf3d16d},
+ {id:'mint',name:'Mint Outfit',emoji:'🍃',slot:'outfit',level:3,price:185,color:0x88d5b3},
+ {id:'lilac',name:'Lilac Outfit',emoji:'💜',slot:'outfit',level:5,price:195,color:0xba9def},
  {id:'gold',name:'Golden Charm',emoji:'✨',slot:'charm',price:80,color:0xffd565},
  {id:'heart-charm',name:'Heart Charm',emoji:'💕',slot:'charm',price:85,color:0xff86aa},
  {id:'bell',name:'Tiny Bell',emoji:'🔔',slot:'charm',price:90,color:0xf5c65d},
  {id:'snowflake',name:'Snowflake Charm',emoji:'❄️',slot:'charm',price:95,color:0xbcefff}
 ]);
+for(const item of ACCESSORIES){if(!item.level)item.level=1;}
 export const SLOTS=Object.freeze(['head','eyes','neck','outfit','charm']);
 const byId=new Map(ACCESSORIES.map(a=>[a.id,a]));
 export const accessoryById=id=>byId.get(id);
@@ -42,7 +44,7 @@ export function sanitizeWardrobe(saved){
 }
 export function buyAccessory(profile,id){
  const item=byId.get(id);
- if(!item||profile.wardrobe.owned.includes(id)||(profile.pinkCash||0)<item.price)return false;
+ if(!item||profile.wardrobe.owned.includes(id)||!canPurchase(profile,item))return false;
  profile.pinkCash-=item.price;
  profile.wardrobe.owned.push(id);
  return true;

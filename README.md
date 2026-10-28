@@ -101,6 +101,9 @@ GitHub Actions checks JavaScript syntax, unit tests, Vite production assets and 
 
 ## 👗 Baby Animal Dressing Room
 
+The dress shop now has **seven selectable themed boutique corners** based on each animal's wardrobe-showcase concept: berry pink for Bella, rainbow stars for Ula, orchard greens for Hugo, cherry couture for Coco, sunny blue for Dodo, frosty lilac for Pip, and sunflowers for Mimi. Select an animal, click a hanging garment to try it on in the live 3D mirror, and buy accessories using **earned pink cash only**. The room uses Anime.js for gentle transitions. Fashion level is derived from your **best solo running distance**: level 1 at 0m, then +1 per 250m (up to level 99). Outfits are gated at levels 1, 2, 3 or 5. Level unlocks make items *eligible to purchase*, not free; purchases spend pink cash and are saved locally. The illustrated showcase images are design references rather than embedded 3D assets.
+
+
 **Gameplay economy:** Collect 🪙 coins during runs for character unlocks and gifts; collect your animal’s food (🥕 bunny carrots, 🍎 horse apples, 🐟 cat/penguin fish, 🦴 puppy bones, 🌽 calf corn, 🌈 unicorn rainbow fruit). Sell food under **🧺 Sell Food** for 💗 pink cash. Spend pink cash in the boutique to buy clothes, glasses, scarves and charms. Both currencies and inventory are saved separately. There are no real-money payments.
 
 Open **CHARACTERS & SHOP → 👗 Dressing Room** (or use **👗 DRESSING ROOM** on the main menu) to style any of the seven baby animals. You can preview cosmetics on a separate 3D character model, buy them using **pink cash earned from selling collected animal food**, and equip different looks per animal. Wardrobe purchases and equipped outfits are saved in browser storage along with your other progress.

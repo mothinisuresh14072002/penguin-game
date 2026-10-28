@@ -99,3 +99,29 @@
 .boutique-hanger small{font-size:10px;display:block;line-height:1.1}
 .boutique-hanger:hover,.boutique-hanger:focus-visible{filter:drop-shadow(0 4px 7px #8f588a66);transform:translateY(-3px)}
 @media(max-width:540px){.boutique-map{grid-template-columns:repeat(3,minmax(0,1fr))}.boutique-zone{font-size:11px;padding:7px 3px}.boutique-hanger small{font-size:9px}}
+
+
+/* Clear two-pane wardrobe layout: preview never overlays the catalog. */
+.dressing-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start;margin-top:16px;text-align:left}
+.dressing-workspace .boutique-room{width:100%;min-width:0;margin:0;max-width:none}
+.dressing-workspace .boutique-studio{grid-template-columns:minmax(0,1fr);gap:0}
+.dressing-workspace .boutique-shelf,.dressing-workspace .boutique-shelves{display:none}
+.dressing-workspace .boutique-mirror{width:100%;min-width:0;max-width:100%;border-radius:90px 90px 20px 20px}
+.dressing-workspace .boutique-mirror .dress-stage{width:100%;min-height:0;overflow:hidden}
+.dressing-workspace .boutique-mirror canvas{position:relative!important;inset:auto!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;max-width:100%;height:auto!important;aspect-ratio:390/340;object-fit:contain;touch-action:pan-y}
+.dressing-workspace .boutique-map{grid-template-columns:repeat(3,minmax(0,1fr))}
+.dressing-workspace .boutique-rack{flex-wrap:wrap;justify-content:center}
+.dressing-catalog{min-width:0;background:#fff9fc;border:1px solid #edbfd7;border-radius:22px;padding:16px;color:#753a61;box-shadow:0 8px 30px #b77fa328}
+.dressing-catalog h3{margin:0 0 6px;color:#973a78}
+.dressing-help{font-size:13px;color:#8a6580;line-height:1.45;margin:0 0 12px}
+.dressing-catalog .dress-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:min(62vh,670px);overflow-y:auto;overscroll-behavior:contain;padding:3px}
+.dressing-catalog .dress-card{min-width:0;padding:10px;border:1px solid #f1d3e2;border-radius:14px;background:white;display:flex;flex-direction:column;gap:7px}
+.dressing-catalog .dress-card button{max-width:100%;font-size:12px}
+.dressing-catalog .dress-card.preview-active{outline:2px solid #e57bb4;background:#fff1fa}
+.dressing-catalog .dress-card.purchase-locked{opacity:1}
+.dressing-catalog .dress-card.purchase-locked button.secondary{opacity:1;cursor:pointer}
+.dressing-catalog .dress-card small{white-space:normal}
+.dressing-catalog .dress-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.dressing-catalog .fashion-level{flex-basis:100%}
+@media(max-width:790px){.dressing-workspace{grid-template-columns:minmax(0,1fr)}.dressing-workspace .boutique-room{max-width:570px;margin:auto}.dressing-catalog{width:100%}.dressing-catalog .dress-grid{max-height:none}.dressing-workspace .boutique-studio{max-width:390px;margin:0 auto}}
+@media(max-width:390px){.dressing-catalog .dress-grid{grid-template-columns:1fr}}

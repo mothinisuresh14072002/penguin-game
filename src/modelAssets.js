@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 // Put exported GLB files in public/models/. Missing or invalid models fall back
 // to the existing procedural animal rather than breaking either game mode.
@@ -16,7 +17,10 @@ export const CHARACTER_ASSETS = Object.freeze({
   cow: 'models/cow.glb'
 });
 
+// GLB files optimized with glTF-Transform use EXT_meshopt_compression.
+// Three.js bundles the meshoptimizer decoder — no second runtime dependency.
 const loader = new GLTFLoader();
+loader.setMeshoptDecoder(MeshoptDecoder);
 const preflight = new Map();
 
 export function animalAssetUrl(id) {
@@ -79,13 +83,16 @@ export async function loadImportedAnimal(id) {
   const url=animalAssetUrl(id);
   if (!url) return null;
   try {
-    let checked=preflight.get(url);
-    if (!checked) {
-      checked=fetch(url,{method:'HEAD'}).then(r=>r.ok).catch(()=>false);
-      preflight.set(url,checked);
-    }
-    if (!await checked) return null;
-    const gltf=await loader.loadAsync(url);
+    // Prefer optimized GLBs, but keep existing authored files as a fallback.
+    // Optimized assets use the same names inside public/models/optimized/.
+    const optimizedUrl=url.replace('/models/','/models/optimized/');
+    const exists=async candidate=>{
+      if(!preflight.has(candidate))preflight.set(candidate,fetch(candidate,{method:'HEAD'}).then(r=>r.ok).catch(()=>false));
+      return preflight.get(candidate);
+    };
+    const selected=await exists(optimizedUrl)?optimizedUrl:await exists(url)?url:null;
+    if(!selected)return null;
+    const gltf=await loader.loadAsync(selected);
     const group=new THREE.Group();
     const visual=new THREE.Group();
     group.name='imported-'+id;

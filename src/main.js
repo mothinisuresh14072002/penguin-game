@@ -565,7 +565,7 @@ function menu(){
  disposeDressingRoom();
  running=false;paused=false;$('pauseBanner').classList.add('hidden');$('shop').classList.add('hidden');updateHUD();
  showScreen('PAWVERSE DASH','A cute animal adventure across magical worlds. Switch lanes, jump obstacles, collect energy and unlock new animal friends.',[
-  {text:'🏃 SOLO RUN',action:start},{text:'🏁 2 FRIEND RACE',action:()=>location.assign('./race.html')},{text:'CHARACTERS & SHOP',secondary:true,action:()=>shop('characters')},{text:'👗 DRESSING ROOM',secondary:true,action:()=>shop('dress')},{text:'🧺 SELL FOOD',secondary:true,action:()=>shop('sell')},{text:'🎯 DAILY & WEEKLY',secondary:true,action:()=>shop('goals')}
+  {text:'🏃 SOLO RUN',action:start},{text:'🏁 2 FRIEND RACE',action:()=>location.assign('./race.html')},{text:'💕 FRIENDS WALK',action:()=>location.assign('./walk.html')},{text:'CHARACTERS & SHOP',secondary:true,action:()=>shop('characters')},{text:'👗 DRESSING ROOM',secondary:true,action:()=>shop('dress')},{text:'🧺 SELL FOOD',secondary:true,action:()=>shop('sell')},{text:'🎯 DAILY & WEEKLY',secondary:true,action:()=>shop('goals')}
  ]);
 }
 function start(){

@@ -224,41 +224,45 @@ for(let i=0;i<10;i++){
  orb(g,dark,0,0,0,.055,.13,.06);
  scene.add(g);butterflies.push({g,wings});
 }
-function applyBiome(){
+let activeBiomeKey = null;
+function applyBiome(overrideBiomeKey = null){
  const picked=CHARS.find(c=>c.id===profile.selected)||CHARS[0];
- const biome=BIOMES[picked.biome];currentTheme=biome;
+ const biomeKey = overrideBiomeKey || picked.biome;
+ activeBiomeKey = biomeKey;
+ const biome=BIOMES[biomeKey] || BIOMES.meadow;
+ currentTheme=biome;
  scene.background.setHex(biome.sky);scene.fog.color.setHex(biome.fog);
- applyLighting(picked.biome,{renderer,hemi,sun,fill:fillLight});
- backdrop.setBiome(picked.biome,biome.sky);
- cloudMaterial.color.setHex(picked.biome==='rainbow'?0xffe4ff:0xffffff);
- if(weatherParticles)weatherParticles.visible=picked.biome==='rainbow';
- for(const b of butterflies)b.g.visible=['meadow','grassland','park','farm'].includes(picked.biome);
+ applyLighting(biomeKey,{renderer,hemi,sun,fill:fillLight});
+ backdrop.setBiome(biomeKey,biome.sky);
+ cloudMaterial.color.setHex(biomeKey==='rainbow'?0xffe4ff:0xffffff);
+ if(weatherParticles)weatherParticles.visible=biomeKey==='rainbow';
+ for(const b of butterflies)b.g.visible=['meadow','grassland','park','farm'].includes(biomeKey);
  snowMat.color.setHex(biome.ground);iceMat.color.setHex(biome.track);
- roadArt.setBiome(picked.biome);
- for(const cliff of glacialCliffs)cliff.visible=picked.biome==='arctic';
- for(const marker of laneDashes)marker.visible=['arctic','rainbow'].includes(picked.biome);
- landmarks?.dispose();landmarks=createWorldLandmarks(scene,picked.biome);
- journeyArt?.dispose();journeyArt=createJourneyArt(scene,picked.biome);
+ roadArt.setBiome(biomeKey);
+ for(const cliff of glacialCliffs)cliff.visible=biomeKey==='arctic';
+ for(const marker of laneDashes)marker.visible=['arctic','rainbow'].includes(biomeKey);
+ landmarks?.dispose();landmarks=createWorldLandmarks(scene,biomeKey);
+ journeyArt?.dispose();journeyArt=createJourneyArt(scene,biomeKey);
  meadowDetails?.dispose();
- meadowDetails=picked.biome==='meadow'?createMeadowDetails(scene):null;
+ meadowDetails=biomeKey==='meadow'?createMeadowDetails(scene):null;
  meadowDetails?.update(distance);
  skylandDetails?.dispose();
- skylandDetails=picked.biome==='rainbow'?createSkylandDetails(scene):null;
+ skylandDetails=biomeKey==='rainbow'?createSkylandDetails(scene):null;
  skylandDetails?.update(distance,clockTime);
  prairieDetails?.dispose();
- prairieDetails=picked.biome==='grassland'?createPrairieDetails(scene):null;
+ prairieDetails=biomeKey==='grassland'?createPrairieDetails(scene):null;
  prairieDetails?.update(distance);
  townDetails?.dispose();
- townDetails=picked.biome==='city'?createTownDetails(scene):null;
+ townDetails=biomeKey==='city'?createTownDetails(scene):null;
  townDetails?.update(distance,clockTime);
  parkDetails?.dispose();
- parkDetails=picked.biome==='park'?createParkDetails(scene):null;
+ parkDetails=biomeKey==='park'?createParkDetails(scene):null;
  parkDetails?.update(distance);
  glacierDetails?.dispose();
- glacierDetails=picked.biome==='arctic'?createGlacierDetails(scene):null;
+ glacierDetails=biomeKey==='arctic'?createGlacierDetails(scene):null;
  glacierDetails?.update(distance,clockTime);
  farmDetails?.dispose();
- farmDetails=picked.biome==='farm'?createFarmDetails(scene):null;
+ farmDetails=biomeKey==='farm'?createFarmDetails(scene):null;
  farmDetails?.update(distance);
  deepIce.color.setHex(biome.edge);rockMat.color.setHex(biome.hazards.includes('spike')?0x6a8ea4:0x917e75);
  clearScenery();
@@ -577,7 +581,7 @@ function menu(){
 function start(){
  disposeDressingRoom();
  ensureAudio();running=true;paused=false;ended=false;$('pauseBanner').classList.add('hidden');playerLane=1;targetLane=1;playerY=0;velocityY=0;sliding=0;shield=0;magnet=0;boost=0;energy=100;runCoins=0;runFood=0;distance=0;speed=18;spawnNext=26;invincible=1;combo=0;lastCoinDistance=-100;lastMilestone=0;noticeUntil=0;$('speedNotice')?.classList.add('hidden');
- clearObjects();$('overlay').classList.add('hidden');$('shop').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';
+  applyBiome();clearObjects();$('overlay').classList.add('hidden');
  for(let i=0;i<8;i++){row(spawnNext);spawnNext+=17;}
 }
 function finish(reason){
@@ -677,12 +681,19 @@ function tick(now){
   const previousDistance=distance;
   const previousLane=playerLane,previousPlayerY=playerY,previousSlide=sliding;
   distance+=speed*dt;
-  const milestone=Math.floor(distance/240);
+  const milestone=Math.floor(distance/200);
   if(milestone>lastMilestone){
    lastMilestone=milestone;
-   const chapter=journeyChapter(CHARS.find(c=>c.id===profile.selected)?.biome,distance);
+   const biomeKeys=Object.keys(BIOMES);
+   const initialBiome=CHARS.find(c=>c.id===profile.selected)?.biome||"meadow";
+   const startIdx=biomeKeys.indexOf(initialBiome);
+   const nextBiomeKey=biomeKeys[(startIdx+milestone)%biomeKeys.length];
+   if(nextBiomeKey!==activeBiomeKey){
+     applyBiome(nextBiomeKey);
+   }
+   const chapter=journeyChapter(nextBiomeKey,distance);
    $('worldName').textContent=currentTheme.name+' · '+chapter.name;
-   showSpeedNotice('🌍 NEW AREA: '+chapter.name.toUpperCase());
+   showSpeedNotice('🌍 NEW WORLD: '+currentTheme.name.toUpperCase());
    sound(790,.15,'triangle',.04);
   }
   energy=Math.max(0,energy-dt*(1.1+speed*.025));if(energy<=0)finish('You ran out of energy.');

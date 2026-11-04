@@ -65,7 +65,15 @@ jobs:
       - name: Play through solo and local multiplayer in Chromium
         env:
           PAWVERSE_QA_ORIGIN: http://127.0.0.1:5173
-        run: node tests/browserQA.mjs
+        run: |
+          node tests/browserQA.mjs || {
+            echo "::error::Chromium gameplay QA failed. Diagnostic output:"
+            if [ -f qa-artifacts/results.json ]; then
+              cat qa-artifacts/results.json
+            fi
+            exit 1
+          }
+        shell: bash
       - name: Upload gameplay screenshots and QA report
         if: always()
         uses: actions/upload-artifact@v4

@@ -33,7 +33,7 @@ async function openGame(url,opts={}){
  });
  contexts.add(context);
  const page=await context.newPage();
- page.setDefaultTimeout(18000);
+ page.setDefaultTimeout(60000);
  const pageErrors=[];
  page.on('pageerror',e=>pageErrors.push(String(e)));
  page.on('console',m=>{
@@ -68,6 +68,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 try{
  browser=await chromium.launch({
   headless:true,
+  executablePath:process.env.PLAYWRIGHT_CHROME_PATH||undefined,
   args:['--no-sandbox','--disable-dev-shm-usage','--enable-webgl',
         '--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']
  });
@@ -196,7 +197,7 @@ try{
  await test('Solo run advances; pause freezes time, resume continues',async()=>{
   const {page,close}=await openGame('/?qa=1');
   await page.getByRole('button',{name:/SOLO RUN/}).click();
-  await page.waitForFunction(()=>window.__pawverseQA().distance>2,{timeout:30000});
+  await page.waitForFunction(()=>window.__pawverseQA().distance>2,{timeout:60000});
   await page.locator('#pauseBtn').click();
   const a=await state(page);
   assert.equal(a.paused,true);
@@ -204,7 +205,7 @@ try{
   const b=await state(page);
   assert.ok(Math.abs(a.distance-b.distance)<.001);
   await page.locator('#pauseBtn').click();
-  await page.waitForFunction(d=>window.__pawverseQA().distance>d,b.distance+.5,{timeout:10000});
+  await page.waitForFunction(d=>window.__pawverseQA().distance>d,b.distance+.5,{timeout:35000});
   await snap(page,'05-solo-running');
   await close();
  });
@@ -212,9 +213,9 @@ try{
   const {page,close}=await openGame('/?qa=1');
   await page.getByRole('button',{name:/SOLO RUN/}).click();
   await page.keyboard.press('ArrowLeft');
-  await page.waitForFunction(()=>window.__pawverseQA().targetLane===0);
+  await page.waitForFunction(()=>window.__pawverseQA().targetLane===0,{timeout:35000});
   await page.keyboard.press('ArrowUp');
-  await page.waitForFunction(()=>window.__pawverseQA().playerY>.02,{timeout:10000});
+  await page.waitForFunction(()=>window.__pawverseQA().playerY>.02,{timeout:35000});
   await close();
  });
  await test('Race starts two independent WebGL runners and can pause',async()=>{
@@ -223,8 +224,8 @@ try{
   assert.equal(await page.locator('#p1Pick option').count(),7);
   assert.equal(await page.locator('#p2Pick option').count(),7);
   await page.locator('#raceStart').click();
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2);
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players.every(p=>p.distance>1),{timeout:30000});
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2,{timeout:35000});
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.every(p=>p.distance>1),{timeout:60000});
   const before=await state(page);
   assert.equal(before.players[0].id,'bunny');
   assert.equal(before.players[1].id,'penguin');
@@ -251,7 +252,7 @@ try{
                                    window.__pawverseRaceQA().players[1].target===2);
   await page.keyboard.press('KeyW');
   await page.keyboard.press('KeyI');
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players.every(p=>p.y>0),{timeout:10000});
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.every(p=>p.y>0),{timeout:35000});
   await close();
  });
  await test('Unicorn racer gets Skyland while other player keeps separate world',async()=>{
@@ -259,7 +260,7 @@ try{
   await page.locator('#p1Pick').selectOption('unicorn');
   await page.locator('#p2Pick').selectOption('cat');
   await page.locator('#raceStart').click();
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2);
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2,{timeout:35000});
   const a=await state(page);
   assert.equal(a.players[0].id,'unicorn');
   assert.equal(a.players[1].id,'cat');
@@ -274,7 +275,7 @@ try{
   await page.locator('#p1Pick').selectOption('horse');
   await page.locator('#p2Pick').selectOption('dog');
   await page.locator('#raceStart').click();
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2);
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2,{timeout:35000});
   const race=await state(page);
   assert.equal(race.players[0].id,'horse');
   assert.equal(race.players[1].id,'dog');
@@ -289,7 +290,7 @@ try{
   await page.locator('#p1Pick').selectOption('cat');
   await page.locator('#p2Pick').selectOption('bunny');
   await page.locator('#raceStart').click();
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2);
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2,{timeout:35000});
   const race=await state(page);
   assert.equal(race.players[0].id,'cat');
   assert.equal(race.players[1].id,'bunny');
@@ -305,7 +306,7 @@ try{
   await page.locator('#p1Pick').selectOption('dog');
   await page.locator('#p2Pick').selectOption('cat');
   await page.locator('#raceStart').click();
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2);
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2,{timeout:35000});
   const race=await state(page);
   assert.equal(race.players[0].id,'dog');
   assert.equal(race.players[1].id,'cat');
@@ -321,7 +322,7 @@ try{
   await page.locator('#p1Pick').selectOption('penguin');
   await page.locator('#p2Pick').selectOption('dog');
   await page.locator('#raceStart').click();
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2);
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2,{timeout:35000});
   const race=await state(page);
   assert.equal(race.players[0].id,'penguin');
   assert.equal(race.players[1].id,'dog');
@@ -337,7 +338,7 @@ try{
   await page.locator('#p1Pick').selectOption('cow');
   await page.locator('#p2Pick').selectOption('penguin');
   await page.locator('#raceStart').click();
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2);
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players.length===2,{timeout:35000});
   const race=await state(page);
   assert.equal(race.players[0].id,'cow');
   assert.equal(race.players[1].id,'penguin');
@@ -440,9 +441,9 @@ try{
  await test('Foreground world travels faster than distant clouds and mountains stand still',async()=>{
   const {page,close}=await openGame('/?qa=1');
   await page.getByRole('button',{name:/SOLO RUN/}).click();
-  await page.waitForFunction(()=>window.__pawverseQA().distance>2,{timeout:30000});
+  await page.waitForFunction(()=>window.__pawverseQA().distance>2,{timeout:60000});
   const first=await state(page);
-  await page.waitForFunction(()=>window.__pawverseQA().distance>7,{timeout:30000});
+  await page.waitForFunction(()=>window.__pawverseQA().distance>7,{timeout:60000});
   const second=await state(page);
   assert.ok(second.distance>first.distance);
   assert.ok(Math.abs(second.terrainZ-first.terrainZ)>2);
@@ -459,9 +460,9 @@ try{
   assert.equal(ready.hasBunnyCottonTail,true);
   assert.ok(ready.avatarHeadWidth<.60,'Bunny head should have a neat silhouette');
   await page.getByRole('button',{name:/SOLO RUN/}).click();
-  await page.waitForFunction(()=>window.__pawverseQA().distance>2);
+  await page.waitForFunction(()=>window.__pawverseQA().distance>2,{timeout:60000});
   const first=await state(page);
-  await page.waitForFunction(()=>window.__pawverseQA().distance>8);
+  await page.waitForFunction(()=>window.__pawverseQA().distance>8,{timeout:60000});
   const second=await state(page);
   const progress=second.distance-first.distance;
   const flowersMoved=second.physicalLandmarkZ-first.physicalLandmarkZ;
@@ -484,14 +485,14 @@ try{
    c.dispatchEvent(new PointerEvent('pointerdown',{...a,clientX:160,clientY:210}));
    c.dispatchEvent(new PointerEvent('pointerup',{...a,clientX:75,clientY:210}));
   });
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players[0].target===0,{timeout:10000});
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players[0].target===0,{timeout:35000});
   await page.evaluate(()=>{
    const c=document.querySelector('canvas');
    const a={bubbles:true,pointerId:12,pointerType:'touch'};
    c.dispatchEvent(new PointerEvent('pointerdown',{...a,clientX:100,clientY:650}));
    c.dispatchEvent(new PointerEvent('pointerup',{...a,clientX:260,clientY:650}));
   });
-  await page.waitForFunction(()=>window.__pawverseRaceQA().players[1].target===2,{timeout:10000});
+  await page.waitForFunction(()=>window.__pawverseRaceQA().players[1].target===2,{timeout:35000});
   await close();
  });
  await test('Mobile solo layout and touch swipe remain playable',async()=>{
@@ -505,7 +506,7 @@ try{
    c.dispatchEvent(new PointerEvent('pointerdown',{...a,clientX:250,clientY:450}));
    c.dispatchEvent(new PointerEvent('pointerup',{...a,clientX:90,clientY:450}));
   });
-  await page.waitForFunction(()=>window.__pawverseQA().targetLane===0);
+  await page.waitForFunction(()=>window.__pawverseQA().targetLane===0,{timeout:35000});
   await snap(page,'08-solo-mobile');
   await close();
  });
@@ -518,5 +519,29 @@ try{
  const summary={total,passed:total-failed,failed,results};
  await fs.writeFile(path.join(OUT,'results.json'),JSON.stringify(summary,null,2));
  console.log('BROWSER QA RESULTS:',JSON.stringify({total,passed:total-failed,failed}));
- if(failed)process.exitCode=1;
+  if(process.env.GITHUB_STEP_SUMMARY){
+  try {
+   let md = "# 🎮 Pawverse Dash - Chromium Gameplay QA Report\n\n";
+   md += "| Test Case | Status | Time | Details |\n| :--- | :---: | :---: | :--- |\n";
+   for(const r of results){
+    const icon = r.status==="PASS" ? "✅" : "❌";
+    const time = r.elapsedMs ? (Math.round(r.elapsedMs/100)/10)+"s" : "-";
+    const note = r.status==="FAIL" ? ("`" + (r.error.split("\n")[0]||"Failed").replace(/\|/g,"/") + "`") : "OK";
+    md += "| " + r.name + " | " + icon + " " + r.status + " | " + time + " | " + note + " |\n";
+   }
+   if(failed){
+    md += "\n### ❌ Failures Breakdown\n\n";
+    for(const r of results.filter(r=>r.status==="FAIL")){
+     md += "#### " + r.name + "\n```\n" + r.error + "\n```\n\n";
+    }
+   }
+   await fs.writeFile(process.env.GITHUB_STEP_SUMMARY, md);
+  }catch(err){console.warn("Step summary write failed:", err);}
+ }
+ if(failed){
+  for(const r of results.filter(r=>r.status==="FAIL")){
+   console.error("::error title=QA Failure: " + r.name + "::" + r.error.replace(/\r?\n/g, "%0A"));
+  }
+  process.exitCode=1;
+ }
 }

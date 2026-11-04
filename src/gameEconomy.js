@@ -1,6 +1,8 @@
 // Offline-only progression for Pawverse Dash. All rewards are virtual
 // in-game coins/food, with no purchase, ads, or real-money random rewards.
 export const FOOD_BY_ANIMAL=Object.freeze({
+ mochi:{id:'jellyDrop',label:'Jelly Berry',emoji:'🍓',price:4,color:0x3fcf9f},
+ hop:{id:'clover',label:'Lucky Clover',emoji:'🍀',price:3,color:0x5cd687},
  bunny:{id:'carrot',label:'Carrot',emoji:'🥕',price:3,color:0xf18b36},
  unicorn:{id:'rainbowFruit',label:'Rainbow Fruit',emoji:'🌈',price:5,color:0xec9bfc},
  horse:{id:'apple',label:'Apple',emoji:'🍎',price:4,color:0xe95f60},
@@ -108,7 +110,6 @@ export function openSurpriseBox(profile,{free=false,found=false,animal='bunny',r
   profile.coins-=55;
  }
  if(free&&!found)e.freeBoxDay=today;
- // Weighted, bounded virtual-reward prize table; no cash or payment.
  const roll=Math.min(.99999,Math.max(0,Number(rng())||0));
  if(roll<.50){
   const coins=(free||found)?25:20;

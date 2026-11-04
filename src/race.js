@@ -138,11 +138,35 @@ function obstacle(player,kind,lane,at){
   for(const x of [-1.06,1.06])piece(root,geom.box,wood,x,.78,0,.16,1.55,.46);
   piece(root,geom.box,snow,0,1.98,0,2.11,.12,.43);
  }else if(kind==='coin'){
-  const c=piece(root,geom.torus,gold,0,1.14,0,1,1,1);
-  c.rotation.x=.16;pickup=true;
+  const starGeo=new THREE.IcosahedronGeometry(.32, 0);
+  const c=new THREE.Mesh(starGeo, gold);
+  c.position.set(0,1.14,0);c.scale.set(1.1,1.1,.55);
+  root.add(c);
+  const eyeM=new THREE.MeshBasicMaterial({color:0x120d18});
+  const glintM=new THREE.MeshBasicMaterial({color:0xffffff});
+  const blushM=new THREE.MeshBasicMaterial({color:0xff8fa8});
+  for(const side of [-1,1]){
+   const e=new THREE.Mesh(geom.ball, eyeM);e.position.set(side*.08,1.15,.18);e.scale.set(.03,.034,.02);root.add(e);
+   const g=new THREE.Mesh(geom.ball, glintM);g.position.set(side*.08-.008,1.16,.20);g.scale.set(.012,.012,.012);root.add(g);
+   const b=new THREE.Mesh(geom.ball, blushM);b.position.set(side*.13,1.11,.16);b.scale.set(.032,.02,.012);root.add(b);
+  }
+  pickup=true;
  }else if(kind==='energy'){
-  ball(root,material(0x40f3b0),0,1.19,0,.31,.4,.33);
-  ball(root,snow,0,1.18,.27,.11,.21,.06);pickup=true;
+  const energyJelly=new THREE.MeshPhysicalMaterial({
+   color:0x3fcf9f,roughness:.15,transmission:.55,sheen:.85,sheenColor:new THREE.Color(0x9effd9)
+  });
+  ball(root,energyJelly,0,1.19,0,.34,.44,.32);
+  ball(root,energyJelly,-.10,1.32,0,.18,.18,.16);
+  ball(root,energyJelly,.10,1.32,0,.18,.18,.16);
+  const eyeM=new THREE.MeshBasicMaterial({color:0x120d18});
+  const glintM=new THREE.MeshBasicMaterial({color:0xffffff});
+  const blushM=new THREE.MeshBasicMaterial({color:0xff8fa8});
+  for(const side of [-1,1]){
+   const e=new THREE.Mesh(geom.ball, eyeM);e.position.set(side*.08,1.21,.25);e.scale.set(.028,.032,.02);root.add(e);
+   const g=new THREE.Mesh(geom.ball, glintM);g.position.set(side*.08-.007,1.22,.27);g.scale.set(.011,.011,.011);root.add(g);
+   const b=new THREE.Mesh(geom.ball, blushM);b.position.set(side*.13,1.17,.23);b.scale.set(.03,.018,.012);root.add(b);
+  }
+  pickup=true;
  }
  player.objects.push({root,kind,at,lane,pickup,taken:false});
 }

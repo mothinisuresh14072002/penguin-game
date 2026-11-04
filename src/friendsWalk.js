@@ -5,6 +5,8 @@ import { applyWardrobe, sanitizeWardrobe } from './dressUp.js';
 
 // --- CONFIG & BIOMES ---
 export const WALK_ANIMALS = [
+  { id: 'mochi', name: 'Mochi Mascot', emoji: '🍡' },
+  { id: 'hop', name: 'Hop Fluff', emoji: '🐇' },
   { id: 'bunny', name: 'Bella Bunny', emoji: '🐰' },
   { id: 'unicorn', name: 'Ula Unicorn', emoji: '🦄' },
   { id: 'horse', name: 'Hugo Horse', emoji: '🐴' },

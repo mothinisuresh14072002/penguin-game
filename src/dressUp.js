@@ -33,7 +33,7 @@ export function sanitizeWardrobe(saved){
  const owned=[...new Set(Array.isArray(data.owned)?data.owned:[])].filter(id=>byId.has(id));
  const equipped={};
  if(data.equipped&&typeof data.equipped==='object')for(const [animal,slots] of Object.entries(data.equipped)){
-  if(!['bunny','unicorn','horse','cat','dog','penguin','cow'].includes(animal)||!slots||typeof slots!=='object')continue;
+  if(!['bunny','unicorn','horse','cat','dog','penguin','cow','mochi','hop'].includes(animal)||!slots||typeof slots!=='object')continue;
   equipped[animal]={};
   for(const slot of SLOTS){
    const item=byId.get(slots[slot]);
@@ -73,7 +73,6 @@ export function applyWardrobe(actor,slots={}){
  }
  const root=new THREE.Group();root.name='wardrobe-cosmetics';actor.group.add(root);
  const material=(hex)=>new THREE.MeshStandardMaterial({color:hex,roughness:.68});
- // Facing game direction is -Z, so rear accessories are readable during running.
  const head=actor.group.getObjectByName(actor.id+'-distinct-head');
  const headRadius=head?.scale?.x??.55;
  const headY=actor.face?.position.y??1.82;
@@ -83,7 +82,6 @@ export function applyWardrobe(actor,slots={}){
   const item=byId.get(slots[slot]);if(!item||item.slot!==slot)continue;
   const mat=material(item.color);
   if(slot==='eyes'){
-   // Glasses on the face (+Z), not the back of the runner.
    for(const side of [-1,1]){
     const lens=ball(root,mat,side*headRadius*.44,headY+.02,head?.scale?.z*.94??.45,.20,.145,.045);
     lens.name='cosmetic-glasses-lens';
@@ -95,11 +93,9 @@ export function applyWardrobe(actor,slots={}){
    ball(root,mat,x,y,-.18,.105,.10,.055);
    for(const side of [-1,1])ball(root,mat,x+side*.14,y+.015,-.18,.14,.09,.06);
   }else if(slot==='neck'){
-   // Thin neck ribbon plus a small flowing tip on the visible rear.
    ball(root,mat,0,1.34,-bodyRadius*.88,bodyRadius*.91,.09,.09);
    ball(root,mat,-.23,1.16,-bodyRadius-.13,.105,.22,.06);
   }else if(slot==='outfit'){
-   // Delicate fabric-like front-and-back colour accents, leaving species markings visible.
    ball(root,mat,0,.97,-bodyRadius*.97,bodyRadius*.76,.31,.055);
    ball(root,mat,0,.97,bodyRadius*.97,bodyRadius*.76,.31,.055);
   }else if(slot==='charm'){

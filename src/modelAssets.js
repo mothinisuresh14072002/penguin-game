@@ -4,10 +4,10 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 // Put exported GLB files in public/models/. Missing or invalid models fall back
 // to the existing procedural animal rather than breaking either game mode.
-// All seven heroes support authored, painted / rigged 3D model overrides.
-// Filenames are intentionally fixed: only assets the project owner installs
-// under public/models/ will load; no unlicensed third-party URLs.
+// All heroes support authored, painted / rigged 3D model overrides.
 export const CHARACTER_ASSETS = Object.freeze({
+  mochi: 'models/mochi.glb',
+  hop: 'models/hop.glb',
   bunny: 'models/bunny.glb',
   unicorn: 'models/unicorn.glb',
   horse: 'models/horse.glb',
@@ -38,8 +38,6 @@ export function fitImportedCharacter(object, targetHeight = 2.55) {
   }
   const factor = targetHeight / size.y;
   object.scale.multiplyScalar(factor);
-  // Recompute bounds in world units so feet land at y=0 and the character
-  // remains centred on its lane regardless of its export's coordinates.
   const fitted = new THREE.Box3().setFromObject(object);
   const center = fitted.getCenter(new THREE.Vector3());
   object.position.x -= center.x;
@@ -48,9 +46,6 @@ export function fitImportedCharacter(object, targetHeight = 2.55) {
   return object;
 }
 
-// Real production models often store more than one animation clip.
-// Prefer an actual run/trot, distinct jump and idle instead of blindly playing
-// the first clip (which is often 'Idle') throughout the entire run.
 export function selectAnimalClips(clips=[]){
  const get=(pattern)=>clips.find(clip=>pattern.test(clip.name||''));
  return {
@@ -61,9 +56,6 @@ export function selectAnimalClips(clips=[]){
  };
 }
 
-// A shape-only Meshy download can technically load but will render plain
-// white. Prefer our colourful articulated game character until the model
-// contains baked colours, multiple painted materials, or texture maps.
 export function hasPaintedAppearance(root) {
  const colors=new Set();
  let textured=false;
@@ -83,8 +75,6 @@ export async function loadImportedAnimal(id) {
   const url=animalAssetUrl(id);
   if (!url) return null;
   try {
-    // Prefer optimized GLBs, but keep existing authored files as a fallback.
-    // Optimized assets use the same names inside public/models/optimized/.
     const optimizedUrl=url.replace('/models/','/models/optimized/');
     const exists=async candidate=>{
       if(!preflight.has(candidate))preflight.set(candidate,fetch(candidate,{method:'HEAD'}).then(r=>r.ok).catch(()=>false));
@@ -105,8 +95,6 @@ export async function loadImportedAnimal(id) {
         meshCount++;
         o.castShadow=true;
         o.receiveShadow=true;
-        // Meshy exports without material/texture should render white instead
-        // of disappearing or looking uniformly dark.
         if (!o.material) o.material=new THREE.MeshStandardMaterial({color:0xfff7f2,roughness:.82});
       }
     });
@@ -149,8 +137,6 @@ export async function loadImportedAnimal(id) {
           changeAction(desired);
           mixer.update(Math.max(0,dt));
         }else{
-          // The GLB has no rig/animation clips; gently bob until a rigged
-          // version is exported instead of implying full running animation.
           visual.position.y=moving&&!airborne?Math.abs(Math.sin(clock*12))*.065:0;
           visual.rotation.z=moving?Math.sin(clock*12)*.028:0;
           visual.rotation.x=airborne?-.09:0;

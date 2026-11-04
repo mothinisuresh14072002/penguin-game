@@ -1,6 +1,8 @@
-// Wardrobe lookbook inspired by the seven character showcase concepts.
+// Wardrobe lookbook inspired by the character showcase concepts.
 // All prices are virtual pink cash earned only by selling collected food.
 export const DRESS_SHOPS=Object.freeze({
+ mochi:{title:'Mochi’s Jelly Boutique',icon:'🍡',theme:'mint',color:'#3fcf9f',label:'Jelly Sprout',pose:'Bounce',outfit:'mint',styles:['flower','heart','pink-scarf','mint','heart-charm'],decor:['🍡','🌱','✨','🍓']},
+ hop:{title:'Hop’s Fluffy Wardrobe',icon:'🐇',theme:'berry',color:'#ff8fb1',label:'Fluffy Hop',pose:'Ear Wiggle',outfit:'berry',styles:['pink-bow','heart','pink-scarf','berry','bell'],decor:['🐇','🎀','🍀','💕']},
  bunny:{title:'Bella’s Berry Boutique',icon:'🐰',theme:'berry',color:'#f6a1bb',label:'Berry Meadow',pose:'Twirl',outfit:'berry',styles:['red-bow','heart','red-scarf','berry','heart-charm'],decor:['🍒','🌷','🎀','👗']},
  unicorn:{title:'Ula’s Rainbow Atelier',icon:'🦄',theme:'rainbow',color:'#c8a9fb',label:'Rainbow Dream',pose:'Sparkle',outfit:'lilac',styles:['flower','star','rainbow-scarf','lilac','gold'],decor:['🌈','⭐','🪄','🦄']},
  horse:{title:'Hugo’s Orchard Closet',icon:'🐴',theme:'orchard',color:'#b7d5a6',label:'Orchard Breeze',pose:'Prance',outfit:'mint',styles:['cap','sky','blue-scarf','mint','gold'],decor:['🍎','🌼','🌿','🧺']},

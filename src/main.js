@@ -1,3 +1,26 @@
+
+function createCuteStarGeometry(radiusOuter = .36, radiusInner = .19, depth = .10) {
+  const shape = new THREE.Shape();
+  const points = 5;
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? radiusOuter : radiusInner;
+    const a = (i * Math.PI) / points - Math.PI / 2;
+    const x = Math.cos(a) * r;
+    const y = Math.sin(a) * r;
+    if (i === 0) shape.moveTo(x, y);
+    else shape.lineTo(x, y);
+  }
+  shape.closePath();
+  return new THREE.ExtrudeGeometry(shape, {
+    depth: depth,
+    bevelEnabled: true,
+    bevelSegments: 2,
+    steps: 1,
+    bevelSize: .03,
+    bevelThickness: .03
+  });
+}
+
 import * as THREE from 'three';
 import {animate,stagger} from 'animejs';
 import {ACCESSORIES,SLOTS,sanitizeWardrobe,buyAccessory,equipAccessory,unequipAccessory,applyWardrobe} from './dressUp.js';
@@ -34,6 +57,8 @@ function popIn(target){if(target&&motionOK())animate(target,{opacity:[0,1],y:[14
 function rewardPop(target){if(!target||!motionOK())return;animate(target,{scale:[1,1.28,1],rotate:[0,-6,0],duration:460,ease:'outCubic'});}
 function floatInCards(elements){if(!motionOK()||!elements?.length)return;animate(elements,{opacity:[0,1],y:[22,0],scale:[.94,1],delay:stagger(42),duration:500,ease:'outCubic'});}
 const CHARS=[
+ {id:'mochi',name:'Mochi Mascot',cost:0,icon:'🍡',color:0x3fcf9f,biome:'meadow'},
+ {id:'hop',name:'Hop Fluff',cost:100,icon:'🐇',color:0xfbf8f4,biome:'meadow'},
  {id:'bunny',name:'Bella Bunny',cost:0,icon:'🐰',color:0xf9e5ef,biome:'meadow'},
  {id:'unicorn',name:'Ula Unicorn',cost:150,icon:'🦄',color:0xf5e5ff,biome:'rainbow'},
  {id:'horse',name:'Hugo Horse',cost:250,icon:'🐴',color:0xbf8557,biome:'grassland'},
@@ -56,9 +81,9 @@ const LEGACY_KEY='penguin-ice-runner-v2';
 let saved;
 try { saved=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(LEGACY_KEY)||'{}'); } catch { saved={}; }
 const validIds=new Set(CHARS.map(c=>c.id));
-const profile={pinkCash:Math.max(0,Math.floor(Number(saved.pinkCash)||0)),coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['bunny','penguin'],selected:saved.selected||'bunny',economy:createEconomy(saved.economy),wardrobe:sanitizeWardrobe(saved.wardrobe)};
-for(const id of ['bunny','penguin'])if(!profile.unlocked.includes(id))profile.unlocked.push(id);
-if(!profile.unlocked.includes(profile.selected))profile.selected='penguin';
+const profile={pinkCash:Math.max(0,Math.floor(Number(saved.pinkCash)||0)),coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['mochi','bunny','penguin'],selected:saved.selected||'mochi',economy:createEconomy(saved.economy),wardrobe:sanitizeWardrobe(saved.wardrobe)};
+for(const id of ['mochi','bunny','penguin'])if(!profile.unlocked.includes(id))profile.unlocked.push(id);
+if(!profile.unlocked.includes(profile.selected))profile.selected='mochi';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(profile))}catch{}};
 let audioEnabled=false,audioContext=null,lastStepSound=0;
 function ensureAudio(){try{audioContext??=new (window.AudioContext||window.webkitAudioContext)();if(audioContext.state==='suspended')audioContext.resume()}catch{}}
@@ -277,28 +302,110 @@ applyBiome();
 function makeObject(kind,lane,at){
  const root=new THREE.Group();scene.add(root);let radius=.7;
  const x=laneX[lane];
- if(kind==='rock'){orb(root,rockMat,0,.59,0,.86,.69,.68);orb(root,snowMat,-.15,1.13,-.03,.65,.23,.53);radius=.78;}
- else if(kind==='spike'){for(let i=0;i<3;i++)part(root,coneGeo,iceMat,(i-1)*.33,.65+(i%2)*.22,0,.36,.72+(i%2)*.38,.36);radius=.72;}
+ if(kind==='rock'){
+  orb(root,rockMat,0,.59,0,.86,.69,.68);
+  orb(root,snowMat,-.15,1.13,-.03,.65,.23,.53);
+  part(root,coneGeo,mat(0x56a665),.16,1.24,0,.03,.16,.03);
+  orb(root,mat(0xff8fa8),.16,1.33,0,.08,.08,.06);
+  radius=.78;
+ }
+ else if(kind==='spike'){
+  const spikeHues=[0x9be8ff,0xd4b8ff,0xffbce3];
+  for(let i=0;i<3;i++){
+   part(root,coneGeo,mat(spikeHues[i%3],.2,.3),(i-1)*.33,.65+(i%2)*.22,0,.36,.72+(i%2)*.38,.36);
+   orb(root,white,(i-1)*.33,1.05+(i%2)*.42,0,.06,.06,.06);
+  }
+  radius=.72;
+ }
  else if(kind==='log'){
-  // Raised arch: standing animals strike the overhead log; sliding animals
-  // genuinely fit under the gap, matching the collision rules.
   part(root,cube,wood,0,1.67,0,2.15,.54,.46);
   for(const x of [-1.06,1.06])part(root,cube,wood,x,.78,0,.16,1.55,.46);
   for(const x of [-.52,0,.52])orb(root,snowMat,x,1.98,0,.30,.11,.28);
+  orb(root,mat(0xff4d6d),-1.15,1.35,.15,.11,.09,.11);
+  orb(root,white,-1.15,1.41,.15,.04,.04,.04);
+  orb(root,mat(0xff4d6d),1.15,1.15,-.15,.10,.08,.10);
+  orb(root,white,1.15,1.20,-.15,.035,.035,.035);
   radius=1.05;
-}
+ }
  else if(kind==='food'||kind==='box'){
   root.add(createPickupArtwork(kind,profile.selected));radius=.45;
  }
- else if(kind==='coin'){part(root,new THREE.TorusGeometry(.33,.11,9,18),gold,0,1.12,0);radius=.42;}
- else if(kind==='energy'){orb(root,energyMat,0,1.2,0,.35,.48,.35);orb(root,white,0,1.2,.3,.12,.25,.07);radius=.48;}
- else if(kind==='shield'||kind==='magnet'){part(root,new THREE.OctahedronGeometry(.44),kind==='shield'?iceMat:powerMat,0,1.27,0);radius=.5;}
+ else if(kind==='coin'){
+  // Kawaii 3D Star Coin with cute bead eyes, catchlights and blushing cheeks
+  const starMesh=new THREE.Mesh(createCuteStarGeometry(.35,.18,.09),gold);
+  starMesh.position.set(0,1.12,-.045);
+  root.add(starMesh);
+  const eyeMat=new THREE.MeshStandardMaterial({color:0x120d18,roughness:.1});
+  const glintMat=new THREE.MeshBasicMaterial({color:0xffffff});
+  const blushMat=new THREE.MeshBasicMaterial({color:0xff8fa8});
+  for(const side of [-1,1]){
+   const eye=new THREE.Mesh(sphere,eyeMat);
+   eye.position.set(side*.09,1.13,.065);eye.scale.set(.032,.036,.028);root.add(eye);
+   const glint=new THREE.Mesh(sphere,glintMat);
+   glint.position.set(side*.09-.009,1.142,.088);glint.scale.set(.014,.014,.014);root.add(glint);
+   const blush=new THREE.Mesh(sphere,blushMat);
+   blush.position.set(side*.14,1.09,.058);blush.scale.set(.035,.022,.015);root.add(blush);
+  }
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.44,.02,6,24),mat(0xfff3ad,.2,.5));
+  ring.rotation.x=Math.PI/3;ring.position.set(0,1.12,0);root.add(ring);
+  radius=.44;
+ }
+ else if(kind==='energy'){
+  // Kawaii Glowing Jelly Energy Heart / Droplet with smiling bead face
+  const energyJelly=new THREE.MeshPhysicalMaterial({
+   color:0x3fcf9f,roughness:.15,transmission:.55,sheen:.85,sheenColor:new THREE.Color(0x9effd9),clearcoat:.4
+  });
+  orb(root,energyJelly,0,1.20,0,.36,.45,.34);
+  orb(root,energyJelly,-.11,1.34,0,.20,.20,.18);
+  orb(root,energyJelly,.11,1.34,0,.20,.20,.18);
+  const eyeMat=new THREE.MeshStandardMaterial({color:0x120d18,roughness:.1});
+  const glintMat=new THREE.MeshBasicMaterial({color:0xffffff});
+  const blushMat=new THREE.MeshBasicMaterial({color:0xff8fa8});
+  for(const side of [-1,1]){
+   const eye=new THREE.Mesh(sphere,eyeMat);
+   eye.position.set(side*.085,1.22,.28);eye.scale.set(.030,.034,.025);root.add(eye);
+   const glint=new THREE.Mesh(sphere,glintMat);
+   glint.position.set(side*.085-.008,1.232,.30);glint.scale.set(.012,.012,.012);root.add(glint);
+   const blush=new THREE.Mesh(sphere,blushMat);
+   blush.position.set(side*.14,1.18,.27);blush.scale.set(.032,.020,.015);root.add(blush);
+  }
+  orb(root,white,0,1.48,0,.06,.08,.06);
+  radius=.48;
+ }
+ else if(kind==='shield'){
+  // Iridescent Shield Bubble with Floating 3D Heart
+  const bubbleMat=new THREE.MeshPhysicalMaterial({
+   color:0xb5f2ff,roughness:.08,transmission:.82,clearcoat:1.0,sheen:1.0,sheenColor:new THREE.Color(0xffbce8),ior:1.25
+  });
+  orb(root,bubbleMat,0,1.25,0,.52,.52,.52);
+  const heartMat=mat(0xff557f,.3);
+  orb(root,heartMat,0,1.22,0,.20,.22,.18);
+  orb(root,heartMat,-.08,1.30,0,.12,.12,.12);
+  orb(root,heartMat,.08,1.30,0,.12,.12,.12);
+  radius=.52;
+ }
+ else if(kind==='magnet'){
+  // Kawaii Horseshoe Magnet with coral arch and smiling face
+  const magnetMat=mat(0xff4d6d,.35);
+  const silverMat=mat(0xe8eef5,.2,.8);
+  const arch=new THREE.Mesh(new THREE.TorusGeometry(.26,.10,8,20,Math.PI),magnetMat);
+  arch.rotation.z=Math.PI;arch.position.set(0,1.28,0);root.add(arch);
+  part(root,cube,magnetMat,-.26,1.20,0,.18,.22,.18);
+  part(root,cube,magnetMat,.26,1.20,0,.18,.22,.18);
+  part(root,cube,silverMat,-.26,1.04,0,.19,.14,.19);
+  part(root,cube,silverMat,.26,1.04,0,.19,.14,.19);
+  orb(root,mat(0x120d18),-.07,1.30,.09,.026,.03,.02);
+  orb(root,mat(0x120d18),.07,1.30,.09,.026,.03,.02);
+  orb(root,mat(0xff8fa8),-.12,1.26,.08,.03,.02,.015);
+  orb(root,mat(0xff8fa8),.12,1.26,.08,.03,.02,.015);
+  radius=.50;
+ }
  else if(kind==='lion'){
-   const coat=mat(0xdba45b),mane=mat(0x985127);
-   orb(root,coat,0,.78,0,.7,.55,.52);orb(root,mane,0,1.4,.12,.56,.59,.52);
-   orb(root,coat,0,1.41,.55,.38,.36,.34);orb(root,dark,0,1.37,.86,.09,.07,.09);
-   for(let s of [-1,1]){orb(root,dark,s*.19,1.54,.83,.05,.06,.03);orb(root,coat,s*.43,.3,.24,.23,.3,.23)}
-   radius=.9;
+  const coat=mat(0xdba45b),mane=mat(0x985127);
+  orb(root,coat,0,.78,0,.7,.55,.52);orb(root,mane,0,1.4,.12,.56,.59,.52);
+  orb(root,coat,0,1.41,.55,.38,.36,.34);orb(root,dark,0,1.37,.86,.09,.07,.09);
+  for(let s of [-1,1]){orb(root,dark,s*.19,1.54,.83,.05,.06,.03);orb(root,coat,s*.43,.3,.24,.23,.3,.23)}
+  radius=.9;
  }
  root.position.set(x,0,-(at-distance));entities.push({kind,lane,at,root,radius,taken:false});
 }

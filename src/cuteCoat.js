@@ -3,6 +3,7 @@ import * as THREE from 'three';
 // Coat patterns belong to the body surface, not to raised blob-like meshes.
 // Three.js LatheGeometry's back (-Z) is centred around UV u=.5.
 export const COAT_PATTERNS=Object.freeze({
+ mochi:'translucent-jelly',hop:'fluffy-white-fur',
  bunny:'clean-cream',unicorn:'pearlescent-back',horse:'cream-rump',
  cat:'orange-tabby',dog:'cream-shoulders',penguin:'charcoal-feathers',cow:'black-calf-spots'
 });
@@ -33,6 +34,11 @@ export function createCoatTexture(id,color){
  ctx.fillRect(0,0,512,512);
  // Minimal, naturally soft transitions for the rear-facing camera.
  switch(id){
+  case 'mochi':
+   softOval(ctx,256,270,85,120,'#6feec5',.42);
+   softOval(ctx,256,350,65,80,'#27aa7f',.35);break;
+  case 'hop':
+   softOval(ctx,256,365,60,78,'#fffdfa',.38);break;
   case 'bunny':
    softOval(ctx,256,365,58,75,'#fff3ed',.26);break;
   case 'unicorn':

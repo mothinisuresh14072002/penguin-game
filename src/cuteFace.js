@@ -4,8 +4,6 @@ import * as THREE from 'three';
 // are PAINTED on the head surface instead of assembling 20+ raised spheres.
 // This is a true 3D head with a texture, not a 2D game sprite.
 export const CUTE_FACE_STYLES=Object.freeze({
- mochi:   Object.freeze({coat:0x3fcf9f,iris:0x120d18,blush:0xff8fa8,nose:0x173528}),
- hop:     Object.freeze({coat:0xfbf8f4,iris:0x3b1f2b,blush:0xffb3c8,nose:0xff7fa5}),
  bunny:   Object.freeze({coat:0xfffaf5,iris:0x413645,blush:0xf6b1c5,nose:0xd8899e}),
  unicorn: Object.freeze({coat:0xf9f4ff,iris:0x413645,blush:0xeab2cc,nose:0xcd99c1}),
  horse:   Object.freeze({coat:0xc58b60,iris:0x413645,blush:0xeeb7a0,nose:0xb27d65}),
@@ -43,7 +41,7 @@ function softBlush(ctx,x,y,shade){
  ctx.fillRect(x-25,y-25,50,50);
 }
 export function getCuteFaceStyle(id){
- return CUTE_FACE_STYLES[id]||CUTE_FACE_STYLES.mochi||CUTE_FACE_STYLES.bunny;
+ return CUTE_FACE_STYLES[id]||CUTE_FACE_STYLES.bunny;
 }
 export function createCuteFaceTexture(id,coatOverride=null){
  if(typeof document==='undefined')return null;
@@ -55,19 +53,10 @@ export function createCuteFaceTexture(id,coatOverride=null){
  canvas.width=canvas.height=512;
  const ctx=canvas.getContext('2d');
  if(!ctx)return null;
- // A standard Three.js SphereGeometry looks towards +Z at u=.25.
- // The common face occupies only that arc, leaving the back solid-coated.
  ctx.fillStyle=hex(coat);ctx.fillRect(0,0,512,512);
  ctx.save();
  const cx=128;
- // Species markings are subtle pigments instead of thick extra meshes.
- if(id==='mochi'){
-  pigment(ctx,cx,260,85,75,'#6ff3cc',0.5);
-  pigment(ctx,cx,295,45,28,'#ffedf2',0.4);
- }else if(id==='hop'){
-  pigment(ctx,cx,292,44,26,'#ffffff',0.98);
-  pigment(ctx,cx,250,55,30,'#fff8f6',0.6);
- }else if(id==='penguin'){
+ if(id==='penguin'){
   pigment(ctx,cx,270,92,138,'#fffaf7');
   pigment(ctx,cx-38,250,44,112,'#ffffff');
   pigment(ctx,cx+38,250,44,112,'#ffffff');
@@ -93,23 +82,10 @@ export function createCuteFaceTexture(id,coatOverride=null){
   pigment(ctx,cx,292,39,23,'#fff5ed');
  }
  for(const direction of [-1,1]){
-  const isPenguin=id==='penguin',isCow=id==='cow',isDog=id==='dog',isCat=id==='cat',isMochi=id==='mochi',isHop=id==='hop';
-  const x=cx+direction*(isPenguin?42:isCow?40:isDog?40:isCat?39:isMochi?41:isHop?39:38);
-  softBlush(ctx,cx+direction*(isPenguin?62:isCow?63:isDog?64:isCat?65:isMochi?66:isHop?65:67),isPenguin?286:isCow?292:isDog?292:isCat?294:isMochi?295:isHop?294:296,hex(palette.blush));
-  if(isMochi){
-   // Wobnimo signature large obsidian bead eyes with double white specular catchlights
-   ellipse(ctx,x,233,26,33,'#fffefc');
-   ellipse(ctx,x,234,21,28,'#120d18');
-   ellipse(ctx,x,238,14,21,hex(palette.iris));
-   ellipse(ctx,x-7,222,8.5,9.5,'#ffffff');
-   ellipse(ctx,x+7,243,3.8,4.5,'#ffffff');
-  }else if(isHop){
-   ellipse(ctx,x,233,25,32,'#fffefc');
-   ellipse(ctx,x,234,20,27,'#3b1f2b');
-   ellipse(ctx,x,238,13.5,20,hex(palette.iris));
-   ellipse(ctx,x-6.5,222,8,9,'#ffffff');
-   ellipse(ctx,x+7,243,3.5,4.2,'#ffffff');
-  }else if(isCow){
+  const isPenguin=id==='penguin',isCow=id==='cow',isDog=id==='dog',isCat=id==='cat';
+  const x=cx+direction*(isPenguin?42:isCow?40:isDog?40:isCat?39:38);
+  softBlush(ctx,cx+direction*(isPenguin?62:isCow?63:isDog?64:isCat?65:67),isPenguin?286:isCow?292:isDog?292:isCat?294:296,hex(palette.blush));
+  if(isCow){
    ellipse(ctx,x,234,26,32,'#fffefc');
    ellipse(ctx,x,235,20,27,'#352d38');
    ellipse(ctx,x,240,13.5,20,hex(palette.iris));
@@ -141,24 +117,7 @@ export function createCuteFaceTexture(id,coatOverride=null){
    ellipse(ctx,x+7,242,3.1,3.8,'#ffffff');
   }
  }
- if(id==='mochi'){
-  // Sweet curved mouth with little pink tongue
-  ctx.strokeStyle='#173528';ctx.lineWidth=3.8;ctx.lineCap='round';
-  ctx.beginPath();
-  ctx.arc(cx,292,13,0.18*Math.PI,0.82*Math.PI);
-  ctx.stroke();
-  ellipse(ctx,cx,303,6.5,4.8,'#ff7d97');
- }else if(id==='hop'){
-  // Cute pink bunny nose and gentle smile
-  ellipse(ctx,cx,284,8,5.5,hex(palette.nose));
-  ctx.strokeStyle='#5a2a3a';ctx.lineWidth=3.2;ctx.lineCap='round';
-  ctx.beginPath();
-  ctx.moveTo(cx,289);ctx.lineTo(cx,297);
-  ctx.quadraticCurveTo(cx-8,305,cx-15,298);
-  ctx.moveTo(cx,297);ctx.quadraticCurveTo(cx+8,305,cx+15,298);
-  ctx.stroke();
-  ellipse(ctx,cx,302,4.8,3.5,'#ff8fa3');
- }else if(id!=='penguin'){
+ if(id!=='penguin'){
   ellipse(ctx,cx,286,id==='cow'?6:9,id==='cow'?4:6,hex(palette.nose));
   ctx.strokeStyle='#66535b';ctx.lineWidth=3.4;ctx.lineCap='round';
   ctx.beginPath();
@@ -167,7 +126,6 @@ export function createCuteFaceTexture(id,coatOverride=null){
   ctx.moveTo(cx,302);ctx.quadraticCurveTo(cx+9,310,cx+16,303);
   ctx.stroke();
  }else{
-  // A rounded beak shade complements the tiny 3D beak.
   ellipse(ctx,cx,286,24,15,'#f5bf54');
   ellipse(ctx,cx,289,18,9,'#f0ad32');
  }

@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   web-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
 
   browser-qa:
     name: Real Chromium gameplay QA
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +45,7 @@ jobs:
       - name: Install game and browser tester
         run: |
           npm install --no-audit --no-fund
-          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.50.1
       - name: Install Chromium and system dependencies
         run: npx playwright install --with-deps chromium
       - name: Launch game web server
@@ -61,6 +61,7 @@ jobs:
           done
           cat /tmp/pawverse-vite.log
           exit 1
+        shell: bash
       - name: Play through solo and local multiplayer in Chromium
         env:
           PAWVERSE_QA_ORIGIN: http://127.0.0.1:5173

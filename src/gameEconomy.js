@@ -1,8 +1,6 @@
 // Offline-only progression for Pawverse Dash. All rewards are virtual
 // in-game coins/food, with no purchase, ads, or real-money random rewards.
 export const FOOD_BY_ANIMAL=Object.freeze({
- mochi:{id:'jellyDrop',label:'Jelly Berry',emoji:'🍓',price:4,color:0x3fcf9f},
- hop:{id:'clover',label:'Lucky Clover',emoji:'🍀',price:3,color:0x5cd687},
  bunny:{id:'carrot',label:'Carrot',emoji:'🥕',price:3,color:0xf18b36},
  unicorn:{id:'rainbowFruit',label:'Rainbow Fruit',emoji:'🌈',price:5,color:0xec9bfc},
  horse:{id:'apple',label:'Apple',emoji:'🍎',price:4,color:0xe95f60},
@@ -68,7 +66,7 @@ export function recordEvent(profile,event,quantity=1,now=new Date()){
  return false;
 }
 export function collectFood(profile,animal,count=1,now=new Date()){
- const food=FOOD_BY_ANIMAL[animal],n=whole(count);
+ const food=FOOD_BY_ANIMAL[animal]||FOOD_BY_ANIMAL.bunny,n=whole(count);
  if(!food||!n)return null;
  recordEvent(profile,'food',n,now);
  profile.economy.inventory[food.id]+=n;

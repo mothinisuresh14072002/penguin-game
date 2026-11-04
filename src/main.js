@@ -57,8 +57,6 @@ function popIn(target){if(target&&motionOK())animate(target,{opacity:[0,1],y:[14
 function rewardPop(target){if(!target||!motionOK())return;animate(target,{scale:[1,1.28,1],rotate:[0,-6,0],duration:460,ease:'outCubic'});}
 function floatInCards(elements){if(!motionOK()||!elements?.length)return;animate(elements,{opacity:[0,1],y:[22,0],scale:[.94,1],delay:stagger(42),duration:500,ease:'outCubic'});}
 const CHARS=[
- {id:'mochi',name:'Mochi Mascot',cost:0,icon:'🍡',color:0x3fcf9f,biome:'meadow'},
- {id:'hop',name:'Hop Fluff',cost:100,icon:'🐇',color:0xfbf8f4,biome:'meadow'},
  {id:'bunny',name:'Bella Bunny',cost:0,icon:'🐰',color:0xf9e5ef,biome:'meadow'},
  {id:'unicorn',name:'Ula Unicorn',cost:150,icon:'🦄',color:0xf5e5ff,biome:'rainbow'},
  {id:'horse',name:'Hugo Horse',cost:250,icon:'🐴',color:0xbf8557,biome:'grassland'},
@@ -81,9 +79,9 @@ const LEGACY_KEY='penguin-ice-runner-v2';
 let saved;
 try { saved=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(LEGACY_KEY)||'{}'); } catch { saved={}; }
 const validIds=new Set(CHARS.map(c=>c.id));
-const profile={pinkCash:Math.max(0,Math.floor(Number(saved.pinkCash)||0)),coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['mochi','bunny','penguin'],selected:saved.selected||'mochi',economy:createEconomy(saved.economy),wardrobe:sanitizeWardrobe(saved.wardrobe)};
-for(const id of ['mochi','bunny','penguin'])if(!profile.unlocked.includes(id))profile.unlocked.push(id);
-if(!profile.unlocked.includes(profile.selected))profile.selected='mochi';
+const profile={pinkCash:Math.max(0,Math.floor(Number(saved.pinkCash)||0)),coins:Math.max(0,Math.floor(Number(saved.coins)||0)),best:Math.max(0,Math.floor(Number(saved.best)||0)),unlocked:Array.isArray(saved.unlocked)?saved.unlocked.filter(id=>validIds.has(id)):['bunny','penguin'],selected:saved.selected||'bunny',economy:createEconomy(saved.economy),wardrobe:sanitizeWardrobe(saved.wardrobe)};
+for(const id of ['bunny','penguin'])if(!profile.unlocked.includes(id))profile.unlocked.push(id);
+if(!profile.unlocked.includes(profile.selected))profile.selected='bunny';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(profile))}catch{}};
 let audioEnabled=false,audioContext=null,lastStepSound=0;
 function ensureAudio(){try{audioContext??=new (window.AudioContext||window.webkitAudioContext)();if(audioContext.state==='suspended')audioContext.resume()}catch{}}

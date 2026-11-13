@@ -50,6 +50,7 @@ import {createPickupArtwork} from './foodArt.js';
 import {FOODS,FOOD_BY_ANIMAL,DAILY_GOALS,WEEKLY_GOALS,createEconomy,synchronizeEconomy,collectFood,sellFood,openSurpriseBox,recordEvent,goalProgress,claimGoal,dailyKey} from './gameEconomy.js';
 import {createJourneyArt} from './journeyArt.js';
 import {loopZ,layerTravel,journeyChapter} from './worldMotion.js';
+import {createWorldEnvironment} from './worldEnvironment.js';
 
 const $ = id => document.getElementById(id);
 const motionOK=()=>!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -179,6 +180,7 @@ for(let i=0;i<14;i++){
  }
 }
 
+const terrainEnvironment=createWorldEnvironment(scrollItems,'arctic',{anisotropy:graphicsQuality.anisotropy});
 const roadArt=createRoadArtwork(scene,'arctic',{length:260,centerZ:-106,surfaceY:.29,width:8.95});
 let landmarks=null;
 let journeyArt=null;
@@ -254,6 +256,7 @@ function applyBiome(overrideBiomeKey = null){
  activeBiomeKey = biomeKey;
  const biome=BIOMES[biomeKey] || BIOMES.meadow;
  currentTheme=biome;
+ terrainEnvironment.setBiome(biomeKey);
  scene.background.setHex(biome.sky);scene.fog.color.setHex(biome.fog);
  applyLighting(biomeKey,{renderer,hemi,sun,fill:fillLight});
  backdrop.setBiome(biomeKey,biome.sky);
@@ -872,6 +875,7 @@ function tick(now){
    b.wings[1].rotation.y=-Math.sin(clockTime*11+i)*.9;
   }
   roadArt.update(distance);
+  terrainEnvironment.update(clockTime);
   meadowDetails?.update(distance);
   skylandDetails?.update(distance,clockTime);
   prairieDetails?.update(distance);

@@ -10,7 +10,8 @@
     "android:add": "npx cap add android",
     "android:sync": "npm run build && npx cap sync android",
     "android:open": "npx cap open android",
-    "models:optimize": "node scripts/optimize-models.mjs"
+    "models:optimize": "node scripts/optimize-models.mjs",
+    "test": "node --test"
   },
   "dependencies": {
     "three": "^0.169.0",

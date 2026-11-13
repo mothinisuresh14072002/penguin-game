@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {animate} from 'animejs';
 import './race.css';
 import {createAnimal, animateAnimal, alignAnimalFeetToRoad} from './animalArt.js';
 import {applyWardrobe,sanitizeWardrobe} from './dressUp.js';
@@ -223,11 +224,12 @@ function beep(freq=500,duration=.11,volume=.03){
   osc.connect(gain);gain.connect(audio.destination);osc.start(t);osc.stop(t+duration);
  }catch{}
 }
-function showNotice(p,message){const e=$('p'+(p.index+1)+'Notice');e.textContent=message;p.noticeUntil=p.time+1.5;}
+function showNotice(p,message){const e=$('p'+(p.index+1)+'Notice');e.textContent=message;p.noticeUntil=p.time+1.5;if(e&&!matchMedia('(prefers-reduced-motion: reduce)').matches)animate(e,{opacity:[0,1],y:[10,0],scale:[.97,1],duration:320,ease:'outCubic'});}
 function setResult(message){
  finished=true;playing=false;paused=false;$('raceOverlay').classList.remove('hidden');$('raceSetup').hidden=true;$('raceResult').hidden=false;
  $('raceTitle').textContent='🏆 RACE FINISHED';$('raceMessage').textContent=message;
  $('raceResult').textContent=racers.map((p,i)=>'P'+(i+1)+' · '+p.ch.emoji+' '+p.ch.name+': '+Math.floor(p.distance)+'m, '+p.coins+' coins, '+p.hit+' hits').join('  |  ');
+ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)animate($('raceResult'),{opacity:[0,1],y:[18,0],scale:[.96,1],duration:520,ease:'outBack'});
  $('raceStart').textContent='🔁 RACE AGAIN';$('pauseLabel').hidden=true;
  beep(800,.25,.045);
 }

@@ -40,7 +40,7 @@ const geo=(parent,shape,material,x,y,z,sx,sy,sz)=>{const m=new THREE.Mesh(shape,
 const tree=(g,x,z)=>{geo(g,box,wood,x,.8,z,.23,1.6,.25);geo(g,sphere,leaves,x,2.05,z,1.08,.95,.89)};
 const bloom=(g,x,z,i)=>{geo(g,box,leaves,x,.24,z,.06,.44,.06);geo(g,sphere,flowers[i%3],x,.52,z,.22,.2,.2)};
 const cottage=(g,x,z)=>{geo(g,box,cottageWall,x,.7,z,1.6,1.3,1.5);const roof=geo(g,box,cottageRoof,x,1.49,z,1.85,.32,1.78);roof.rotation.z=.08};
-function fillSegment(g,index){g.clear();const theme=Math.floor(index/4)%6;for(const side of [-1,1]){const x=side*(6.5+(index%3));if(theme===0||theme===4)cottage(g,x,-3);if(theme!==2)tree(g,x+side*2.6,-8);if(theme===2){for(let j=0;j<5;j++)bloom(g,x+side*(j%2)*.6,-j*2,j)}else for(let j=0;j<3;j++)bloom(g,x+side*.8,-j*3-2,j+index);if(theme===3||theme===5)geo(g,sphere,theme===5?pond:magicStone,x,.19,-5,1.6,.16,1.5)}}
+function fillSegment(g,index){for(const child of [...g.children])if(child.name!=='textured-side-terrain'&&child.name!=='instanced-world-grass')g.remove(child);const theme=Math.floor(index/4)%6;for(const side of [-1,1]){const x=side*(6.5+(index%3));if(theme===0||theme===4)cottage(g,x,-3);if(theme!==2)tree(g,x+side*2.6,-8);if(theme===2){for(let j=0;j<5;j++)bloom(g,x+side*(j%2)*.6,-j*2,j)}else for(let j=0;j<3;j++)bloom(g,x+side*.8,-j*3-2,j+index);if(theme===3||theme===5)geo(g,sphere,theme===5?pond:magicStone,x,.19,-5,1.6,.16,1.5)}}
 let distance=0,running=false,paused=false,front=false,time=0,actors=[],actorGeneration=0;
 const selectors=[$('friend-one'),$('friend-two')];
 for(const select of selectors)for(const animal of WALK_ANIMALS){const option=document.createElement('option');option.value=animal.id;option.textContent=animal.emoji+' '+animal.name;select.append(option)}

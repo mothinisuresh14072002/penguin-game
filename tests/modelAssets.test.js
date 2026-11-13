@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { fitImportedCharacter,animalAssetUrl,CHARACTER_ASSETS,hasPaintedAppearance,selectAnimalClips } from '../src/modelAssets.js';
+import { fitImportedCharacter,animalAssetUrl,CHARACTER_ASSETS,POLYFORK_ANIMALS,hasPaintedAppearance,selectAnimalClips } from '../src/modelAssets.js';
 
 test('all seven heroes accept optional textured GLB character assets',()=>{
  const animals=['bunny','unicorn','horse','cat','dog','penguin','cow'];
@@ -49,4 +49,12 @@ test('rigged characters select named run, idle and jump clips',()=>{
  assert.equal(found.jump,jump);
  assert.equal(selectAnimalClips([idle]).run,idle);
  assert.equal(selectAnimalClips([]).run,null);
+});
+
+test('Polyfork catalogue animal GLBs are configured for matching heroes',()=>{
+ assert.deepEqual(POLYFORK_ANIMALS,{
+  bunny:'rabbit-base',horse:'horse-base',cat:'cat-base',
+  dog:'dog-base',penguin:'penguin-base',cow:'cow-base'
+ });
+ assert.equal(POLYFORK_ANIMALS.unicorn,undefined);
 });

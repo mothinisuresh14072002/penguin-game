@@ -22,6 +22,7 @@ import {installCurvedWorld,curveRequested} from './curvedWorld.js';
 import {giveSurfaceDetail,surfaceKindForColor} from './hdSurface.js';
 import {createJourneyArt} from './journeyArt.js';
 import {loopZ,layerTravel} from './worldMotion.js';
+import {createWorldEnvironment} from './worldEnvironment.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
 const $ = id => document.getElementById(id);
@@ -97,6 +98,8 @@ function newRacePlayer(ch,index){
  const glacierDetails=biomeId==='arctic'?createGlacierDetails(scene):null;
  const farmDetails=biomeId==='farm'?createFarmDetails(scene):null;
  const roadArt=createRoadArtwork(scene,biomeId,{length:260,centerZ:-105,surfaceY:.068,width:8.95});
+ const terrainSegments=Array.from({length:14},(_,i)=>{const segment=new THREE.Group();segment.position.z=10-i*18;scene.add(segment);return segment;});
+ const terrainEnvironment=createWorldEnvironment(terrainSegments,biomeId,{anisotropy:graphicsQuality.anisotropy,surfaceY:-.115,grassY:-.11});
  const turf=material(ch.ground),road=material(ch.road),border=material(ch.accent);
  piece(scene,geom.box,turf,0,-.74,-105,30,1.25,255);
  piece(scene,geom.box,road,0,-.04,-105,9.1,.17,255);
@@ -121,7 +124,7 @@ function newRacePlayer(ch,index){
   scenery.push(prop(scene,ch.scenery,ch,x,z,i));
  }
  const hero=createHero(ch.id,scene);
- return {scene,camera,backdrop,landmarks,journeyArt,meadowDetails,skylandDetails,prairieDetails,townDetails,parkDetails,glacierDetails,farmDetails,roadArt,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
+ return {scene,camera,backdrop,terrainEnvironment,terrainSegments,landmarks,journeyArt,meadowDetails,skylandDetails,prairieDetails,townDetails,parkDetails,glacierDetails,farmDetails,roadArt,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
 }
 function obstacle(player,kind,lane,at){
  const root=new THREE.Group();root.position.set(LANE_POSITIONS[lane],0,2-(at-player.distance));player.scene.add(root);
@@ -195,6 +198,8 @@ function clearPlayer(player){
  player.glacierDetails?.dispose();
  player.farmDetails?.dispose();
  player.roadArt?.dispose();
+ player.terrainEnvironment?.dispose();
+ for(const segment of player.terrainSegments||[])segment.parent?.remove(segment);
  if(player.hero?.imported&&player.hero.mixer)player.hero.mixer.stopAllAction();
  const geometries=new Set(),materials=new Set();
  player.scene.traverse(object=>{
@@ -284,6 +289,8 @@ function updatePlayer(p,dt){
  for(let i=p.objects.length-1;i>=0;i--){
   if(p.objects[i].at<p.distance-12){p.scene.remove(p.objects[i].root);p.objects.splice(i,1)}
  }
+ for(let i=0;i<p.terrainSegments.length;i++)p.terrainSegments[i].position.z=loopZ(i,18,layerTravel(p.distance,'track'),p.terrainSegments.length,10);
+ p.terrainEnvironment.update(p.time);
  for(let i=0;i<p.scenery.length;i++)p.scenery[i].position.z=loopZ(Math.floor(i/2),12,layerTravel(p.distance,'near'),23,14);
  for(let i=0;i<p.skyClouds.length;i++){
   const cloud=p.skyClouds[i];

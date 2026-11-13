@@ -680,3 +680,24 @@ npm run build
 
 The script calls **@gltf-transform/cli 4.5.1** via npx to optimize each installed GLB with **Meshopt compression** and **WebP textures**, preserving all originals. Output is written to `public/models/optimized/<animal>.glb` and the game automatically prefers that version when present. Three.js's GLTFLoader has **MeshoptDecoder** enabled; it falls back to the unoptimized GLB (or the procedural animal when no authored GLB exists). The script skips missing models. First execution of npx requires internet; WebP texture conversion may slightly change texture quality, so inspect all characters and their animations before committing generated assets. Run the script again when replacing an original GLB. This optimizes existing models — it does not create new detailed 3D art.
 
+
+## 🐾 Polyfork animated 3D animal models
+
+Pawverse Dash can stream selected **Polyfork Animals v2** GLB models through the public CDN using the existing Three.js `GLTFLoader` and `AnimationMixer` pipeline:
+
+| Pawverse hero | Polyfork model |
+|---|---|
+| Bella Bunny | Rabbit |
+| Hugo Foal | Horse |
+| Coco Kitten | Cat |
+| Dodo Puppy | Dog |
+| Pip Penguin | Penguin |
+| Mimi Calf | Cow |
+| Ula Unicorn | Existing custom procedural model |
+
+Models are loaded at runtime from `https://polyfork.dev/cdn/<model-id>.glb`. No Polyfork account or API key is needed for these free GLB assets. The model catalog is an index; the GLB files are served by Polyfork, not stored in this repository. The game tries local optimized and original GLBs first, then the Polyfork CDN. If a network request fails, it keeps the existing procedural character so gameplay remains available offline. The GLBs include authored animation clips where provided; the loader selects run/walk, idle and jump clips by name.
+
+**Art direction note:** Polyfork's animal models are low-poly and animated. They add articulated animal models, but their visual style is different from Pawverse's soft plush/chibi characters. The unicorn remains custom until a matching unicorn asset is available. Check the in-game look, scale and outfit placement on desktop and mobile before deciding whether to keep each imported model.
+
+**Asset terms:** Use the Polyfork free GLB assets through their CDN; do not copy or redistribute the model files in this repository. See the [Polyfork catalogue and licence](https://github.com/lucas-martinic/polyfork-catalog) and the [Polyfork asset catalogue](https://polyfork.dev/assets) for current terms and model details.
+

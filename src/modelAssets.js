@@ -88,7 +88,7 @@ export async function loadImportedAnimal(id) {
       group.name='imported-'+id;group.add(visual);visual.add(gltf.scene);
       fitImportedCharacter(gltf.scene);
       let meshCount=0;
-      gltf.scene.traverse(o=>{if(o.isMesh){meshCount++;o.castShadow=true;o.receiveShadow=true;if(!o.material)o.material=new THREE.MeshStandardMaterial({color:0xfff7f2,roughness:.82)};}});
+      gltf.scene.traverse(o=>{if(o.isMesh){meshCount++;o.castShadow=true;o.receiveShadow=true;if(!o.material)o.material=new THREE.MeshStandardMaterial({color:0xfff7f2,roughness:.82});}});
       if(!meshCount)throw new Error('GLB contains no meshes');
       if(!hasPaintedAppearance(gltf.scene))throw new Error('Model has no painted or vertex-colour appearance');
       const mixer=gltf.animations?.length?new THREE.AnimationMixer(gltf.scene):null;

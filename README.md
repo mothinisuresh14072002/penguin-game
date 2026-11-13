@@ -701,3 +701,21 @@ Models are loaded at runtime from `https://polyfork.dev/cdn/<model-id>.glb`. No 
 
 **Asset terms:** Use the Polyfork free GLB assets through their CDN; do not copy or redistribute the model files in this repository. See the [Polyfork catalogue and licence](https://github.com/lucas-martinic/polyfork-catalog) and the [Polyfork asset catalogue](https://polyfork.dev/assets) for current terms and model details.
 
+
+
+## Unified 3D game pipeline
+
+Pawverse Dash uses one coordinated runtime rather than treating the visual libraries as separate effects:
+
+1. **Three.js is the foundation.** It owns the scene, perspective camera, continuous runner track, biome lighting, shadows, textured terrain, instanced roadside foliage, 3D landmarks, pickups, obstacles and character placement. Side terrain is attached to recycled track segments, so the world remains continuous as the player runs. Grass tufts are instanced and use a small wind shader to add movement without creating a mesh for every blade.
+2. **Anime.js adds presentation motion.** It is used for interface transitions, staggered shop cards, rewards and character-preview polish. It does not replace the Three.js render loop, physics, camera or world movement.
+3. **Polyfork supplies optional animal GLB assets.** The model loader tries optimized/local character files first and then the mapped Polyfork CDN animal model. Three.js GLTFLoader, MeshoptDecoder and AnimationMixer load, normalize and play authored clips. If a remote model is unavailable or invalid, the existing procedural animal remains playable.
+
+The seven biome terrain themes each have their own generated surface texture. Terrain textures are reused across recycled segments; grass uses InstancedMesh and is disabled for ice/stone worlds where it would look out of place. This keeps the added detail bounded and compatible with the existing adaptive-resolution graphics settings.
+
+Run the checks with:
+
+```bash
+npm test
+npm run build
+```

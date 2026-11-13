@@ -4,6 +4,7 @@ import {createAnimal,animateAnimal,alignAnimalFeetToRoad} from './animalArt.js';
 import {applyWardrobe,sanitizeWardrobe} from './dressUp.js';
 import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
 import {createWorldEnvironment} from './worldEnvironment.js';
+import {createPolyforkScenery} from './polyforkScenery.js';
 
 export const WALK_ANIMALS=[
  {id:'bunny',name:'Bella Bunny',emoji:'🐰'},{id:'unicorn',name:'Ula Unicorn',emoji:'🦄'},
@@ -36,6 +37,7 @@ for(const side of [-1,1]){const edge=new THREE.Mesh(new THREE.BoxGeometry(.16,.0
 const scenery=new THREE.Group();scene.add(scenery);
 const segments=Array.from({length:12},(_,i)=>{const group=new THREE.Group();scenery.add(group);return group});
 const terrainEnvironment=createWorldEnvironment(segments,'park',{width:250,length:17,surfaceY:-.09,grassY:-.085,grassCount:42});
+const polyforkScenery=createPolyforkScenery(scene,'park');
 const geo=(parent,shape,material,x,y,z,sx,sy,sz)=>{const m=new THREE.Mesh(shape,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);parent.add(m);return m;};
 const tree=(g,x,z)=>{geo(g,box,wood,x,.8,z,.23,1.6,.25);geo(g,sphere,leaves,x,2.05,z,1.08,.95,.89)};
 const bloom=(g,x,z,i)=>{geo(g,box,leaves,x,.24,z,.06,.44,.06);geo(g,sphere,flowers[i%3],x,.52,z,.22,.2,.2)};
@@ -68,6 +70,7 @@ function frame(){
   for(const actor of actors){animateAnimal(actor,time*.72,true,false);actor.update?.(dt,time*.72,true,false);actor.group.position.y=0;alignAnimalFeetToRoad(actor,0);actor.group.position.z=3;actor.group.rotation.y=Math.PI;} // Front camera sees faces; rear camera sees both friends from behind.
   for(const g of segments){g.position.z+=dt*WALK_SPEED; if(g.position.z>22){const smallest=Math.min(...segments.map(x=>x.position.z));g.position.z=smallest-17;g.userData.index+=segments.length;fillSegment(g,g.userData.index)}}
   terrainEnvironment.update(time);
+  polyforkScenery.update(distance);
  }
  camera.position.set(0,front?3.2:4.3,front?-4.7:11.5);camera.lookAt(0,1.15,front?3.2:-4);renderer.render(scene,camera);
 }

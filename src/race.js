@@ -24,6 +24,7 @@ import {giveSurfaceDetail,surfaceKindForColor} from './hdSurface.js';
 import {createJourneyArt} from './journeyArt.js';
 import {loopZ,layerTravel} from './worldMotion.js';
 import {createWorldEnvironment} from './worldEnvironment.js';
+import {createPolyforkScenery} from './polyforkScenery.js';
 import { FINISH_DISTANCE, LANE_POSITIONS, clampLane, raceSpeed, spawnSpacing, trackLoop, rowPattern, rowRandom, pickupTouch, crossedDistance } from './raceMath.js';
 
 const $ = id => document.getElementById(id);
@@ -88,6 +89,7 @@ function newRacePlayer(ch,index){
  camera.position.set(0,6.7,16.9);camera.lookAt(0,1.38,-21);
  const biomeId={bunny:'meadow',unicorn:'rainbow',horse:'grassland',cat:'city',dog:'park',penguin:'arctic',cow:'farm'}[ch.id]||'meadow';
  const backdrop=create3DBackdrop(scene,biomeId);
+ const polyforkScenery=createPolyforkScenery(scene,biomeId);
  backdrop.setBiome(biomeId,ch.sky);
  const landmarks=createWorldLandmarks(scene,biomeId);
  const journeyArt=createJourneyArt(scene,biomeId);
@@ -125,7 +127,7 @@ function newRacePlayer(ch,index){
   scenery.push(prop(scene,ch.scenery,ch,x,z,i));
  }
  const hero=createHero(ch.id,scene);
- return {scene,camera,backdrop,terrainEnvironment,terrainSegments,landmarks,journeyArt,meadowDetails,skylandDetails,prairieDetails,townDetails,parkDetails,glacierDetails,farmDetails,roadArt,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
+ return {scene,camera,backdrop,polyforkScenery,terrainEnvironment,terrainSegments,landmarks,journeyArt,meadowDetails,skylandDetails,prairieDetails,townDetails,parkDetails,glacierDetails,farmDetails,roadArt,hero,ch,index,distance:0,coins:0,energy:100,hit:0,lane:1,target:1,y:0,vy:0,slide:0,stun:0,invuln:0,time:0,objects:[],spawnRow:0,nextSpawn:28,scenery,laneMarks,skyClouds,done:false,step:0,noticeUntil:0};
 }
 function obstacle(player,kind,lane,at){
  const root=new THREE.Group();root.position.set(LANE_POSITIONS[lane],0,2-(at-player.distance));player.scene.add(root);
@@ -189,6 +191,7 @@ function spawnRow(player){
 }
 function clearPlayer(player){
  player.backdrop?.dispose();
+ player.polyforkScenery?.dispose();
  player.landmarks?.dispose();
  player.journeyArt?.dispose();
  player.meadowDetails?.dispose();
@@ -293,6 +296,7 @@ function updatePlayer(p,dt){
  }
  for(let i=0;i<p.terrainSegments.length;i++)p.terrainSegments[i].position.z=loopZ(i,18,layerTravel(p.distance,'track'),p.terrainSegments.length,10);
  p.terrainEnvironment.update(p.time);
+ p.polyforkScenery.update(p.distance);
  for(let i=0;i<p.scenery.length;i++)p.scenery[i].position.z=loopZ(Math.floor(i/2),12,layerTravel(p.distance,'near'),23,14);
  for(let i=0;i<p.skyClouds.length;i++){
   const cloud=p.skyClouds[i];

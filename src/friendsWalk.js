@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import {animate} from 'animejs';
 import {createAnimal,animateAnimal,alignAnimalFeetToRoad} from './animalArt.js';
 import {applyWardrobe,sanitizeWardrobe} from './dressUp.js';
+import {loadImportedAnimal,releaseImportedAnimal} from './modelAssets.js';
+import {createWorldEnvironment} from './worldEnvironment.js';
 
 export const WALK_ANIMALS=[
  {id:'bunny',name:'Bella Bunny',emoji:'🐰'},{id:'unicorn',name:'Ula Unicorn',emoji:'🦄'},
@@ -33,20 +35,21 @@ const road=new THREE.Mesh(new THREE.PlaneGeometry(7.8,250),path);road.rotation.x
 for(const side of [-1,1]){const edge=new THREE.Mesh(new THREE.BoxGeometry(.16,.07,250),trim);edge.position.set(side*3.94,.005,0);scene.add(edge)}
 const scenery=new THREE.Group();scene.add(scenery);
 const segments=Array.from({length:12},(_,i)=>{const group=new THREE.Group();scenery.add(group);return group});
+const terrainEnvironment=createWorldEnvironment(segments,'park',{width:250,length:17,surfaceY:-.09,grassY:-.085,grassCount:42});
 const geo=(parent,shape,material,x,y,z,sx,sy,sz)=>{const m=new THREE.Mesh(shape,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);parent.add(m);return m;};
 const tree=(g,x,z)=>{geo(g,box,wood,x,.8,z,.23,1.6,.25);geo(g,sphere,leaves,x,2.05,z,1.08,.95,.89)};
 const bloom=(g,x,z,i)=>{geo(g,box,leaves,x,.24,z,.06,.44,.06);geo(g,sphere,flowers[i%3],x,.52,z,.22,.2,.2)};
 const cottage=(g,x,z)=>{geo(g,box,cottageWall,x,.7,z,1.6,1.3,1.5);const roof=geo(g,box,cottageRoof,x,1.49,z,1.85,.32,1.78);roof.rotation.z=.08};
 function fillSegment(g,index){g.clear();const theme=Math.floor(index/4)%6;for(const side of [-1,1]){const x=side*(6.5+(index%3));if(theme===0||theme===4)cottage(g,x,-3);if(theme!==2)tree(g,x+side*2.6,-8);if(theme===2){for(let j=0;j<5;j++)bloom(g,x+side*(j%2)*.6,-j*2,j)}else for(let j=0;j<3;j++)bloom(g,x+side*.8,-j*3-2,j+index);if(theme===3||theme===5)geo(g,sphere,theme===5?pond:magicStone,x,.19,-5,1.6,.16,1.5)}}
-let distance=0,running=false,paused=false,front=false,time=0,actors=[];
+let distance=0,running=false,paused=false,front=false,time=0,actors=[],actorGeneration=0;
 const selectors=[$('friend-one'),$('friend-two')];
 for(const select of selectors)for(const animal of WALK_ANIMALS){const option=document.createElement('option');option.value=animal.id;option.textContent=animal.emoji+' '+animal.name;select.append(option)}
 selectors[0].value=WALK_ANIMALS.some(a=>a.id===profile.selected)?profile.selected:'bunny';
 selectors[1].value=selectors[0].value==='cat'?'dog':'cat';
-function removeActors(){for(const actor of actors){scene.remove(actor.group);const seen=new Set();actor.group.traverse(o=>{if(!o.isMesh)return;seen.add(o.geometry);seen.add(o.material)});for(const item of seen)item.dispose?.()}actors=[]}
+function removeActors(){actorGeneration++;for(const actor of actors){scene.remove(actor.group);if(actor.imported)releaseImportedAnimal(actor)}actors=[]}
 function start(){
  const ids=selectors.map(s=>s.value);if(ids[0]===ids[1]){selectors[1].value=WALK_ANIMALS[(WALK_ANIMALS.findIndex(a=>a.id===ids[0])+1)%7].id;ids[1]=selectors[1].value}
- removeActors();actors=ids.map((id,i)=>{const actor=createAnimal(id);actor.group.position.set(i===0?-1.25:1.25,0,3);actor.group.rotation.y=Math.PI;applyWardrobe(actor,wardrobe.equipped[id]||{});scene.add(actor.group);return actor});
+ removeActors();const generation=actorGeneration;actors=ids.map((id,i)=>{const actor=createAnimal(id);actor.group.position.set(i===0?-1.25:1.25,0,3);actor.group.rotation.y=Math.PI;applyWardrobe(actor,wardrobe.equipped[id]||{});scene.add(actor.group);loadImportedAnimal(id).then(imported=>{if(!imported)return;if(generation!==actorGeneration||!running||!actors.includes(actor)){releaseImportedAnimal(imported);return;}scene.remove(actor.group);imported.group.position.copy(actor.group.position);imported.group.rotation.y=Math.PI;applyWardrobe(imported,wardrobe.equipped[id]||{});scene.add(imported.group);actors[i]=imported;});return actor});
  distance=0;time=0;running=true;paused=false;
  segments.forEach((g,i)=>{fillSegment(g,i);g.position.z=5-i*17;g.userData.index=i});
  $('friend-setup').hidden=true;$('walk-controls').hidden=false;$('walk-pause').textContent='⏸ Pause';
@@ -62,8 +65,9 @@ function frame(){
  requestAnimationFrame(frame);
  const dt=Math.min(clock.getDelta(),.08);
  if(running&&!paused){time+=dt;distance=walkDistance(distance,dt,true);$('walk-distance').textContent=Math.floor(distance)+' m';
-  for(const actor of actors){animateAnimal(actor,time*.72,true,false);actor.group.position.y=0;alignAnimalFeetToRoad(actor,0);actor.group.position.z=3;actor.group.rotation.y=Math.PI;} // Front camera sees faces; rear camera sees both friends from behind.
+  for(const actor of actors){animateAnimal(actor,time*.72,true,false);actor.update?.(dt,time*.72,true,false);actor.group.position.y=0;alignAnimalFeetToRoad(actor,0);actor.group.position.z=3;actor.group.rotation.y=Math.PI;} // Front camera sees faces; rear camera sees both friends from behind.
   for(const g of segments){g.position.z+=dt*WALK_SPEED; if(g.position.z>22){const smallest=Math.min(...segments.map(x=>x.position.z));g.position.z=smallest-17;g.userData.index+=segments.length;fillSegment(g,g.userData.index)}}
+  terrainEnvironment.update(time);
  }
  camera.position.set(0,front?3.2:4.3,front?-4.7:11.5);camera.lookAt(0,1.15,front?3.2:-4);renderer.render(scene,camera);
 }

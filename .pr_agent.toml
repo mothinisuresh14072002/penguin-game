@@ -1,0 +1,14 @@
+[pr_reviewer]
+extra_instructions = """
+This is a 3D Three.js WebGL game (Pawverse Dash). When reviewing pull requests:
+1. Three.js Best Practices: Ensure materials and geometries are pooled/reused rather than re-instantiated inside animation loops or scenery recycles.
+2. 7-Hero Core Contract: The game economy, character rosters, and wardrobe shops rely on the exact 7 core animals ('bunny', 'unicorn', 'horse', 'cat', 'dog', 'penguin', 'cow'). Dictionaries must retain these exact keys so contract unit tests pass.
+3. Performance: Check for memory leaks (calling dispose() on removed meshes/materials), draw call optimizations, and mobile touch event handlers.
+"""
+
+[pr_description]
+publish_description_as_comment = true
+add_custom_labels = true
+
+[pr_code_suggestions]
+num_code_suggestions_per_chunk = 4

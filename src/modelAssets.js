@@ -97,7 +97,7 @@ export async function loadImportedAnimal(id) {
       let activeAction=null;
       function changeAction(next){if(!next||next===activeAction)return;if(activeAction)activeAction.fadeOut(.17);next.reset().fadeIn(.17).play();activeAction=next;}
       if(actions)changeAction(actions.idle||actions.run);
-      return {group,visual,mixer,imported:true,source:selected,pivotL:new THREE.Group(),pivotR:new THREE.Group(),feet:[],ears:[],face:null,tail:null,
+      return {id,group,visual,mixer,imported:true,source:selected,pivotL:new THREE.Group(),pivotR:new THREE.Group(),feet:[],ears:[],face:null,tail:null,
         update(dt,clock,moving,airborne){if(mixer){const desired=airborne?(actions.jump||actions.run):moving?(actions.run||actions.idle):(actions.idle||actions.run);changeAction(desired);mixer.update(Math.max(0,dt));}else{visual.position.y=moving&&!airborne?Math.abs(Math.sin(clock*12))*.065:0;visual.rotation.z=moving?Math.sin(clock*12)*.028:0;visual.rotation.x=airborne?-.09:0;}}
       };
     }catch(e){

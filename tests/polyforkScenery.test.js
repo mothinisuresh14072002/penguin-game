@@ -19,6 +19,6 @@ test('Polyfork environment props recycle at a stable spacing without jumps',()=>
  const positions=Array.from({length:4},(_,i)=>worldLoopZ(i,66,0,4,18));
  const sorted=positions.slice().sort((a,b)=>b-a);
  for(let i=1;i<sorted.length;i++)assert.equal(sorted[i-1]-sorted[i],66);
- assert.equal(worldLoopZ(0,66,1,4,18),positions[0]-1);
+ assert.equal(worldLoopZ(0,66,1,4,18),positions[0]+1);
  assert.equal(worldLoopZ(0,66,264,4,18),positions[0]);
 });

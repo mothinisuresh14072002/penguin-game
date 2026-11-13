@@ -105,7 +105,7 @@ function makeGrassGeometry() {
   return geometry;
 }
 
-function populateGrass(instances, segmentIndex, materialColor) {
+function populateGrass(instances, segmentIndex, materialColor, grassY = .15) {
   const dummy = new THREE.Object3D();
   const color = new THREE.Color();
   for (let i = 0; i < instances.count; i++) {
@@ -114,7 +114,7 @@ function populateGrass(instances, segmentIndex, materialColor) {
     const x = side * (5.3 + terrainSeed(seed * 3) * 32);
     const z = -8.4 + terrainSeed(seed * 5) * 16.8;
     const scale = .55 + terrainSeed(seed * 7) * .9;
-    dummy.position.set(x, .15, z);
+    dummy.position.set(x, grassY, z);
     dummy.rotation.set(0, terrainSeed(seed * 11) * Math.PI, 0);
     dummy.scale.setScalar(scale);
     dummy.updateMatrix();
@@ -126,8 +126,8 @@ function populateGrass(instances, segmentIndex, materialColor) {
   if (instances.instanceColor) instances.instanceColor.needsUpdate = true;
 }
 
-export function createWorldEnvironment(segments, initialBiome = 'meadow', {anisotropy = 4} = {}) {
-  const geometry = new THREE.PlaneGeometry(85, 18, 1, 1);
+export function createWorldEnvironment(segments, initialBiome = 'meadow', {anisotropy = 4, width = 85, length = 18, surfaceY = .145, grassY = surfaceY + .005, grassCount = 48} = {}) {
+  const geometry = new THREE.PlaneGeometry(width, length, 1, 1);
   const grassGeometry = makeGrassGeometry();
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 512;
@@ -164,13 +164,13 @@ export function createWorldEnvironment(segments, initialBiome = 'meadow', {aniso
     const terrain = new THREE.Mesh(geometry, terrainMaterial);
     terrain.name = 'textured-side-terrain';
     terrain.rotation.x = -Math.PI / 2;
-    terrain.position.y = .145;
+    terrain.position.y = surfaceY;
     terrain.receiveShadow = true;
     terrain.frustumCulled = false;
     segment.add(terrain);
     terrainMeshes.push(terrain);
 
-    const grass = new THREE.InstancedMesh(grassGeometry, grassMaterial, 48);
+    const grass = new THREE.InstancedMesh(grassGeometry, grassMaterial, grassCount);
     grass.name = 'instanced-world-grass';
     grass.frustumCulled = false;
     grass.castShadow = false;
@@ -192,7 +192,7 @@ export function createWorldEnvironment(segments, initialBiome = 'meadow', {aniso
     grassMaterial.visible = theme.mode === 'grass' || theme.mode === 'crystal';
     for (let i = 0; i < grassInstances.length; i++) {
       grassInstances[i].visible = grassMaterial.visible;
-      populateGrass(grassInstances[i], i, theme.foliage);
+      populateGrass(grassInstances[i], i, theme.foliage, grassY);
     }
     activeBiome = key;
     return key;

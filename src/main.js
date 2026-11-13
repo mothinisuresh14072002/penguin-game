@@ -51,6 +51,7 @@ import {FOODS,FOOD_BY_ANIMAL,DAILY_GOALS,WEEKLY_GOALS,createEconomy,synchronizeE
 import {createJourneyArt} from './journeyArt.js';
 import {loopZ,layerTravel,journeyChapter} from './worldMotion.js';
 import {createWorldEnvironment} from './worldEnvironment.js';
+import {createPolyforkScenery} from './polyforkScenery.js';
 
 const $ = id => document.getElementById(id);
 const motionOK=()=>!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -204,6 +205,7 @@ for(let k=0;k<48;k++){
 
 // Camera-following shader sky and habitat-specific 3D horizon replace the old Arctic-only peaks.
 const backdrop=create3DBackdrop(scene,'arctic');
+const polyforkScenery=createPolyforkScenery(scene,'arctic');
 // All biome decorations are generated in Three.js and reused across runs.
 let currentTheme=BIOMES.arctic;
 let weatherParticles=null;
@@ -257,6 +259,7 @@ function applyBiome(overrideBiomeKey = null){
  const biome=BIOMES[biomeKey] || BIOMES.meadow;
  currentTheme=biome;
  terrainEnvironment.setBiome(biomeKey);
+ polyforkScenery.setBiome(biomeKey);
  scene.background.setHex(biome.sky);scene.fog.color.setHex(biome.fog);
  applyLighting(biomeKey,{renderer,hemi,sun,fill:fillLight});
  backdrop.setBiome(biomeKey,biome.sky);
@@ -876,6 +879,7 @@ function tick(now){
   }
   roadArt.update(distance);
   terrainEnvironment.update(clockTime);
+  polyforkScenery.update(distance);
   meadowDetails?.update(distance);
   skylandDetails?.update(distance,clockTime);
   prairieDetails?.update(distance);
